@@ -119,6 +119,7 @@ module Source
       Source::URL::PixivFactory,
       Source::URL::Pixellent,
       Source::URL::LitLink,
+      Source::URL::DcInside,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
@@ -160,8 +161,8 @@ module Source
     #
     # @param options [Hash] The options to pass to the extractor.
     # @return [Source::Extractor, nil] The extractor for this URL, or nil if one doesn't exist.
-    def extractor(**options)
-      extractor_class&.new(self, **options)
+    def extractor(**)
+      extractor_class&.new(self, **)
     end
 
     # The name of the site this URL belongs to.
@@ -322,7 +323,7 @@ module Source
     end
 
     protected def initialize(...)
-      super(...)
+      super
       parse
     end
 
