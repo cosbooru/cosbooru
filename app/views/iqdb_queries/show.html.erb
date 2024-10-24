@@ -2,15 +2,16 @@
 <% noindex if params[:search].present? %>
 
 <div id="c-iqdb-queries">
-  <div id="a-check">
+  <div id="a-show">
     <h1>Reverse Images Search</h1>
     <section>
-      <p>Paste a URL or upload a file to perform a reverse image search on <%= Danbooru.config.app_name %>.</p>
+      <p>Paste a URL or file to perform a reverse image search on <%= Danbooru.config.app_name %>.</p>
 
       <%= search_form_for(iqdb_queries_path, method: :post) do |f| %>
-        <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
-        <%= f.input :url, input_html: { value: params[:search][:url] } %>
-        <%= f.input :hash, input_html: { value: params[:search][:hash] } %>
+        <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id], class: "no-paste" } %>
+        <%= f.input :media_asset_id, label: "Media asset ID", input_html: { value: params[:search][:media_asset_id], class: "no-paste"} %>
+        <%= f.input :url, input_html: { value: params[:search][:url], class: "no-paste" } %>
+        <%= f.input :hash, input_html: { value: params[:search][:hash], class: "no-paste" } %>
         <%= f.input :file, as: :file %>
         <%= f.submit "Search" %>
       <% end %>

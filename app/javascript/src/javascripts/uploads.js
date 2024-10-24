@@ -60,7 +60,8 @@ Upload.initialize_similar = function() {
     search: {
       media_asset_id: media_asset_id,
       similarity: Upload.IQDB_MIN_SIMILARITY,
-      high_similarity: Upload.IQDB_HIGH_SIMILARITY
+      high_similarity: Upload.IQDB_HIGH_SIMILARITY,
+      skip_ids: [media_asset_id],
     }
   });
 }

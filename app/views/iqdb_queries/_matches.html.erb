@@ -14,22 +14,29 @@
     <% end %>
   </p>
 
-  <%= render(PostGalleryComponent.new(size: "180")) do |gallery| %>
+  <%= render(MediaAssetGalleryComponent.new(size: "180")) do |gallery| %>
     <% @matches.each do |match| %>
-      <% post = match["post"] %>
-      <% preview_class = match.in?(@high_similarity_matches) ? "iqdb-high-similarity" : "iqdb-low-similarity hidden" %>
+      <% media_asset = match["media_asset"] %>
+      <% preview_class = match.in?(@high_similarity_matches) ? "iqdb-high-similarity text-center" : "iqdb-low-similarity text-center hidden" %>
+      <% link_target = media_asset.post.present? ? post_path(media_asset.post) : media_asset_path(media_asset) %>
 
-      <%= gallery.with_post(post: post, size: gallery.size, show_deleted: true, classes: preview_class) do |preview| %>
-        <% preview.with_footer do %>
-          <div class="text-xs text-center mt-1">
-            <div>
-              <%= render "posts/partials/show/preview_source_footer", post: post %>
-            </div>
+      <%= gallery.with_media_asset do %>
+        <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: link_target, classes: preview_class) do |preview| %>
+          <% preview.with_footer do %>
+            <div class="text-xs text-center mt-1">
+              <div>
+                <% if media_asset.post.present? %>
+                  <%= render "posts/partials/show/preview_source_footer", post: media_asset.post %>
+                <% else %>
+                  <%= link_to_media_asset media_asset %>
+                <% end %>
+              </div>
 
-            <div>
-              <%= link_to "#{match["score"].round}% similar", iqdb_queries_path(post_id: post.id), class: "inactive-link iqdb-similarity-score" %>
+              <div>
+                <%= link_to "#{match["score"].round}% similar", iqdb_queries_path(media_asset_id: media_asset.id), class: "inactive-link iqdb-similarity-score" %>
+              </div>
             </div>
-          </div>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

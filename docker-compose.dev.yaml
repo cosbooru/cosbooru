@@ -21,7 +21,7 @@
 #   # You can use `bin/dev` as a shortcut for `docker compose -f docker-compose.dev.yaml`.
 #   $ bin/dev up
 
-name: devbooru
+name: devaibooru
 
 x-base-template: &base-template
   # Use the latest development image from master, instead of the production image. The development
@@ -114,10 +114,10 @@ services:
   # https://github.com/danbooru/iqdb
   # https://hub.docker.com/repository/docker/evazion/iqdb
   iqdb:
-    image: evazion/iqdb
+    image: ghcr.io/nottalulah/iqdb-rs:latest
     volumes:
       - "iqdb-data:/iqdb/data"
-    command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
+    command: ["--database", "/iqdb/data/iqdb.sqlite"]
 
   redis:
     image: redis

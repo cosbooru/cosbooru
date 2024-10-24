@@ -66,6 +66,7 @@ class MediaAsset < ApplicationRecord
   validates :image_height, comparison: { greater_than: 0 }, if: :image_height_changed?
 
   before_create :initialize_file_key
+  after_create_commit :update_iqdb
 
   def self.prune!
     expired.update_all(status: :failed)
@@ -407,7 +408,7 @@ class MediaAsset < ApplicationRecord
     def regenerate_files!(original_file)
       distribute_files!(original_file, variants: variants.without(original))
       purge_cached_urls!
-      post.update_iqdb if post.present?
+      update_iqdb
     end
 
     # Purge all image URLs from Cloudflare.
@@ -425,12 +426,27 @@ class MediaAsset < ApplicationRecord
       update!(ai_tags: generate_ai_tags)
     end
 
+    def regenerate_iqdb!(user)
+        ModAction.log("regenerated IQDB for media asset ##{id}", :media_asset_regenerate_iqdb, subject: self, user: user)
+        update_iqdb
+    end
+
     def generate_ai_tags
       return [] if !has_variant?("360x360")
 
       variant("360x360").open_file! do |media_file|
         media_file.ai_tags
       end
+    end
+
+    def update_iqdb
+      # performs IqdbClient.new.add_media_asset(post)
+      IqdbAddMediaAssetJob.perform_later(self) if IqdbClient.new.enabled?
+    end
+
+    def remove_iqdb
+      # performs IqdbClient.new.remove(id)
+      IqdbRemoveMediaAssetJob.perform_later(id) if IqdbClient.new.enabled?
     end
 
     def expunge!(current_user, log: true)
@@ -440,6 +456,8 @@ class MediaAsset < ApplicationRecord
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
       end
+
+      remove_iqdb
     rescue
       update!(status: :failed)
       raise
@@ -452,6 +470,8 @@ class MediaAsset < ApplicationRecord
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
       end
+
+      remove_iqdb
     rescue
       update!(status: :failed)
       raise
@@ -545,6 +565,10 @@ class MediaAsset < ApplicationRecord
 
     def is_animated_png?
       is_animated? && file_ext == "png"
+    end
+
+    def has_preview?
+      is_image? || is_video? || is_ugoira?
     end
   end
 

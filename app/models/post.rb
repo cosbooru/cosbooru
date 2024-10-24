@@ -75,7 +75,6 @@ class Post < ApplicationRecord
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
-  after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
@@ -868,8 +867,6 @@ class Post < ApplicationRecord
           update_parent_on_destroy
         end
       end
-
-      remove_iqdb # this is non-transactional
     end
 
     def ban!(current_user)
@@ -1899,7 +1896,7 @@ class Post < ApplicationRecord
 
     def regenerate!(category, user)
       if category == "iqdb"
-        update_iqdb
+        media_asset.update_iqdb
 
         ModAction.log("regenerated IQDB for post ##{id}", :post_regenerate_iqdb, subject: self, user: user)
       else
@@ -1933,18 +1930,6 @@ class Post < ApplicationRecord
         )
         RETURNING posts.*;
       SQL
-    end
-  end
-
-  concerning :IqdbMethods do
-    def update_iqdb
-      # performs IqdbClient.new.add_post(post)
-      IqdbAddPostJob.perform_later(self) if IqdbClient.new.enabled?
-    end
-
-    def remove_iqdb
-      # performs IqdbClient.new.remove(id)
-      IqdbRemovePostJob.perform_later(id) if IqdbClient.new.enabled?
     end
   end
 

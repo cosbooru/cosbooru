@@ -85,14 +85,24 @@
                       <% end %>
                     <% end %>
 
-                    <% if policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged? %>
+                    <% if policy(@media_asset).regenerate? || (policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged?) %>
                       <% menu.with_item do %>
                         <hr class="border">
                       <% end %>
 
-                      <% menu.with_item do %>
-                        <%= link_to media_asset_path(@media_asset), class: "text-danger", remote: true, xhr: true, method: :delete, "data-confirm": "This will permanently delete this file. Are you sure?" do %>
-                          <%= delete_icon %> Delete file
+                      <% if policy(@media_asset).regenerate? %>
+                        <% menu.with_item do %>
+                          <%= link_to regenerate_media_asset_path(@media_asset), remote: true, xhr: true, method: :post, "data-confirm": "This will reindex the media asset in IQDB. Are you sure?" do %>
+                            <%= rotate_icon %> Reindex IQDB
+                          <% end %>
+                        <% end %>
+                      <% end %>
+
+                      <% if (policy(@media_asset).destroy? && @media_asset.post.nil? && !@media_asset.deleted? && !@media_asset.expunged?) %>
+                        <% menu.with_item do %>
+                          <%= link_to media_asset_path(@media_asset), class: "text-danger", remote: true, xhr: true, method: :delete, "data-confirm": "This will permanently delete this file. Are you sure?" do %>
+                            <%= delete_icon %> Delete file
+                          <% end %>
                         <% end %>
                       <% end %>
                     <% end %>

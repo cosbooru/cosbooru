@@ -51,7 +51,6 @@ class PostReplacementProcessor
 
     rescale_notes(post)
     post.save!
-    post.update_iqdb
   rescue Exception => exception
     replacement.errors.add(:base, exception.message)
     raise ActiveRecord::Rollback

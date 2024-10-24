@@ -32,8 +32,8 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
           perform_enqueued_jobs
 
           assert_equal(@mod, ModAction.last.creator)
-          assert_equal("post_regenerate_iqdb", ModAction.last.category)
-          assert_equal("regenerated IQDB for post ##{@post.id}", ModAction.last.description)
+          assert_equal("media_asset_regenerate_iqdb", ModAction.last.category)
+          assert_equal("regenerated IQDB for media asset ##{@post.media_asset.id}", ModAction.last.description)
           assert_equal(@post, ModAction.last.subject)
           assert_equal(@mod, ModAction.last.creator)
         end

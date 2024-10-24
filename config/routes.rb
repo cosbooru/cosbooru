@@ -146,6 +146,7 @@ Rails.application.routes.draw do
   resources :media_assets, only: [:index, :show, :destroy] do
     get :metadata
     get "/:variant", to: "media_assets#image", as: :image
+    post "/regenerate", to: "media_assets#regenerate", on: :member
   end
   resources :media_metadata, only: [:index]
 

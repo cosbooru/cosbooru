@@ -122,11 +122,11 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "remove the post from iqdb" do
+      should "remove the media asset from iqdb" do
         mock_iqdb_remove_post!(@post)
         @post.expunge!
         perform_enqueued_jobs
-        assert_performed_jobs(1, only: IqdbRemovePostJob)
+        assert_performed_jobs(1, only: IqdbRemoveMediaAssetJob)
       end
 
       context "that belongs to a pool" do

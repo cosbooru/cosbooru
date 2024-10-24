@@ -58,4 +58,12 @@ class MediaAssetsController < ApplicationController
 
     respond_with(@ai_metadata)
   end
+
+  def regenerate
+    @media_asset = authorize MediaAsset.find(params[:id])
+    @media_asset.regenerate_iqdb!(CurrentUser.user)
+    flash[:notice] = "IQDB regeneration queued"
+
+    respond_with(@media_asset)
+  end
 end

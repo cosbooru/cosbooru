@@ -25,12 +25,13 @@ class IqdbClient
   end
 
   concerning :QueryMethods do
-    # Search for an image by file, URL, hash, or post ID.
-    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD, limit: 20)
+    # Search for an image by file, URL, hash, or post or media asset ID.
+    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: LOW_SIMILARITY_THRESHOLD, high_similarity: HIGH_SIMILARITY_THRESHOLD, limit: 20, skip_ids: [])
       limit = limit.to_i.clamp(1, 1000)
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
       target_url = url.presence || file_url.presence || image_url.presence
+      skip_ids = skip_ids.map(&:to_i)
 
       if file.present?
         file = file.tempfile
@@ -61,12 +62,16 @@ class IqdbClient
         results = []
       end
 
+      results.reject! do |result|
+        result["id"].in?(skip_ids)
+      end
+
       process_results(results, similarity, high_similarity)
     ensure
       file.try(:close)
     end
 
-    # Transform the JSON returned by IQDB to add the full post data for each match.
+    # Transform the JSON returned by IQDB to add the full media asset data for each match.
     #
     # @param matches [Array<Hash>] the array of IQDB matches
     # @param low_similarity [Float] the threshold for a result to be considered low similarity
@@ -74,11 +79,11 @@ class IqdbClient
     # @return [(Array, Array, Array)] the set of high similarity, low similarity, and all matches
     def process_results(matches, low_similarity, high_similarity)
       matches = matches.select { |match| match["score"] >= low_similarity }.sort_by { |match| -match["score"] }
-      posts = Post.includes(:media_asset).where(id: matches.pluck("post_id")).group_by(&:id).transform_values(&:first)
+      media_assets = MediaAsset.includes(:post).where(id: matches.pluck("id")).group_by(&:id).transform_values(&:first)
 
       matches = matches.map do |match|
-        post = posts.fetch(match["post_id"], nil)
-        match.with_indifferent_access.merge(post: post) if post
+        media_asset = media_assets.fetch(match["id"], nil)
+        match.with_indifferent_access.merge(media_asset: media_asset) if media_asset
       end.compact
 
       high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
@@ -86,12 +91,12 @@ class IqdbClient
     end
   end
 
-  # Add a post to IQDB.
-  # @param post [Post] the post to add
-  def add_post(post)
-    return unless enabled? && post.has_preview?
-    preview_file = post.file(:"180x180")
-    add(post.id, preview_file)
+  # Add a media asset to IQDB.
+  # @param media_asset [MediaAsset] the media asset to add
+  def add_media_asset(media_asset)
+    return unless enabled? && media_asset.has_preview?
+    preview_file = media_asset.variant(:"180x180").open_file!
+    add(media_asset.id, preview_file)
   end
 
   concerning :HttpMethods do
@@ -112,18 +117,18 @@ class IqdbClient
       preview&.close
     end
 
-    # Add a post to IQDB.
-    # @param post_id [Integer] the post to add
+    # Add a media asset to IQDB.
+    # @param media_asset_id [Integer] the media asset to add
     # @param file [File] the image to add
-    def add(post_id, file)
+    def add(media_asset_id, file)
       file = HTTP::FormData::File.new(file)
-      request(:post, "images/#{post_id}", form: { file: file })
+      request(:post, "images/#{media_asset_id}", form: { file: file })
     end
 
     # Remove an image from IQDB.
-    # @param post_id [Integer] the post to remove
-    def remove(post_id)
-      request(:delete, "images/#{post_id}")
+    # @param media_asset_id [Integer] the media_asset to remove
+    def remove(media_asset_id)
+      request(:delete, "images/#{media_asset_id}")
     end
 
     # Send a request to IQDB.
