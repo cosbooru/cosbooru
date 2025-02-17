@@ -94,7 +94,7 @@
 
       <a class="mobile-only" href="#search-box">Search &raquo;</a>
       <% if true || CurrentUser.user.show_ads?%>
-          <li id="nav-ad-0"><a id="test" class="mobile-only"  href="https://redirect.aibooru.online/nav-ad-0?location=https%3A%2F%2Fwww.google.com%2F&utm_source=link-abr&cp_id=navbar&click_location=nav-ad-0&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">test</a></li>
+          <a id="test" class="mobile-only"  href="https://redirect.aibooru.online/nav-ad-0?location=https%3A%2F%2Fwww.google.com%2F&utm_source=link-abr&cp_id=navbar&click_location=nav-ad-0&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">test</a>
       <% end %>
     <li class="flex items-center gap-2">
       <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
