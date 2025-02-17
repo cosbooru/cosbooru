@@ -105,7 +105,7 @@
           <%= nav_link_to("Reports", moderation_reports_path, :class => (ModerationReport.where(status: "pending").present? ? "reports-pending" : nil)) %>
           <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
         <% end %>
-        <% if CurrentUser.user.show_ads?%>
+        <% if CurrentUser.user.show_ads? || true %>
           <li id="nav-ad-0"><a id="test" href="https://redirect.aibooru.online/nav-ad-0?location=https%3A%2F%2Fwww.google.com%2F&utm_source=link-abr&cp_id=navbar&click_location=nav-ad-0&page=<%= CGI.escape(request.original_url) %>" style="color: #F784C6 !important;">test</a></li>
         <% end %>
         <% if CurrentUser.user.show_ads?%>
