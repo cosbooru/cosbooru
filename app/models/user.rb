@@ -110,7 +110,6 @@ class User < ApplicationRecord
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validate :validate_custom_css, if: :custom_style_changed?
   validate :validate_add_extra_data_attributes, unless: :new_record?
-  validate :validate_not_signing_up_from_proxy, if: :new_record?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
 
@@ -229,13 +228,6 @@ class User < ApplicationRecord
     def validate_add_extra_data_attributes
       if !add_extra_data_attributes_was && add_extra_data_attributes_was && !Pundit.policy!(self, self).add_extra_data_attributes?
         errors.add(:base, "Can't enable extra data attributes without a Gold account")
-      end
-    end
-
-    def validate_not_signing_up_from_proxy
-      return unless Danbooru.config.new_user_verification?.to_s.truthy? && Danbooru.config.disable_proxy_signup?.to_s.truthy?
-      if last_ip_addr&.is_proxy?
-        errors.add(:base, "Sign ups are not allowed from that IP address.")
       end
     end
 
@@ -402,7 +394,7 @@ class User < ApplicationRecord
 
     module ClassMethods
       def owner
-        User.where(level: Levels::OWNER).order(id: :asc).take!
+        User.find_by!(level: Levels::OWNER)
       end
 
       def system
@@ -663,7 +655,9 @@ class User < ApplicationRecord
     end
 
     def show_ads?
-      !CurrentUser.safe_mode? && !is_member?
+      # !CurrentUser.safe_mode? && !is_member?
+      # CHANGED THIS
+      false
     end
   end
 
@@ -800,8 +794,6 @@ class User < ApplicationRecord
         elsif params[:is_banned].to_s.falsy?
           q = q.bit_prefs_match(:is_banned, false)
         end
-      elsif !current_user.is_moderator?
-        q = q.bit_prefs_match(:is_banned, false)
       end
 
       if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?
@@ -819,10 +811,6 @@ class User < ApplicationRecord
         q = q.order(post_update_count: :desc)
       else
         q = q.apply_default_order(params)
-      end
-
-      if params.keys.none? { _1.match?(/level/) } && !current_user.is_moderator?
-        q = q.where("level > 10")
       end
 
       q

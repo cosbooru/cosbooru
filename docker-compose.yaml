@@ -36,9 +36,7 @@
 #  docker compose restart
 #
 #  # Backup the database and images.
-#  docker compose run --rm -T aibooru bin/rails danbooru:database:backup > aibooru-database.pg_dump
-#  docker compose run --rm -T aibooru bin/rails danbooru:images:backup > aibooru-images.tar
-#  docker compose cp iqdb:/iqdb/data/iqdb.sqlite ./
+#   -> See notes.md
 #
 #  # Restore the database and images from backup.
 #  docker compose down
@@ -78,7 +76,7 @@
 
 # You can change the name to run multiple AIBooru instances simultaneously.
 # This doesn't change the name of the site, it only affects the name used by Docker Compose.
-name: danbooru
+name: cosbooru
 
 x-base-template: &base-template
   # You can set DANBOORU_IMAGE to `ghcr.io/aibooruorg/aibooru:master` to get the latest unstable release,
@@ -87,47 +85,91 @@ x-base-template: &base-template
   # See https://github.com/aibooruorg/aibooru/pkgs/container/aibooru for a list of versions
   image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:production}
 
+
+  # read_only affects the aibooru container and should be set to 'true' for production.
+  # setting to 'false' could allow for minor adjustments of eg html files.
+  # read_only: false
   read_only: true
   restart: unless-stopped
 
   healthcheck:
     test: ["CMD", "curl", "-f", "http://localhost:3000/up"]
-    start_period: 120s
-    interval: 10s
+    start_period: 30s
+    interval: 120s
     retries: 1
 
   environment:
     # The public URL of your site. You can set this if you have a domain name for your site.
-    DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
+    DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL}
 
     # Set this to true if you're running behind a reverse proxy, such as Cloudflare.
-    DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-false}
+    DANBOORU_REVERSE_PROXY: true
 
     # You should set DANBOORU_SECRET_KEY_BASE to a random secret string. If you
     # don't set this, you will be logged out every time you restart the instance.
     #
     # Keep this secret. If someone finds this out, they will be able to log in as any user.
-    # DANBOORU_SECRET_KEY_BASE: "<random secret password>"
+    DANBOORU_SECRET_KEY_BASE: ${DANBOORU_SECRET_KEY_BASE}
 
     # Don't change the options below.
     RAILS_ENV: production
     DATABASE_URL: postgresql://danbooru@postgres/danbooru?pool=100
+    # Changed below from port 6379 to 6380 --> no should not do this
     DANBOORU_REDIS_URL: redis://redis:6379
+    # Changed below from port 5588 to 5589 --> no should not do this
     DANBOORU_IQDB_URL: http://iqdb:5588
+    # Dunno if it'll work but probably just reuse the autotagger from OYP:
     DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
+#   Fred's autotagger uses port 8000
+#    DANBOORU_AUTOTAGGER_URL: http://autotagger:8000
     DANBOORU_IMAGE_STORAGE_PATH: /images
 
   tmpfs:
     - /tmp
 
+# This volume is specified below and uses the "name" defined above as a prefix
   volumes:
     - danbooru-images:/images
 
   configs:
     - source: danbooru_local_config
       target: /danbooru/config/danbooru_local_config.rb
+    - source: danbooru_config_puma_rb
+      target: /danbooru/config/puma.rb
     - source: env_local
       target: /danbooru/.env.local
+    - source: danbooru_app_models_user
+      target: /danbooru/app/models/user.rb
+    - source: danbooru_app_models_forum_post
+      target: /danbooru/app/models/forum_post.rb
+    - source: danbooru_app_presenters_tag_set_presenter
+      target: /danbooru/app/presenters/tag_set_presenter.rb
+    - source: danbooru_app_logical_danbooru_http
+      target: /danbooru/app/logical/danbooru/http.rb
+    - source: danbooru_db_migrate_20211014063943_drop_test_parser
+      target: /danbooru/db/migrate/20211014063943_drop_test_parser.rb
+    - source: danbooru_db_migrate_20240413060557_convert_array_indices
+      target: /danbooru/db/migrate/20240413060557_convert_array_indices.rb
+    - source: danbooru_app_models_forum_topic
+      target: /danbooru/app/models/forum_topic.rb
+    - source: danbooru_public_danbooru-logo
+      target: /danbooru/public/images/danbooru-logo.png
+    - source: danbooru_public_danbooru-logo-96x96
+      target: /danbooru/public/images/danbooru-logo-96x96.png
+    - source: danbooru_public_danbooru-logo-128x128
+      target: /danbooru/public/images/danbooru-logo-128x128.png
+    - source: danbooru_public_danbooru-logo-500x500
+      target: /danbooru/public/images/danbooru-logo-500x500.pn
+    - source: danbooru_public_danbooru-logo
+      target: /danbooru/public/packs/static/public/images/danbooru-logo-5dfe4b292bd64a786b41.png
+    - source: danbooru_public_danbooru-logo-96x96
+      target: /danbooru/public/packs/static/public/images/danbooru-logo-96x96-5852ea1671811ed3a43e.png
+    - source: danbooru_public_danbooru-logo-128x128
+      target: /danbooru/public/packs/static/public/images/danbooru-logo-128x128.png
+    - source: danbooru_public_danbooru-logo-128x128
+      target: /danbooru/public/packs/static/public/images/danbooru-logo-128x128-5dfe4b292bd64a786b41.png
+    - source: danbooru_public_danbooru-logo-500x500
+      target: /danbooru/public/packs/static/public/images/danbooru-logo-500x500-a5ca93ef1b6dc822738a.png
 
 services:
   danbooru:
@@ -153,6 +195,7 @@ services:
 
   # https://github.com/danbooru/iqdb
   # https://hub.docker.com/repository/docker/evazion/iqdb
+  # Port is changed from 5588 to 5589 --> no, don't
   iqdb:
     image: evazion/iqdb
     volumes:
@@ -162,6 +205,7 @@ services:
   redis:
     image: redis
 
+  # Changed the port from 5432 to 5433 --> no 
   postgres:
     image: ghcr.io/danbooru/postgres:16.1
     shm_size: 1gb
@@ -171,38 +215,86 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "danbooru"]
       start_period: 30s
-      interval: 1s
+      interval: 120s
       retries: 1
     volumes:
       - "danbooru-data:/var/lib/postgresql/data"
+    ports:
+      - "5431:5432"
 
   nginx:
     image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:production}
     command: ["openresty", "-e", "/dev/stderr"]
     environment:
       # The external port to listen on. You can set this to 80 if you have nothing else listening on port 80.
-      DANBOORU_PORT: "${DANBOORU_PORT:-3000}"
+      # Changed the port from 3000 to 3001
+      DANBOORU_PORT: "3001"
 
       # If your instance is running behind a reverse proxy (such as Cloudflare, Ngrok, etc), then set this to true.
       #
       # If you get a `HTTP Origin header didn't match request.base_url` error when creating a new account, then set this to true.
-      DANBOORU_REVERSE_PROXY: ${DANBOORU_REVERSE_PROXY:-false}
+      DANBOORU_REVERSE_PROXY: true
 
       # Used by Nginx to determine the root directory if we're running in a subdirectory (e.g. http://example.com/danbooru).
       DANBOORU_CANONICAL_URL: ${DANBOORU_CANONICAL_URL:-}
+    # Changed the port from 3000 to 3001
     ports:
-      - "${DANBOORU_PORT:-3000}:3000"
+      - "3001:3000"
     depends_on:
       danbooru:
         condition: service_started
     configs:
       - source: nginx
         target: /usr/local/nginx/conf/nginx.conf
+      - source: danbooru_config_puma_rb
+        target: /danbooru/config/puma.rb
+      - source: danbooru_public_danbooru-logo
+        target: /danbooru/public/images/danbooru-logo.png
+      - source: danbooru_public_danbooru-logo
+        target: /danbooru/public/packs/static/public/images/danbooru-logo-5dfe4b292bd64a786b41.png
+      - source: danbooru_public_danbooru-logo-96x96
+        target: /danbooru/public/images/danbooru-logo-96x96.png
+      - source: danbooru_public_danbooru-logo-96x96
+        target: /danbooru/public/packs/static/public/images/danbooru-logo-96x96-5852ea1671811ed3a43e.png
+      - source: danbooru_public_danbooru-logo-128x128
+        target: /danbooru/public/images/danbooru-logo-128x128.png
+      - source: danbooru_public_danbooru-logo-128x128
+        target: /danbooru/public/packs/static/public/images/danbooru-logo-128x128-5dfe4b292bd64a786b41.png
+      - source: danbooru_public_danbooru-logo-500x500
+        target: /danbooru/public/images/danbooru-logo-500x500.png
+      - source: danbooru_public_danbooru-logo-500x500
+        target: /danbooru/public/packs/static/public/images/danbooru-logo-500x500-a5ca93ef1b6dc822738a.png
+      - source: danbooru_public_favicon_ico
+        target: /danbooru/public/favicon.ico
+      - source: danbooru_public_favicon_svg
+        target: /danbooru/public/favicon.svg
     volumes:
       - "danbooru-images:/images"
 
+# We will not start a separate autotagger for cosbooru, reuse the one from OYP?
+# uncomment the below to reactivate the autotagger:
   autotagger:
     image: ghcr.io/danbooru/autotagger:latest
+
+#   Fred's autotagger, based on SmilingWolf's v3 models, runs on port 8000
+#    image: ghcr.io/fredgido/autotagger:f4977561f3cfc82767d0beb95bea2ce1b6ed9ff9
+#    image: ghcr.io/fredgido/autotagger:2581f55814b4f99b293456dcc54876d107e2ec29
+
+# disabled for now, uncomment to reactivate:
+  discord:
+    image: ghcr.io/aibooruorg/aibooru:production
+    container_name: discord_cosbooru
+    hostname: discord
+    command: ["bin/rails", "danbooru:discord"]
+    environment:
+      DATABASE_URL: postgresql://danbooru@postgres/danbooru
+    depends_on:
+      - postgres
+    configs:
+      - source: env_local
+        target: /danbooru/.env.local
+      - source: danbooru_local_config
+        target: /danbooru/config/danbooru_local_config.rb
 
 configs:
   danbooru_local_config:
@@ -211,6 +303,34 @@ configs:
     file: .env.local
   nginx:
     file: config/nginx.conf
+  danbooru_config_puma_rb:
+    file: config/puma.rb
+  danbooru_app_models_user:
+    file: app/models/user.rb
+  danbooru_app_models_forum_post:
+    file: app/models/forum_post.rb
+  danbooru_app_presenters_tag_set_presenter:
+    file: app/presenters/tag_set_presenter.rb
+  danbooru_app_logical_danbooru_http:
+    file: app/logical/danbooru/http.rb
+  danbooru_db_migrate_20211014063943_drop_test_parser:
+    file: db/migrate/20211014063943_drop_test_parser.rb
+  danbooru_db_migrate_20240413060557_convert_array_indices:
+    file: db/migrate/20240413060557_convert_array_indices.rb
+  danbooru_app_models_forum_topic:
+    file: app/models/forum_topic.rb
+  danbooru_public_danbooru-logo:
+    file: public/images/danbooru-logo.png
+  danbooru_public_danbooru-logo-96x96:
+    file: public/images/danbooru-logo-96x96.png
+  danbooru_public_danbooru-logo-128x128:
+    file: public/images/danbooru-logo-128x128.png
+  danbooru_public_danbooru-logo-500x500:
+    file: public/images/danbooru-logo-500x500.png
+  danbooru_public_favicon_ico:
+    file: public/favicon.ico
+  danbooru_public_favicon_svg:
+    file: public/favicon.svg
 
 volumes:
   danbooru-images:

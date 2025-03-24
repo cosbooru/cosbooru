@@ -1,5 +1,3 @@
-[<img src="https://github.com/codespaces/badge.svg" height="20">](https://codespaces.new/aibooruorg/aibooru?quickstart=1) [![Discord](https://img.shields.io/discord/1026560538240618547?label=Discord)](https://discord.gg/Md9fQSVjkU) [![codecov](https://codecov.io/gh/aibooruorg/aibooru/branch/master/graph/badge.svg)](https://codecov.io/gh/aibooruorg/aibooru)
-
 ## Quickstart
 
 ### Using Github Codespaces
