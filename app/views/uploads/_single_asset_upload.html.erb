@@ -192,10 +192,6 @@
             </div>
           <% end %>
 
-          <% t.panel("AI Metadata") do %>
-            <%= render "ai_metadata/form_fields", ai_metadata: post.ai_metadata %>
-          <% end %>
-
           <% t.spacer %>
 
           <% help_updated = WikiPage.find_by_title("help:upload_notice")&.updated_at.to_i > CurrentUser.user.posts.maximum(:created_at).to_i %>
