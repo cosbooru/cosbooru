@@ -51,10 +51,10 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ai_metadata, only: [:index, :show] do
-    get :stealth, on: :collection, to: "prompt_protector#index"
-  end
-  resources :ai_metadata_versions, only: [:index, :show]
+  # resources :ai_metadata, only: [:index, :show] do
+  #   get :stealth, on: :collection, to: "prompt_protector#index"
+  # end
+  # resources :ai_metadata_versions, only: [:index, :show]
   resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
 
   resources :artists do
@@ -203,13 +203,13 @@ Rails.application.routes.draw do
     resources :events, only: [:index], controller: "post_events", as: "post_events"
     resources :favorites, only: [:index, :create, :destroy]
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
-    resource :ai_metadata, only: [:show] do
-      collection { put :create_or_update }
-      member do
-        put :revert
-        put :undo
-      end
-    end
+    # resource :ai_metadata, only: [:show] do
+    #  collection { put :create_or_update }
+    #  member do
+    #    put :revert
+    #    put :undo
+    #  end
+    # end
     resource :artist_commentary, only: [:show] do
       collection { put :create_or_update }
       member { put :revert }
