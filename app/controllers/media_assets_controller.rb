@@ -51,11 +51,4 @@ class MediaAssetsController < ApplicationController
 
     redirect_to variant.file_url, allow_other_host: true
   end
-
-  def metadata
-    media_asset = authorize MediaAsset.find(params[:media_asset_id])
-    @ai_metadata = AIMetadata.new_from_metadata(media_asset.metadata)
-
-    respond_with(@ai_metadata)
-  end
 end

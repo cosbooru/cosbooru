@@ -33,7 +33,6 @@ Autocomplete.initialize_all = function() {
   this.initialize_fields($('[data-autocomplete="wiki-page"]'), "wiki_page");
   this.initialize_fields($('[data-autocomplete="favorite-group"]'), "favorite_group");
   this.initialize_fields($('[data-autocomplete="saved-search-label"]'), "saved_search_label");
-  this.initialize_fields($('[data-autocomplete="ai-metadata-label"]'), "ai_metadata_label");
 }
 
 Autocomplete.initialize_fields = function($fields, type) {
