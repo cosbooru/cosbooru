@@ -47,7 +47,7 @@ class MediaFile::Video < MediaFile
     return false if video_streams.size != 1
     return false if audio_streams.size > 1
     return false if is_webm? && exif_metadata["Matroska:DocType"] != "webm"
-    return false if is_mp4? && !video_codec.in?(["h264", "vp9"])
+    return false if is_mp4? && !video_codec.in?(["h264", "vp9", "hevc", "av1"]) # CHANGED THIS allow hevc and av1
     return false if has_audio? && !audio_codec.in?(%w[aac opus vorbis mp3])
 
     # Only allow pixel formats supported by most browsers. Don't allow 10-bit video or 4:4:4 subsampling (neither are supported by Firefox).
@@ -59,7 +59,8 @@ class MediaFile::Video < MediaFile
     # gbrp: 8-bit RGB (used by VP9). Uncommon, but widely supported.
     #
     # https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
-    return false if !pix_fmt.in?(%w[yuv420p yuvj420p gbrp])
+    # CHANGED THIS: allow yuv420p10le and yuv444p
+    return false if !pix_fmt.in?(%w[yuv420p yuvj420p gbrp yuv420p10le yuv444p])
 
     true
   end
