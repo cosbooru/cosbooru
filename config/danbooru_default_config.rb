@@ -826,6 +826,15 @@ module Danbooru
       "drawn"
     end
 
+    # Available forum topic categories to choose from
+    def forum_topic_categories
+      {
+        0 => "General",
+        1 => "Tags",
+        2 => "Bugs & Features"
+      }
+    end
+
     # A list of emojis supported in DText.
     def dtext_emojis
       @dtext_emojis ||= {

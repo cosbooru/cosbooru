@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 class ForumTopic < ApplicationRecord
-  CATEGORIES = {
-    0 => "General",
-    1 => "Tags",
-    2 => "Bugs & Features",
-  }
+  CATEGORIES = Danbooru.config.forum_topic_categories
 
   MIN_LEVELS = {
     None: 0,
