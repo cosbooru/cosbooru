@@ -34,10 +34,10 @@ module Danbooru
     Danbooru::Http::SpoofReferrer.register
     Danbooru::Http::UnpolishCloudflare.register
 
-    DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
+    DEFAULT_USER_AGENT = Danbooru.config.http_default_user_agent
 
-    DEFAULT_TIMEOUT = 20
-    MAX_REDIRECTS = 5
+    DEFAULT_TIMEOUT = Danbooru.config.http_default_timeout
+    MAX_REDIRECTS = Danbooru.config.http_max_redirects
 
     attr_accessor :max_size, :http
 

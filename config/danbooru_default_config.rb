@@ -702,6 +702,21 @@ module Danbooru
       # "http://username:password@proxy.example.com:1080"
     end
 
+    # HTTP user agent to use if not overwritten
+    def http_default_user_agent
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
+    end
+
+    # Default HTTP client request timeout
+    def http_default_timeout
+      20
+    end
+
+    # Maximum number of redirects to accept for the HTTP client
+    def http_max_redirects
+      5
+    end
+
     # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
     # Optional. Used for tracking post views, popular searches, and missed searches.
     # Set to http://localhost/mock/reportbooru to enable a fake reportbooru
