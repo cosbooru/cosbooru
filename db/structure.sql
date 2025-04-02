@@ -1610,7 +1610,6 @@ CREATE TABLE public.posts (
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
     tag_count_meta integer DEFAULT 0 NOT NULL,
-    tag_count_model integer DEFAULT 0 NOT NULL,
     views integer DEFAULT 0 NOT NULL
 );
 
@@ -6671,6 +6670,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250402125343'),
 ('20240413060557'),
 ('20240324223203'),
 ('20240221060848'),

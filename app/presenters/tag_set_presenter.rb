@@ -38,10 +38,7 @@ class TagSetPresenter
     artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
     artists = "worn by #{artists}" if artists.present?
 
-    models = tags_for_category("model").map(&:name).to_sentence
-    models = "using #{models}" if models.present?
-
-    [characters, copyrights, artists, models].filter_map(&:presence).join(" ")
+    [characters, copyrights, artists].filter_map(&:presence).join(" ")
   end
 
   private
