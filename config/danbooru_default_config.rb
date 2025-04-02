@@ -821,11 +821,6 @@ module Danbooru
       ]
     end
 
-    # A list of custom search terms to show on the front page.
-    def custom_sidebar_tags
-      ["has:metadata", "is:sfw", "order:rank", "order:views", "self_upload", "is:nsfw -photorealistic", "has:prompt score:>9"]
-    end
-
     # Describes what the creator of a post did
     def created_by_quip
       "drawn"
