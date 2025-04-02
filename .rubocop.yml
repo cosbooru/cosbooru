@@ -77,6 +77,11 @@ Metrics/PerceivedComplexity:
 Lint/InheritException:
   EnforcedStyle: standard_error
 
+Lint/UnusedMethodArgument:
+  Exclude:
+    - config/danbooru_default_config.rb
+    - config/danbooru_local_config.rb
+
 Naming/HeredocDelimiterNaming:
   Enabled: false
 

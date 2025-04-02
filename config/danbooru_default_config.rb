@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # This file contains all the configuration settings for Danbooru.
 #
@@ -257,17 +258,17 @@ module Danbooru
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
     def max_image_resolution
-      21000 * 21000
+      21_000 * 21_000
     end
 
     # Maximum width of an upload.
     def max_image_width
-      40000
+      40_000
     end
 
     # Maximum height of an upload.
     def max_image_height
-      40000
+      40_000
     end
 
     # Maximum duration of an video in seconds.
@@ -394,7 +395,7 @@ module Danbooru
 
     # The location where images should be stored. By default, images are stored under `public/data`.
     def image_storage_path
-      Rails.root.join("public/data")
+      Rails.public_path.join("data")
     end
 
     # The method to use for storing uploaded files.
@@ -603,15 +604,15 @@ module Danbooru
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
-      jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
-      resolution_mismatch source_larger source_smaller source_request non-web_source]
+         jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
+         resolution_mismatch source_larger source_smaller source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
       %w[bad_anatomy bad_arm bad_feet bad_hands bad_head bad_horizon bad_leg bad_reflection
-      bad_shadow duplicate error extra_finger extra_toes image_sample jpeg_artifacts md5_mismatch
-      missing_finger missing_toe off-topic paid_reward]
+         bad_shadow duplicate error extra_finger extra_toes image_sample jpeg_artifacts md5_mismatch
+         missing_finger missing_toe off-topic paid_reward]
     end
 
     # Whether to enable API rate limits.
@@ -825,6 +826,11 @@ module Danbooru
       ["has:metadata", "is:sfw", "order:rank", "order:views", "self_upload", "is:nsfw -photorealistic", "has:prompt score:>9"]
     end
 
+    # Describes what the creator of a post did
+    def created_by_quip
+      "drawn"
+    end
+
     # A list of emojis supported in DText.
     def dtext_emojis
       @dtext_emojis ||= {
@@ -836,7 +842,7 @@ module Danbooru
 
   EnvironmentConfiguration = Struct.new(:config) do
     def method_missing(method, *args)
-      var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
+      var = ENV.fetch("DANBOORU_#{method.to_s.upcase.chomp("?")}", nil)
 
       var.presence || config.send(method, *args)
     end
