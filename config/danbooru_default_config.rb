@@ -846,7 +846,7 @@ module Danbooru
       {
         0 => "General",
         1 => "Tags",
-        2 => "Bugs & Features"
+        2 => "Bugs & Features",
       }
     end
 
@@ -856,6 +856,36 @@ module Danbooru
         # This defines an emoji called :smile: that is replaced with 😄.
         "smile" => "😄",
       }
+    end
+
+    # Maximum tag size allowed by the rename command before an alias must be used.
+    def bur_max_rename_count
+      200
+    end
+
+    # Maximum size of artist tags movable by builders.
+    def bur_max_builder_move_count
+      200
+    end
+
+    # Maximum number of lines a BUR may have.
+    def bur_max_length
+      100
+    end
+
+    # Minimum number of posts required for a gentag implication
+    def implication_minimum_tag_count
+      10
+    end
+
+    # Minimum required percentage of the implied tag
+    def implication_minimum_tag_percentage
+      0.0001
+    end
+
+    # Maximum required percentage of the implied tag
+    def implication_maximum_tag_percentage
+      0.9
     end
   end
 

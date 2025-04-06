@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class TagImplication < TagRelationship
-  MINIMUM_TAG_COUNT = 10
-  MINIMUM_TAG_PERCENTAGE = 0.0001
-  MAXIMUM_TAG_PERCENTAGE = 0.9
-
   has_many :child_implications, class_name: "TagImplication", primary_key: :consequent_name, foreign_key: :antecedent_name
   has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
@@ -120,15 +116,15 @@ class TagImplication < TagRelationship
       return unless antecedent_tag.general?
       return if antecedent_tag.empty? || consequent_tag.empty?
 
-      if antecedent_tag.post_count < MINIMUM_TAG_COUNT
-        errors.add(:base, "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts")
-      elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
-        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts")
+      if antecedent_tag.post_count < Danbooru.config.implication_minimum_tag_count
+        errors.add(:base, "'#{antecedent_name}' must have at least #{Danbooru.config.implication_minimum_tag_count} posts")
+      elsif antecedent_tag.post_count < (Danbooru.config.implication_minimum_tag_percentage * consequent_tag.post_count)
+        errors.add(:base, "'#{antecedent_name}' must have at least #{(Danbooru.config.implication_minimum_tag_percentage * consequent_tag.post_count).to_i} posts")
       end
 
-      max_count = MAXIMUM_TAG_PERCENTAGE * PostQuery.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
+      max_count = Danbooru.config.implication_maximum_tag_percentage * PostQuery.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
       if antecedent_tag.post_count > max_count && max_count > 0
-        errors.add(:base, "'#{antecedent_name}' can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'")
+        errors.add(:base, "'#{antecedent_name}' can't make up more than #{(Danbooru.config.implication_maximum_tag_percentage * 100).to_i}% of '#{consequent_name}'")
       end
     end
 

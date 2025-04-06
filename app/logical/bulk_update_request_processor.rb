@@ -3,15 +3,6 @@
 # Process a bulk update request. Parses the request and applies each line in
 # sequence.
 class BulkUpdateRequestProcessor
-  # Maximum tag size allowed by the rename command before an alias must be used.
-  MAXIMUM_RENAME_COUNT = 200
-
-  # Maximum size of artist tags movable by builders.
-  MAXIMUM_BUILDER_MOVE_COUNT = 200
-
-  # Maximum number of lines a BUR may have.
-  MAXIMUM_SCRIPT_LENGTH = 100
-
   include ActiveModel::Validations
 
   class Error < StandardError; end
@@ -117,8 +108,8 @@ class BulkUpdateRequestProcessor
 
           if old_tag.nil?
             errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
-          elsif old_tag.post_count > MAXIMUM_RENAME_COUNT
-            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
+          elsif old_tag.post_count > Danbooru.config.bur_max_rename_count
+            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{Danbooru.config.bur_max_rename_count} posts, use an alias instead)")
           elsif new_tag.invalid?(:name)
             errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (#{new_tag.errors.full_messages.join("; ")})")
           end
@@ -172,8 +163,8 @@ class BulkUpdateRequestProcessor
 
   # Validate that the script isn't too long.
   def validate_script_length
-    if commands.size > MAXIMUM_SCRIPT_LENGTH
-      errors.add(:base, "Bulk update request is too long (maximum size: #{MAXIMUM_SCRIPT_LENGTH} lines). Split your request into smaller chunks and try again.")
+    if commands.size > Danbooru.config.bur_max_length
+      errors.add(:base, "Bulk update request is too long (maximum size: #{Danbooru.config.bur_max_length} lines). Split your request into smaller chunks and try again.")
     end
   end
 
@@ -284,7 +275,7 @@ class BulkUpdateRequestProcessor
           "nuke {{#{args[0]}}}"
         end
       when :deprecate, :undeprecate
-        "#{command.to_s} [[#{args[0]}]]"
+        "#{command} [[#{args[0]}]]"
       when :change_category
         "category [[#{args[0]}]] -> #{args[1]}"
       else
@@ -325,8 +316,8 @@ class BulkUpdateRequestProcessor
     antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
     consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))
 
-    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT
-    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT)
+    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < Danbooru.config.bur_max_builder_move_count
+    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < Danbooru.config.bur_max_builder_move_count)
 
     antecedent_allowed && consequent_allowed
   end
