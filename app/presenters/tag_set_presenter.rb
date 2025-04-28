@@ -36,7 +36,9 @@ class TagSetPresenter
     copyrights = "(#{copyrights})" if characters.present? && copyrights.present?
 
     artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
-    artists = "#{Danbooru.config.created_by_quip} by #{artists}" if artists.present?
+    if artists.present?
+      artists = "#{Danbooru.config.created_by_quip.presence || "by"} #{artists}"
+    end
 
     [characters, copyrights, artists].filter_map(&:presence).join(" ")
   end

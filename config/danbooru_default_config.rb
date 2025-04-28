@@ -838,7 +838,7 @@ module Danbooru
 
     # Describes what the creator of a post did
     def created_by_quip
-      "drawn"
+      "drawn by"
     end
 
     # Available forum topic categories to choose from
