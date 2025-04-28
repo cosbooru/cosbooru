@@ -3,7 +3,7 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
-  FILE_TYPES = %w[jpg png gif webp avif mp4 webm swf zip]
+  FILE_TYPES = %w[jpg png gif webp avif mp4 webm mov swf zip]
   FILE_KEY_LENGTH = 9
   VARIANTS = %i[180x180 360x360 720x720 sample full original]
   MAX_FILE_SIZE = Danbooru.config.max_file_size.to_i
@@ -77,6 +77,7 @@ class MediaAsset < ApplicationRecord
     include ActiveModel::Serializers::Xml
 
     attr_reader :media_asset, :type
+
     delegate :id, :md5, :file_key, :storage_service, :backup_storage_service, to: :media_asset
 
     def initialize(media_asset, type)
@@ -102,16 +103,16 @@ class MediaAsset < ApplicationRecord
       backup_storage_service.delete(file_path)
     end
 
-    def open_file(&block)
-      open_file!(&block)
-    rescue
+    def open_file(&)
+      open_file!(&)
+    rescue StandardError
       nil
     end
 
-    def open_file!(&block)
+    def open_file!(&)
       file = storage_service.open(file_path)
       frame_delays = media_asset.frame_delays if media_asset.is_ugoira?
-      MediaFile.open(file, frame_delays: frame_delays, &block)
+      MediaFile.open(file, frame_delays: frame_delays, &)
     end
 
     def convert_file(media_file)
@@ -231,7 +232,7 @@ class MediaAsset < ApplicationRecord
       def exif_matches(string)
         # string = File:ColorComponents=3
         if string.include?("=")
-          key, value = string.split(/=/, 2)
+          key, value = string.split("=", 2)
           hash = { key => value }
           joins(:media_metadata).where_json_contains("media_metadata.metadata", hash)
         # string = File:ColorComponents
@@ -241,7 +242,7 @@ class MediaAsset < ApplicationRecord
       end
 
       def search(params, current_user)
-        q = search_attributes(params, [:id, :created_at, :updated_at, :status, :md5, :pixel_hash, :file_ext, :file_size, :image_width, :image_height, :duration, :file_key, :is_public], current_user: current_user)
+        q = search_attributes(params, %i[id created_at updated_at status md5 pixel_hash file_ext file_size image_width image_height duration file_key is_public], current_user: current_user)
 
         if params[:metadata].present?
           q = q.joins(:media_metadata).merge(MediaMetadata.search({ metadata: params[:metadata] }, current_user))
@@ -253,10 +254,10 @@ class MediaAsset < ApplicationRecord
         end
 
         if params[:is_posted].to_s.truthy?
-          #q = q.where.associated(:post)
+          # q = q.where.associated(:post)
           q = q.where(Post.where("posts.md5 = media_assets.md5").arel.exists)
         elsif params[:is_posted].to_s.falsy?
-          #q = q.where.missing(:post)
+          # q = q.where.missing(:post)
           q = q.where.not(Post.where("posts.md5 = media_assets.md5").arel.exists)
         end
 
@@ -288,7 +289,7 @@ class MediaAsset < ApplicationRecord
       #
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
-      def upload!(media_file, &block)
+      def upload!(media_file, &)
         media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
 
         media_asset = create!(file: media_file, status: :processing)
@@ -344,7 +345,7 @@ class MediaAsset < ApplicationRecord
         elsif media_file.is_corrupt?
           raise Error, "File is corrupt"
         elsif media_file.file_size > MAX_FILE_SIZE
-          raise Error, "File size too large (size: #{media_file.file_size.to_formatted_s(:human_size)}; max size: #{MAX_FILE_SIZE.to_formatted_s(:human_size)})"
+          raise Error, "File size too large (size: #{media_file.file_size.to_fs(:human_size)}; max size: #{MAX_FILE_SIZE.to_fs(:human_size)})"
         elsif media_file.resolution > MAX_IMAGE_RESOLUTION
           raise Error, "Image resolution is too large (resolution: #{(media_file.resolution / 1_000_000.0).round(1)} megapixels (#{media_file.width}x#{media_file.height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)"
         elsif media_file.width > MAX_IMAGE_WIDTH
@@ -440,7 +441,7 @@ class MediaAsset < ApplicationRecord
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
       end
-    rescue
+    rescue StandardError
       update!(status: :failed)
       raise
     end
@@ -452,7 +453,7 @@ class MediaAsset < ApplicationRecord
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
       end
-    rescue
+    rescue StandardError
       update!(status: :failed)
       raise
     end
