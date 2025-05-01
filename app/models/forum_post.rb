@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class ForumPost < ApplicationRecord
-  MAX_IMAGES = 1
-  MAX_VIDEO_SIZE = 1.megabyte
-  MAX_LARGE_EMOJI = 1
-  MAX_SMALL_EMOJI = 100
+  MAX_IMAGES       = Danbooru.config.forum_post_max_images
+  MAX_VIDEO_SIZE   = Danbooru.config.forum_post_max_video_size
+  MAX_LARGE_EMOJI  = Danbooru.config.forum_post_max_large_emoji
+  MAX_SMALL_EMOJI  = Danbooru.config.forum_post_max_small_emoji
 
   # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
@@ -28,12 +28,12 @@ class ForumPost < ApplicationRecord
   validate :validate_undeletion_of_post
   validate :validate_body
 
-  before_create :autoreport_spam
   before_save :handle_reports_on_deletion
+  before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
-  after_destroy :update_topic_updated_at_on_destroy
   after_update :create_mod_action
+  after_destroy :update_topic_updated_at_on_destroy
   after_create_commit :async_send_discord_notification
 
   deletable
@@ -61,7 +61,7 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params, current_user)
-      q = search_attributes(params, [:id, :created_at, :updated_at, :is_deleted, :body, :creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request], current_user: current_user)
+      q = search_attributes(params, %i[id created_at updated_at is_deleted body creator updater topic dtext_links votes tag_alias tag_implication bulk_update_request], current_user: current_user)
 
       if params[:linked_to].present?
         q = q.wiki_link_matches(params[:linked_to])
@@ -126,12 +126,14 @@ class ForumPost < ApplicationRecord
       errors.add(:base, "Can't include videos larger than #{MAX_VIDEO_SIZE.to_fs(:human_size)}")
     end
 
-    if dtext_body.embedded_posts.any? { |embedded_post| embedded_post.rating != "g" }
-      errors.add(:base, "Can't post non-rating:G images")
-    end
+    if Danbooru.config.enforce_forum_embed_ratings
+      if dtext_body.embedded_posts.any? { |embedded_post| embedded_post.rating != "g" }
+        errors.add(:base, "Can't post non-rating:G images")
+      end
 
-    if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.ai_rating.first.in?(%w[q e]) }
-      errors.add(:base, "Can't post non-rating:G images")
+      if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.ai_rating.first.in?(%w[q e]) }
+        errors.add(:base, "Can't post non-rating:G images")
+      end
     end
   end
 

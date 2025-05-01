@@ -887,6 +887,28 @@ module Danbooru
     def implication_maximum_tag_percentage
       0.9
     end
+
+    # If enabled, enforce rating:g embeds in forum posts
+    def enforce_forum_embed_ratings
+      true
+    end
+
+    # Forum post configurations
+    def forum_post_max_images
+      3
+    end
+
+    def forum_post_max_video_size
+      16.megabyte
+    end
+
+    def forum_post_max_large_emoji
+      1
+    end
+
+    def forum_post_max_small_emoji
+      100
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do
