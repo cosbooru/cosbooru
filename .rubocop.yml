@@ -5,6 +5,7 @@ require:
 
 AllCops:
   NewCops: enable
+  AutoCorrect: disabled
   Exclude:
     - "bin/*"
     - "node_modules/**/*"
@@ -74,13 +75,15 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 20
 
+Lint/DisjunctiveAssignmentInConstructor:
+  Enabled: false
+  
 Lint/InheritException:
   EnforcedStyle: standard_error
 
 Lint/UnusedMethodArgument:
   Exclude:
-    - config/danbooru_default_config.rb
-    - config/danbooru_local_config.rb
+    - config/*_config.rb
 
 Naming/HeredocDelimiterNaming:
   Enabled: false
@@ -106,8 +109,14 @@ Rails/HttpStatus:
 Rails/InverseOf:
   Enabled: false
 
+Railse/ToFormattedS:
+  Enabled: false
+
 Style/Alias:
   EnforcedStyle: prefer_alias_method
+
+Style/ArgumentsForwarding:
+  Enabled: false
 
 Style/AsciiComments:
   Enabled: false
@@ -145,6 +154,10 @@ Style/HashSyntax:
 
 Style/IfUnlessModifier:
   Enabled: false
+
+Style/MissingRespondToMissing:
+  Exclude:
+    - "config/*_config.rb"
 
 Style/MutableConstant:
   Enabled: false
