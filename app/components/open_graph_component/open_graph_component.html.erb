@@ -17,7 +17,11 @@
   <% end %>
 
   <% if twitter_image_url.present? %>
-    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
+    <% if is_video? || is_ugoira? %>
+      <%= tag.meta name: "twitter:card", content: "player" %>
+    <% else %>
+      <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
+    <% end %>
     <%= tag.meta name: "twitter:image", content: twitter_image_url %>
   <% end %>
 <% end %>
