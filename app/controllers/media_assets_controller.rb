@@ -4,7 +4,6 @@ class MediaAssetsController < ApplicationController
   respond_to :html, :json, :xml, :js
 
   rate_limit :image, rate: 5.0/1.seconds, burst: 50
-  rate_limit :metadata, rate: 1.0/1.seconds, burst: 3
 
   def index
     @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
