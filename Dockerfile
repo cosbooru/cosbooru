@@ -137,15 +137,15 @@ EOS
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
 ARG FFMPEG_URL
-ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev"
+ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev openssl libssl-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
-  --disable-ffplay --disable-network --disable-doc --disable-static --enable-shared \
+  --disable-ffplay --enable-network --enable-openssl --disable-doc --disable-static --enable-shared \
   --enable-libvpx --enable-libdav1d --enable-zlib \
   --disable-muxers \
     --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=image2 --enable-muxer=null \
   --disable-demuxers \
     --enable-demuxer=mov,mp4,m4a,3gp,3g2,mj2 --enable-demuxer=matroska,webm --enable-demuxer=image2 \
-    --enable-demuxer=apng --enable-demuxer=gif \
+    --enable-demuxer=apng --enable-demuxer=gif --enable-demuxer=hls \
   --disable-filters \
     --enable-filter=scale --enable-filter=thumbnail --enable-filter=silencedetect --enable-filter=ebur128 \
     --enable-filter=aresample --enable-filter=anull --enable-filter=null --enable-filter=copy \
@@ -158,7 +158,7 @@ ARG FFMPEG_BUILD_OPTIONS="\
     --enable-decoder=webp --enable-decoder=aac --enable-decoder=mp3 --enable-decoder=mp2 --enable-decoder=opus \
     --enable-decoder=vorbis --enable-decoder=ac3 \
   --disable-protocols \
-    --enable-protocol=file \
+    --enable-protocol=file --enable-protocol=https --enable-protocol=tls --enable-protocol=tcp \
   --disable-bsfs \
 "
 
