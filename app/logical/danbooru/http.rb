@@ -247,7 +247,7 @@ module Danbooru
       end
 
       def download_media(url, file: Danbooru::Tempfile.new("danbooru-download-#{url.parameterize.truncate(96)}-", binmode: true))
-        response, file = download_file(url, file)
+        response, file = download_file(url, file: file)
         
         [response, MediaFile.open(file)]
       end
