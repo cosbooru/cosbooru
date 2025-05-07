@@ -353,8 +353,8 @@ class MediaAsset < ApplicationRecord
           raise Error, "Image width is too large (width: #{media_file.width}; max width: #{MAX_IMAGE_WIDTH})"
         elsif media_file.height > MAX_IMAGE_HEIGHT
           raise Error, "Image height is too large (height: #{media_file.height}; max height: #{MAX_IMAGE_HEIGHT})"
-        elsif media_file.duration.to_i > MAX_VIDEO_DURATION && !uploader.is_admin?
-          raise Error, "Duration must be less than #{MAX_VIDEO_DURATION} seconds"
+        elsif media_file.duration.to_i > Danbooru.config.max_video_duration(uploader.level) && !uploader.is_admin?
+          raise Error, "Duration must be less than #{Danbooru.config.max_video_duration(uploader.level)} seconds"
         end
       end
     end

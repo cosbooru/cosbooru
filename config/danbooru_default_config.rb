@@ -271,10 +271,15 @@ module Danbooru
       40_000
     end
 
-    # Maximum duration of an video in seconds.
-    def max_video_duration
-      # 2:20m
-      140
+    # Maximum duration of an video in seconds based on user level
+    def max_video_duration(level)
+      case level
+      when User::Levels::BUILDER     then 140
+      when User::Levels::CONTRIBUTOR then 600
+      when User::Levels::APPROVER    then 600
+      when User::Levels::MODERATOR   then 1200
+      else                                30
+      end
     end
 
     # How long pending posts stay in the modqueue before being deleted.
