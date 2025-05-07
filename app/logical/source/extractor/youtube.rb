@@ -1,9 +1,16 @@
 # frozen_string_literal: true
 
+require "shellwords"
+
 # @see Source::URL::Youtube
 class Source::Extractor::Youtube < Source::Extractor
+
+  class Error < StandardError; end
+
   def image_urls
-    if parsed_url.full_image_url.present?
+    if video?
+      [page_url.to_s]
+    elsif parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
     elsif parsed_url.image_url?
       [parsed_url.to_s]
@@ -90,6 +97,32 @@ class Source::Extractor::Youtube < Source::Extractor
         "<span>#{text}</span>"
       end
     end.join
+  end
+
+  def download_file!(url)
+    if !video?
+      return super(url)
+    end
+
+    vcodec = video.dig(:video, :codec)
+    acodec = video.dig(:audio, :codec)
+
+    raise Error, "Unsupported video codec: #{vcodec}" unless vcodec.in?(["h264", "vp9"])
+    raise Error, "Unsupported audio codec: #{acodec}" unless acodec.in?(["aac", "opus"])
+    raise Error, "Incompatible codecs: #{vcodec} + #{acodec}" unless video.dig(:video, :ext) == video.dig(:audio, :ext)
+
+    vresponse, vfile = http_downloader.download_file(video.dig(:video, :url))
+    aresponse, afile = http_downloader.download_file(video.dig(:audio, :url))
+
+    res = Danbooru::Tempfile.new(["danbooru-video-merge-#{parsed_url.video_id}", ".#{video.dig(:video, :ext)}"])
+
+    ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{vfile.path.shellescape} -i #{afile.path.shellescape} -c copy -y #{res.path.shellescape}")
+    raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
+
+    MediaFile.open(res)
+  ensure
+    vfile&.close
+    afile&.close
   end
 
   def community_post_id
