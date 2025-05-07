@@ -10,10 +10,13 @@ module SourceTestHelper
   class_methods do
     def strategy_should_work(url, arguments = {})
       # XXX: can't use **kwargs because of a bug with shoulda-context
-      referer, deleted, media_files = [:referer, :deleted, :media_files].map { |arg| arguments.delete(arg) }
+      referer = arguments.delete(:referer)
+      deleted = arguments.delete(:deleted)
+      media_files = arguments.delete(:media_files)
+      options = arguments.delete(:options).to_h
 
       should "work" do
-        strategy = Source::Extractor.find(url, referer)
+        strategy = Source::Extractor.find(url, referer, **options)
 
         assert_nothing_raised { strategy.to_h }
 
@@ -57,24 +60,24 @@ module SourceTestHelper
   def should_handle_artists_correctly(strategy, profile_url)
     if profile_url.present?
       artist = create(:artist, name: strategy.tag_name || SecureRandom.uuid, url_string: profile_url)
+      assert_equal(profile_url, strategy.profile_url)
       assert_equal([artist], strategy.artists.to_a, "should find the artist with the same profile url")
-    else
-      assert_nil(strategy.profile_url.presence)
-      assert_nil(strategy.artist_name.presence)
-      assert_equal([], strategy.other_names)
     end
   end
 
-  def should_validate_tags(strategy, tags = nil)
-    assert_equal(Array, strategy.tags.class, "tags should be an Array")
-    assert(strategy.tags.all?(Array), "tags should be an Array of Arrays")
+  def should_validate_tags(strategy, expected_tags = nil)
+    actual_tags = strategy.tags
+    assert_equal(Array, actual_tags.class, "tags should be an Array")
+    assert(actual_tags.all?(Array), "tags should be an Array of Arrays")
 
-    return unless tags.present?
+    return unless expected_tags.present?
 
-    if tags&.first.instance_of?(Array)
-      assert_equal(tags.sort, strategy.tags.sort)
-    elsif tags&.first.instance_of?(String)
-      assert_equal(tags.map(&:downcase).sort, strategy.tags.map(&:first).map(&:downcase).sort)
+    if expected_tags&.first.instance_of?(Array)
+      assert_equal(expected_tags.sort, actual_tags.sort, "Tags expected but not found: #{expected_tags.difference(actual_tags)}. Tags found but not expected: #{actual_tags.difference(expected_tags)}")
+    elsif expected_tags&.first.instance_of?(String)
+      expected = expected_tags.map(&:downcase).sort
+      actual = actual_tags.map(&:first).map(&:downcase).sort
+      assert_equal(expected, actual, "Tags expected but not found: #{expected.difference(actual)}. Tags found but not expected: #{actual.difference(expected)}")
     end
   end
 

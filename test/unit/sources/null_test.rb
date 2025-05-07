@@ -1,28 +1,22 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class NullTest < ActiveSupport::TestCase
-    context "A source from an unknown site" do
-      setup do
-        @site = Source::Extractor.find("http://oremuhax.x0.com/yoro1603.jpg", "http://oremuhax.x0.com/yo125.htm")
-      end
-
-      should "be handled by the null strategy" do
-        assert(@site.is_a?(Source::Extractor::Null))
-      end
-
-      should "find the metadata" do
-        assert_equal(["http://oremuhax.x0.com/yoro1603.jpg"], @site.image_urls)
-        assert_nil(@site.artist_name)
-        assert_nil(@site.profile_url)
-        assert_nothing_raised { @site.to_h }
-      end
-
-      should "find the artist" do
-        a1 = FactoryBot.create(:artist, name: "test1", url_string: "http://oremuhax.x0.com")
-
-        assert_equal([a1], @site.artists)
-      end
+    context "An image from an unknown site" do
+      strategy_should_work(
+        # "http://oremuhax.x0.com/yo125.htm"
+        "http://oremuhax.x0.com/yoro1603.jpg",
+        image_urls: ["http://oremuhax.x0.com/yoro1603.jpg"],
+        media_files: [{ file_size: 263_253 }],
+        page_url: nil,
+        profile_url: nil,
+        tags: [],
+        tag_name: nil,
+        other_names: [],
+        artist_name: nil,
+        dtext_artist_commentary_title: nil,
+        dtext_artist_commentary_desc: nil
+      )
     end
 
     context "A IP-based source" do
@@ -30,6 +24,20 @@ module Sources
         "http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52",
         image_urls: ["http://125.6.189.215/kcs2/resources/ship/full/0935_5098_aeltexuflkxs.png?version=52"],
         media_files: [{ file_size: 86_605 }],
+        page_url: nil,
+        profile_url: nil,
+        tags: [],
+        tag_name: nil,
+        artist_name: nil,
+        artist_commentary_title: nil,
+        artist_commentary_desc: nil
+      )
+    end
+
+    context "A file:// source" do
+      strategy_should_work(
+        "file://image.jpg",
+        image_urls: [],
         page_url: nil,
         profile_url: nil,
         tags: [],
@@ -50,6 +58,46 @@ module Sources
         assert_equal("[::1]", Source::URL.parse("https://[::1]").site_name)
         assert_equal("[::1]:3000", Source::URL.parse("https://[::1]:3000").site_name)
       end
+
+      should "work for a known site" do
+        assert_equal("AllMyLinks", Source::URL.parse("https://allmylinks.com/enigma404").site_name)
+        assert_equal("Anime News Network", Source::URL.parse("https://www.animenewsnetwork.com/encyclopedia/people.php?id=17056").site_name)
+        assert_equal("Amino", Source::URL.parse("https://aminoapps.com/u/SequelUncut").site_name)
+        assert_equal("AniList", Source::URL.parse("https://anilist.co/user/Megumon").site_name)
+        assert_equal("Apple Music", Source::URL.parse("https://music.apple.com/artist/1626455561").site_name)
+        assert_equal("Archive of Our Own", Source::URL.parse("https://archiveofourown.org/users/ari1654").site_name)
+        assert_equal("Art Fight", Source::URL.parse("http://artfight.net/~OFUKITTY").site_name)
+        assert_equal("Artists&Clients", Source::URL.parse("https://artistsnclients.com/people/sbong2").site_name)
+        assert_equal("Ask.fm", Source::URL.parse("https://ask.fm/mochaxmr").site_name)
+        assert_equal("Bandcamp", Source::URL.parse("https://pigmhall.bandcamp.com").site_name)
+        assert_equal("Big Cartel", Source::URL.parse("https://quintzeee.bigcartel.com").site_name)
+        assert_equal("Blogger", Source::URL.parse("http://chiizupan.blogspot.com").site_name)
+        assert_equal("Buy Me a Coffee", Source::URL.parse("https://www.buymeacoffee.com/sasimekk42").site_name)
+        assert_equal("Circle.ms", Source::URL.parse("https://portal.circle.ms/Circle/Index/10084525").site_name)
+        assert_equal("Class101", Source::URL.parse("https://class101.net/products/315Q19v2UzhkELv2X4Xa").site_name)
+        assert_equal("Colors Live", Source::URL.parse("https://www.colorslive.com/artist/nasubino").site_name)
+        assert_equal("Curious Cat", Source::URL.parse("https://curiouscat.live/LOPPromptbot").site_name)
+        assert_equal("DLSite", Source::URL.parse("https://www.dlsite.com/maniax/circle/profile/=/maker_id/RG33298.html").site_name)
+        assert_equal("Danbooru", Source::URL.parse("https://danbooru.donmai.us/users/1176221").site_name)
+        assert_equal("DC Inside", Source::URL.parse("https://gallog.dcinside.com/clonatenshi").site_name)
+        assert_equal("Doujinshi.org", Source::URL.parse("http://www.doujinshi.org/browse/author/92838/Ojo").site_name)
+        assert_equal("Doujinshi.org", Source::URL.parse("http://doujinshi.mugimugi.org/browse/author/47832/MisRoma/").site_name)
+        assert_equal("E-Hentai", Source::URL.parse("https://e-hentai.org/uploader/Laundrymom").site_name)
+        assert_equal("Excite Blog", Source::URL.parse("http://spzinno.exblog.jp").site_name)
+        assert_equal("Facebook", Source::URL.parse("https://www.facebook.com/sinyu.tang.9").site_name)
+        assert_equal("Facebook", Source::URL.parse("https://www.fb.com/sinyu.tang.9").site_name)
+        assert_equal("FanFiction.Net", Source::URL.parse("https://www.fanfiction.net/u/1795942").site_name)
+        assert_equal("Flickr", Source::URL.parse("http://www.flickr.com/people/hizna").site_name)
+        assert_equal("GitHub", Source::URL.parse("https://github.com/Shimofumi").site_name)
+        assert_equal("Gunsta", Source::URL.parse("https://gumpla.jp/author/Salty_GUNPLA").site_name)
+        assert_equal("Hatena", Source::URL.parse("http://d.hatena.ne.jp/yuutamiitan/").site_name)
+        assert_equal("Hatena Blog", Source::URL.parse("http://yeaththekid.hatenablog.com").site_name)
+        assert_equal("html.co.jp", Source::URL.parse("https://html.co.jp/zeelch").site_name)
+        assert_equal("Itch.io", Source::URL.parse("https://lewdwayne.itch.io").site_name)
+        assert_equal("Line", Source::URL.parse("https://store.line.me/stickershop/author/103126").site_name)
+        assert_equal("LinkedIn", Source::URL.parse("https://www.linkedin.com/in/star-ren/").site_name)
+        assert_equal("Linktree", Source::URL.parse("https://linktr.ee/crankbot").site_name)
+      end
     end
 
     context "normalizing for source" do
@@ -63,17 +111,11 @@ module Sources
         assert_equal("http://p.twipple.jp/mI2c3", Source::URL.page_url(source))
       end
 
-      should "normalize fc2 links" do
-        source1 = "https://blog-imgs-41.fc2.com/t/u/y/tuyadasi/file.png"
-        source2 = "http://diary.fc2.com/user/kazuharoom/img/2020_1/29.jpg"
-
-        assert_equal("http://tuyadasi.blog.fc2.com/img/file.png", Source::URL.page_url(source1))
-        assert_equal("http://diary.fc2.com/cgi-sys/ed.cgi/kazuharoom?Y=2020&M=1&D=29", Source::URL.page_url(source2))
-      end
-
       should "normalize facebook links" do
         source = "https://scontent-sin1-1.xx.fbcdn.net/hphotos-xtp1/t31.0-8/11254493_576443445841777_7716273903390212288_o.jpg"
         assert_equal("https://www.facebook.com/photo?fbid=576443445841777", Source::URL.page_url(source))
+
+        assert_equal("https://www.facebook.com/sinyu.tang.9", Source::URL.parse("https://www.fb.com/sinyu.tang.9").profile_url)
       end
 
       should "normalize sankaku links" do
@@ -151,6 +193,20 @@ module Sources
         assert_nil(Source::URL.page_url("https://google.com"))
         assert_nil(Source::URL.page_url("a bad non-http source"))
         assert_nil(Source::URL.page_url("https://example.com/Folder/中央大学.html"))
+      end
+    end
+
+    context "The bad_source? method" do
+      should "not treat recognized but unhandled sites as bad sources" do
+        assert_nil(Source::URL.parse("https://www.etsy.com/shop/yeurei").bad_source?)
+        assert_nil(Source::URL.parse("https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg").bad_source?)
+      end
+    end
+
+    context "The bad_link? method" do
+      should "not treat recognized but unhandled sites as bad links" do
+        assert_nil(Source::URL.parse("https://www.etsy.com/shop/yeurei").bad_link?)
+        assert_nil(Source::URL.parse("https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg").bad_link?)
       end
     end
   end

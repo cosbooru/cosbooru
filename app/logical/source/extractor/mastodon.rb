@@ -4,10 +4,6 @@
 # @see https://docs.joinmastodon.org/api
 class Source::Extractor
   class Mastodon < Source::Extractor
-    def match?
-      Source::URL::Mastodon === parsed_url
-    end
-
     def domain
       case site_name
       when "Pawoo" then "pawoo.net"
@@ -19,7 +15,7 @@ class Source::Extractor
       if parsed_url.image_url?
         [parsed_url.full_image_url]
       else
-        api_response.dig("media_attachments").to_a.pluck("url")
+        api_response["media_attachments"].to_a.pluck("url")
       end
     end
 
@@ -48,18 +44,10 @@ class Source::Extractor
     end
 
     def username
-      api_response.dig("account", "username") || artist_name_from_url
+      api_response.dig("account", "username") || parsed_url.username || parsed_referer&.username
     end
 
-    def tag_name
-      username
-    end
-
-    def artist_name_from_url
-      parsed_url.username || parsed_referer&.username
-    end
-
-    def artist_name
+    def display_name
       api_response.dig("account", "display_name").presence
     end
 
@@ -79,7 +67,7 @@ class Source::Extractor
     end
 
     def tags
-      api_response.dig("tags").to_a.map do |tag|
+      api_response["tags"].to_a.map do |tag|
         [tag["name"], tag["url"]]
       end
     end
@@ -88,7 +76,7 @@ class Source::Extractor
       DText.from_html(artist_commentary_desc, base_url: "https://#{domain}") do |element|
         if element.name == "a"
           # don't include links to the toot itself.
-          media_urls = api_response.dig("media_attachments").pluck("text_url")
+          media_urls = api_response["media_attachments"].pluck("text_url")
           element.content = nil if element["href"].in?(media_urls)
         end
       end.strip

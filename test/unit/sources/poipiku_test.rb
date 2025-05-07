@@ -13,7 +13,7 @@ module Sources
           media_files: [{ file_size: 209_902 }],
           profile_url: "https://poipiku.com/583/",
           profile_urls: %w[https://poipiku.com/583/ https://twitter.com/avocado_0w0],
-          artist_name: "リアクションありがとう～～",
+          display_name: "リアクションありがとう～～",
           tag_name: "poipiku_583",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -33,7 +33,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -57,7 +57,7 @@ module Sources
           media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -81,7 +81,7 @@ module Sources
           media_files: [{ file_size: 343_562 }],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           artist_commentary_desc: <<~EOS.chomp,
@@ -109,7 +109,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/8566613/",
           profile_urls: %w[https://poipiku.com/8566613/],
-          artist_name: "kino",
+          display_name: "kino",
           tag_name: "kino",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -132,7 +132,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/6849873/",
           profile_urls: %w[https://poipiku.com/6849873/],
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -153,7 +153,7 @@ module Sources
           ],
           profile_url: "https://poipiku.com/927572/",
           profile_urls: %w[https://poipiku.com/927572/],
-          artist_name: "KAIFEI",
+          display_name: "KAIFEI",
           tag_name: "kaifei",
           tags: [],
           dtext_artist_commentary_desc: "博士出浴(裸體"
@@ -167,7 +167,7 @@ module Sources
           page_url: "https://poipiku.com/6849873/8141991.html",
           image_urls: [],
           profile_url: "https://poipiku.com/6849873/",
-          artist_name: "omo_chi2",
+          display_name: "omo_chi2",
           tag_name: "omo_chi2",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
@@ -185,27 +185,19 @@ module Sources
       context "A page url that is followers only" do
         strategy_should_work(
           "https://poipiku.com/16109/8284794.html",
+          image_urls: [],
           page_url: "https://poipiku.com/16109/8284794.html",
-          image_urls: %w[https://img-org.poipiku.com/user_img03/000016109/008284794_BnnZHAgTQ.jpeg],
           profile_url: "https://poipiku.com/16109/",
-          profile_urls: %w[
-            https://poipiku.com/16109/
-            https://www.pixiv.net/users/46937590
-          ],
-          #profile_urls: %w[
-          #  https://profcard.info/u/HvGjxxr2zKep8GCdEuK1T5Mu3cY2
-          #  https://www.pixiv.net/users/46937590
-          #  https://marshmallow-qa.com/_otsubo_
-          #  https://wavebox.me/wave/7rjgokpzrv4326x8/
-          #  https://odaibako.net/u/kmbkshbnlss
-          #],
-          artist_name: "緊縛師ボンレス（ル×ガの民）",
+          profile_urls: %w[https://poipiku.com/16109/ https://www.pixiv.net/users/46937590],
+          display_name: "緊縛師ボンレス（ル×ガの民）",
           tag_name: "poipiku_16109",
+          other_names: ["緊縛師ボンレス（ル×ガの民）"],
           tags: [
             ["腐向け", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=腐向け"],
             ["TOBL", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=TOBL"],
-            ["ルクガイ", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=ルクガイ"]
+            ["ルクガイ", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=ルクガイ"],
           ],
+          dtext_artist_commentary_title: "",
           dtext_artist_commentary_desc: <<~EOS.chomp
             乳揉まれて気持ち良くなってそうなところ描きたいなと思って描きました。先日描いたやつはまだ「お坊ちゃん可愛い」が勝っている状態。これは「もうそろそろイくかな？」と思われてそうな状態。乳に垂れてる汁は何ですかね。汗？オイル？唾液？うちのルク坊やは唾液でお口ニュルニュルするの気持ちいいボーイなので、きっとお口で遊んだ後（いま決めた）。
           EOS
@@ -219,8 +211,8 @@ module Sources
           page_url: "https://poipiku.com/2210523/4916104.html",
           image_urls: %w[],
           profile_url: "https://poipiku.com/2210523/",
-          artist_name: "るーとzakkubarannnn",
-          tag_name: "poipiku_2210523",
+          display_name: "るーとzakkubarannnn",
+          tag_name: "zakkubarannnn",
           tags: [],
           dtext_artist_commentary_desc: <<~EOS.chomp
             今日はここまでにしとく
@@ -235,7 +227,7 @@ module Sources
           page_url: "https://poipiku.com/302292/6598662.html",
           image_urls: [],
           profile_url: "https://poipiku.com/302292/",
-          artist_name: "(　˙👅˙　)",
+          display_name: "(　˙👅˙　)",
           tag_name: "poipiku_302292",
           tags: [
             ["突発", "https://poipiku.com/SearchIllustByTagPcV.jsp?KWD=突発"],
@@ -256,7 +248,7 @@ module Sources
           page_url: "https://poipiku.com/1727580/6661073.html",
           image_urls: [],
           profile_url: "https://poipiku.com/1727580/",
-          artist_name: nil,
+          display_name: nil,
           tag_name: "poipiku_1727580",
           tags: [],
           dtext_artist_commentary_desc: ""

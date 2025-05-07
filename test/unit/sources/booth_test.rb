@@ -12,9 +12,9 @@ module Sources
         ],
         profile_url: "https://cullmee.booth.pm",
         page_url: "https://booth.pm/en/items/3240411",
-        artist_name: "くるみ",
-        tag_name: "cullmee",
-        other_names: %w[cullmee くるみ],
+        display_name: "くるみ",
+        username: "cullmee",
+        other_names: %w[くるみ cullmee],
         tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
         artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -33,9 +33,9 @@ module Sources
         ],
         profile_url: "https://cullmee.booth.pm",
         page_url: "https://booth.pm/en/items/3240411",
-        artist_name: "くるみ",
-        tag_name: "cullmee",
-        other_names: %w[cullmee くるみ],
+        display_name: "くるみ",
+        username: "cullmee",
+        other_names: %w[くるみ cullmee],
         tags: %w[アイドルマスターシャイニーカラーズ アクリルスタンド二次創作 シャニマス 月岡恋鐘],
         artist_commentary_title: "月岡恋鐘 日本横断フェア アクリルスタンド",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -52,8 +52,8 @@ module Sources
         image_urls: ["https://booth.pximg.net/67e59677-bc7e-4249-918f-8c406b204df6/i/4266304/71f7517c-ed21-4a51-9e62-030787c44c0c.jpeg"],
         page_url: "https://booth.pm/en/items/4266304",
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        display_name: nil,
+        username: nil,
         other_names: [],
         tags: [],
         artist_commentary_title: nil,
@@ -67,8 +67,8 @@ module Sources
         image_urls: ["https://booth.pximg.net/8bb9e4e3-d171-4027-88df-84480480f79d/i/2423989/a692d4f3-4371-4a86-a337-83fee82d46a4.png"],
         profile_url: "https://re-face.booth.pm",
         page_url: "https://booth.pm/en/items/2423989",
-        artist_name: "Re:fAce Music Production SHOP",
-        tag_name: "re-face",
+        display_name: "Re:fAce Music Production SHOP",
+        username: "re-face",
         other_names: ["Re:fAce Music Production SHOP", "re-face"],
         tags: %w[music original re:face ricchan\ * virtual\ youtuber くるみ だてんちゆあ ひなの羽衣 りふぇいす。 アイドル 千草はな 白乃クロミ 白咲べる 赤坂まさか 音楽],
         artist_commentary_title: "RwithV vol.1 -アイドルはじめます！-",
@@ -96,14 +96,50 @@ module Sources
       )
     end
 
+    context "A booth post with a factory.pixiv.net image" do
+      strategy_should_work(
+        "https://dai-xt.booth.pm/items/5701118",
+        image_urls: %w[
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/1eabc2c5-e2a1-4079-89ce-061226edeb85.png
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/3deaf844-0f03-4bb9-ad32-58b158e787ba.png
+          https://booth.pximg.net/1b715ca5-f3dc-484e-9406-eec4047c5ad0/i/5701118/3a461bed-40a5-42bf-b216-676a1303b691.png
+          https://factory.pixiv.net/files/uploads/i/conceptual_drawing/3a6f3742-03b6-4968-9599-20dc2c0e1172/canvas_f2605b12ed.png
+        ],
+        media_files: [
+          { file_size: 606_453 },
+          { file_size: 785_702 },
+          { file_size: 287_766 },
+          { file_size: 321_775 },
+        ],
+        page_url: "https://booth.pm/en/items/5701118",
+        profile_urls: %w[https://dai-xt.booth.pm],
+        display_name: "シーウィード・ヴィレッジ",
+        username: "dai-xt",
+        tags: [
+          ["ライブ・ア・ヒーロー!", "https://booth.pm/en/items?tags%5B%5D=%E3%83%A9%E3%82%A4%E3%83%96%E3%83%BB%E3%82%A2%E3%83%BB%E3%83%92%E3%83%BC%E3%83%AD%E3%83%BC%21"],
+          ["ダンゾー", "https://booth.pm/en/items?tags%5B%5D=%E3%83%80%E3%83%B3%E3%82%BE%E3%83%BC"],
+        ],
+        dtext_artist_commentary_title: "ダンゾー(ライブ・ア・ヒーロー！) 非公式アクリルフィギュア",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          この商品はpixivFACTORYで作られた商品です。サンプル画像は完成イメージのため、実物と異なる場合があります。
+
+          -----
+          画集『SCHRANZ NINJA』の表紙を飾るダンゾーのアクリルフィギュア。
+          公式とは無関係のファングッズですのでご了承ください。
+
+          ロゴデザイン：Poyoshi 様
+        EOS
+      )
+    end
+
     context "A profile background picture" do
       strategy_should_work(
         "https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638_base_resized.jpg",
         image_urls: ["https://s2.booth.pm/8bb9e4e3-d171-4027-88df-84480480f79d/3d70de06-8e7c-444e-b8eb-a8a95bf20638.png"],
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        display_name: nil,
+        username: nil,
         other_names: [],
         tags: [],
         artist_commentary_title: nil,
@@ -117,8 +153,8 @@ module Sources
         image_urls: ["https://booth.pximg.net/users/3193929/icon_image/5be9eff4-1d9e-4a79-b097-33c1cd4ad314.png"],
         page_url: nil,
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        display_name: nil,
+        username: nil,
         other_names: [],
         tags: [],
         artist_commentary_title: nil,
@@ -132,8 +168,8 @@ module Sources
         deleted: true,
         page_url: "https://booth.pm/en/items/2003079",
         profile_url: nil,
-        artist_name: nil,
-        tag_name: nil,
+        display_name: nil,
+        username: nil,
         other_names: [],
         tags: [],
         artist_commentary_title: nil,

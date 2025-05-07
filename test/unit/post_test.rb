@@ -1422,6 +1422,16 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("bad_link tag1 tag2", @post.tag_string)
         end
 
+        should "not add the bad_link tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "tag1 tag2", source: "https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove bad_link tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "bad_link tag1 tag2", source: "https://i.etsystatic.com/isbl/ef769d/65460303/isbl_3360x840.65460303_idqpnurw.jpg")
+          assert_equal("bad_link tag1 tag2", @post.tag_string)
+        end
+
         should "remove the bad_link tag when using the source: metatag" do
           @post.update!(tag_string: "aaa source:https://pbs.twimg.com/media/FQjQA1mVgAMcHLv.jpg:orig")
           assert_equal("aaa bad_link", @post.tag_string)
@@ -1456,6 +1466,16 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("bad_source tag1 tag2", @post.tag_string)
         end
 
+        should "not add the bad_source tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "tag1 tag2", source: "https://www.etsy.com/shop/yeurei")
+          assert_equal("tag1 tag2", @post.tag_string)
+        end
+
+        should "not remove the bad_source tag for recognized but unhandled sources" do
+          @post.update!(tag_string: "bad_source tag1 tag2", source: "https://www.etsy.com/shop/yeurei")
+          assert_equal("bad_source tag1 tag2", @post.tag_string)
+        end
+
         should "remove the bad_source tag when using the source: metatag" do
           @post.update!(tag_string: "aaa source:https://twitter.com/danboorubot/")
           assert_equal("aaa bad_source", @post.tag_string)
@@ -1475,7 +1495,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "a post with a https:// source" do
         should "remove the non-web_source tag" do
-          @post.update!(source: "https://www.google.com", tag_string: "non-web_source")
+          @post.update!(source: "https://www.example.com", tag_string: "non-web_source")
           @post.save!
           assert_equal("tagme", @post.tag_string)
         end

@@ -946,7 +946,9 @@ CREATE TABLE public.good_job_executions (
     scheduled_at timestamp(6) without time zone,
     finished_at timestamp(6) without time zone,
     error text,
-    error_event smallint
+    error_event smallint,
+    error_backtrace text[],
+    process_id uuid
 );
 
 
@@ -958,7 +960,8 @@ CREATE TABLE public.good_job_processes (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    state jsonb
+    state jsonb,
+    lock_type smallint
 );
 
 
@@ -1001,7 +1004,9 @@ CREATE TABLE public.good_jobs (
     executions_count integer,
     job_class text,
     error_event smallint,
-    labels text[]
+    labels text[],
+    locked_by_id uuid,
+    locked_at timestamp(6) without time zone
 );
 
 
@@ -1240,7 +1245,8 @@ CREATE TABLE public.news_updates (
     updater_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
+    is_deleted boolean DEFAULT false NOT NULL,
+    duration interval DEFAULT '14 days'::interval NOT NULL
 );
 
 
@@ -2125,7 +2131,9 @@ CREATE TABLE public.user_events (
     ip_addr inet,
     session_id uuid,
     user_agent character varying,
-    metadata jsonb
+    metadata jsonb,
+    fingerprint jsonb,
+    fingerprint_hash text
 );
 
 
@@ -4323,6 +4331,13 @@ CREATE INDEX index_good_job_executions_on_active_job_id_and_created_at ON public
 
 
 --
+-- Name: index_good_job_executions_on_process_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_job_executions_on_process_id_and_created_at ON public.good_job_executions USING btree (process_id, created_at);
+
+
+--
 -- Name: index_good_job_jobs_for_candidate_lookup; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4397,6 +4412,20 @@ CREATE UNIQUE INDEX index_good_jobs_on_cron_key_and_cron_at_cond ON public.good_
 --
 
 CREATE INDEX index_good_jobs_on_labels ON public.good_jobs USING gin (labels) WHERE (labels IS NOT NULL);
+
+
+--
+-- Name: index_good_jobs_on_locked_by_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_locked_by_id ON public.good_jobs USING btree (locked_by_id) WHERE (locked_by_id IS NOT NULL);
+
+
+--
+-- Name: index_good_jobs_on_priority_scheduled_at_unfinished_unlocked; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_priority_scheduled_at_unfinished_unlocked ON public.good_jobs USING btree (priority, scheduled_at) WHERE ((finished_at IS NULL) AND (locked_by_id IS NULL));
 
 
 --
@@ -6671,6 +6700,11 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250402125343'),
+('20250502093010'),
+('20241023091114'),
+('20240607200251'),
+('20240607200250'),
+('20240607200249'),
 ('20240413060557'),
 ('20240324223203'),
 ('20240221060848'),
@@ -7005,4 +7039,3 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
-

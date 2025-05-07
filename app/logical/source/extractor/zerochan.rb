@@ -4,20 +4,12 @@
 module Source
   class Extractor
     class Zerochan < Source::Extractor
-      def match?
-        Source::URL::Zerochan === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.full_image_url]
         else
           [api_response[:full]].compact
         end
-      end
-
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
       end
 
       def tags

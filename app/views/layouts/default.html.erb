@@ -61,21 +61,21 @@
 </head>
 
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item, @exception) do %>
-  <% if NewsUpdate.recent.active.present? %>
-    <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
-      <ul>
-        <% NewsUpdate.recent.active.each do |news_update| %>
-          <li><%= news_update.message.html_safe %></li>
+  <% if @visible_news_updates.present? %>
+    <div id="news-updates" data-id="<%= @visible_news_updates.first.try(:id) %>" class="flex gap-1 p-1 items-center text-center text-xs <%= ("hidden" if cookies["news-ticker"].to_i == @visible_news_updates.first.try(:id)) %>">
+      <div class="flex-grow-1">
+        <%  @visible_news_updates.each do |news_update| %>
+          <div><%= news_update.message.html_safe %></div>
         <% end %>
-      </ul>
+      </div>
 
-      <a href="#" id="close-news-ticker-link"><%= close_icon %></a>
+      <a href="#" id="close-news-ticker-link" class="px-2 py-1"><%= close_icon %></a>
     </div>
   <% end %>
 
   <header id="top">
     <div id="app-name-header" class="font-bold font-header leading-normal inline-flex items-end gap-2">
-      <%= link_to image_pack_tag("static/public/images/danbooru-logo-128x128.png"), root_path, id: "app-logo" %>
+      <%= link_to image_pack_tag("static/danbooru-logo-128x128.png"), root_path, id: "app-logo" %>
       <%= link_to Danbooru.config.app_name, root_path, id: "app-name", class: "m-auto" %>
     </div>
 

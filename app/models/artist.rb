@@ -36,8 +36,8 @@ class Artist < ApplicationRecord
     extend ActiveSupport::Concern
 
     def sorted_urls
-      urls.sort_by do |url|
-        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, url.url]
+      Danbooru.natural_sort_by(urls, &:url).sort_by.with_index do |url, i|
+        [url.is_active? ? 0 : 1, url.priority, url.domain, url.secondary_url? ? 1 : 0, i]
       end
     end
 
@@ -258,11 +258,14 @@ class Artist < ApplicationRecord
       query = query.strip
 
       if query =~ %r{\Ahttps?://}i
-        url = Source::Extractor.find(query).profile_url || query
-        ArtistFinder.find_artists(url)
+        Source::Extractor.find(query).artists
       else
         where(id: ArtistURL.url_matches(query).select(:artist_id))
       end
+    end
+
+    def has_normalized_url(urls)
+      where(id: ArtistURL.normalized_url_equals_any(urls).select(:artist_id))
     end
 
     def any_name_or_url_matches(query)

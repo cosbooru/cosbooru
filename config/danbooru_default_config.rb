@@ -40,7 +40,7 @@ module Danbooru
     # generated every time the server starts, which will log out all users on
     # every restart.
     #
-    # Use `rake secret` to generate a random secret key.
+    # Use `rails secret` to generate a random secret key.
     def secret_key_base
       SecureRandom.uuid
     end
@@ -200,7 +200,7 @@ module Danbooru
     #
     # Set this to 0 to disable multithreading. This may save memory at the cost of reduced performance.
     def max_concurrency
-      Etc.nprocessors
+      Concurrent.available_processor_count.to_i.clamp(1..)
     end
 
     # If true, allow web crawlers such as Google to crawl your site.
@@ -590,7 +590,7 @@ module Danbooru
     def inkbunny_password
     end
 
-    # Your Bluesky identifier and password.
+    # Your Bluesky identifier and password. The identifier must include the domain that you see on your profile, ie "username.bsky.social"
     def bluesky_identifier
     end
 
@@ -599,6 +599,34 @@ module Danbooru
 
     # Your Reddit "reddit_session" cookie.
     def reddit_session_cookie
+    end
+
+    # Your Postype "PSE3" cookie. Login to Postype then use the devtools to find the "PSE3" cookie.
+    # After creating your account, go to https://www.postype.com/account/settings and enable the "Viewing adult content
+    # by foreigners" setting to see all content.
+    def postype_session_cookie
+    end
+
+    # Your Behance "iat0" cookie. Login to Behance then use the devtools to find the "iat0" cookie.
+    def behance_session_cookie
+    end
+
+    # Your Piapro.jp "piapro_s" cookie. Login to Piapro then use the devtools to find the "piapro_s" cookie.
+    def piapro_session_cookie
+    end
+
+    # Your Plurk "plurktokena" cookie. Login to Plurk then use the devtools to find the "plurktokena" cookie.
+    def plurk_session_cookie
+    end
+
+    # Your Cohost "connect.sid" cookie. Login to Cohost then use the devtools to find the "connect.sid" cookie.
+    def cohost_session_cookie
+    end
+
+    # Your Google Blogger API key. Go to https://developers.google.com/blogger/docs/3.0/using#APIKey to create an API key.
+    # You can also use gallery-dl's API key, but you might get rate-limited if others are using it.
+    # https://github.com/mikf/gallery-dl/blob/07d962d60aed598f0ee8578df914c38e5fc939aa/gallery_dl/extractor/blogger.py#L162
+    def blogger_api_key
     end
 
     # A list of tags that should be removed when a post is replaced. Regexes allowed.

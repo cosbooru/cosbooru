@@ -5,25 +5,12 @@
 module Source
   class Extractor
     class Picdig < Source::Extractor
-      def match?
-        Source::URL::Picdig === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.to_s]
         else
-          image_urls_from_commentary
+          artist_commentary_desc.to_s.parse_html.css("img").pluck("src")
         end
-      end
-
-      def image_urls_from_commentary
-          html = Nokogiri::HTML5.fragment(artist_commentary_desc)
-          html.css("img").map { |img| img[:src] }
-      end
-
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
       end
 
       def profile_url
@@ -41,12 +28,12 @@ module Source
         ].compact_blank
       end
 
-      def tag_name
-        username
+      def display_name
+        api_response.dig(:user, :name)
       end
 
-      def artist_name
-        api_response.dig(:user, :name)
+      def username
+        parsed_url.username || parsed_referer&.username
       end
 
       def artist_commentary_title
@@ -61,10 +48,6 @@ module Source
         api_response[:project_tags].to_a.map do |tag|
           [tag[:name], "https://picdig.net/projects?search_tag=#{Danbooru::URL.escape(tag[:name])}"]
         end
-      end
-
-      def username
-        parsed_url.username || parsed_referer&.username
       end
 
       def api_url

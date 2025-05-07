@@ -2,8 +2,8 @@
 
 # @see Source::URL::Bluesky
 class Source::Extractor::Bluesky < Source::Extractor
-  def match?
-    Source::URL::Bluesky === parsed_url
+  def self.enabled?
+    Danbooru.config.bluesky_identifier.present? && Danbooru.config.bluesky_password.present?
   end
 
   def image_urls
@@ -21,13 +21,18 @@ class Source::Extractor::Bluesky < Source::Extractor
       embed = embed["media"].to_h
     end
 
-    images = if embed["$type"] == "app.bsky.embed.images"
-      embed["images"]
-    end.to_a
+    blobs = case embed["$type"]
+    when "app.bsky.embed.images"
+      embed["images"].pluck("image")
+    when "app.bsky.embed.video"
+      [embed["video"]]
+    else
+      []
+    end
 
-    images.map do |image|
-      image_cid = image.dig("image", "ref", "$link") || image.dig("image", "cid")
-      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{image_cid}"
+    blobs.map do |blob|
+      blob_cid = blob.dig("ref", "$link") || blob.dig("cid")
+      "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=#{user_did}&cid=#{blob_cid}"
     end
   end
 
@@ -47,12 +52,12 @@ class Source::Extractor::Bluesky < Source::Extractor
     [profile_url, account_url].compact
   end
 
-  def tag_name
+  def username
     # ixy.bsky.social -> ixy
     user_handle.to_s.split(".").first
   end
 
-  def artist_name
+  def display_name
     api_response&.dig("thread", "post", "author", "displayName")
   end
 
@@ -92,14 +97,34 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   def artist_commentary_desc
-    api_response&.dig("thread", "post", "record", "text")
+    api_response&.dig("thread", "post", "record", "text") || ""
+  end
+
+  def dtext_artist_commentary_desc
+    DText.from_html(html_artist_commentary_desc, base_url: "https://bsky.app")
+  end
+
+  def html_artist_commentary_desc
+    text = artist_commentary_desc.dup.force_encoding("ASCII-8BIT")
+
+    api_response&.dig("thread", "post", "record", "facets").to_a.reverse.each do |facet|
+      tag = facet["features"].to_a.find {|f| f["$type"] == "app.bsky.richtext.facet#tag"}
+      next if tag.nil?
+
+      tag_name = tag["tag"]
+      byte_start = facet.dig("index", "byteStart")
+      byte_end = facet.dig("index", "byteEnd")
+      text[byte_start...byte_end] = %{<a href="https://bsky.app/hashtag/#{CGI.escapeHTML(Danbooru::URL.escape(tag_name))}">##{CGI.escapeHTML(tag_name)}</a>}.force_encoding("ASCII-8BIT")
+    end
+
+    text.force_encoding("UTF-8").gsub("\n", "<br>")
   end
 
   def tags
-    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f| 
+    api_response&.dig("thread", "post", "record", "facets").to_a.pluck("features").flatten.select do |f|
       f["$type"] == "app.bsky.richtext.facet#tag"
     end.pluck("tag").map do |tag|
-      [tag, "https://bsky.app/search"]
+      [tag, "https://bsky.app/hashtag/#{Danbooru::URL.escape(tag)}"]
     end
   end
 
@@ -111,14 +136,12 @@ class Source::Extractor::Bluesky < Source::Extractor
       "https://bsky.social/xrpc/app.bsky.feed.getPostThread",
       uri: "at://#{user_did}/app.bsky.feed.post/#{post_id}",
       depth: 0,
-      parentHeight: 0,
+      parentHeight: 0
     )
   end
 
   # https://www.docs.bsky.app/docs/api/com-atproto-server-create-session
   memoize def access_token
-    return nil if Danbooru.config.bluesky_identifier.blank? || Danbooru.config.bluesky_password.blank?
-
     response = http.parsed_post(
       "https://bsky.social/xrpc/com.atproto.server.createSession",
       json: { identifier: Danbooru.config.bluesky_identifier, password: Danbooru.config.bluesky_password }
@@ -133,7 +156,7 @@ class Source::Extractor::Bluesky < Source::Extractor
   end
 
   memoize def cached_access_token
-    Cache.get("bluesky-access-token", 1.hours, skip_nil: true) do
+    Cache.get("bluesky-access-token", 1.hour, skip_nil: true) do
       access_token
     end
   end

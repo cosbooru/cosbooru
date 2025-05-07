@@ -366,6 +366,15 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(source, upload.source)
       end
 
+      should "not normalize source URLs to NFC form" do
+        # ブ = U+30D5 U+3099 ('KATAKANA LETTER HU', 'COMBINING KATAKANA-HIRAGANA VOICED SOUND MARK')
+        source = "https://tuyu-official.jp/wp/wp-content/uploads/2022/09/雨模様［サブスクジャケット］.jpeg"
+
+        upload = assert_successful_upload(source, user: @user)
+        assert_equal(source, upload.source)
+        assert_equal(source, upload.upload_media_assets.last.source_url)
+      end
+
       should "save the AI tags" do
         mock_autotagger_evaluate({ "1girl": 0.5 })
         upload = assert_successful_upload("test/files/test.jpg")
@@ -601,8 +610,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://kmyama.fanbox.cc/posts/104708")
         should_upload_successfully("https://downloads.fanbox.cc/images/post/104708/wsF73EC5Fq0CIK84W0LGYk2p.jpeg")
 
-        should_upload_successfully("https://foundation.app/@mochiiimo/~/97376")
-        should_upload_successfully("https://foundation.app/@mochiiimo/foundation/97376")
         should_upload_successfully("https://foundation.app/@KILLERGF/kgfgen/4")
 
         should_upload_successfully("https://skeb.jp/@kokuzou593/works/45")

@@ -7,10 +7,6 @@ module Source
         Danbooru.config.deviantart_client_id.present? && Danbooru.config.deviantart_client_secret.present?
       end
 
-      def match?
-        Source::URL::DeviantArt === parsed_url
-      end
-
       def image_urls
         [image_url].compact
       end
@@ -122,11 +118,15 @@ module Source
       end
 
       def profile_url
-        "https://www.deviantart.com/#{artist_name.downcase}" if artist_name.present?
+        "https://www.deviantart.com/#{username}" if username.present?
       end
 
-      def artist_name
-        user["username"].presence || api_metadata.dig("author", "username") || parsed_url.username || parsed_referer&.username
+      def display_name
+        user["username"].presence || api_metadata.dig("author", "username")
+      end
+
+      def username
+        display_name&.downcase || parsed_url.username || parsed_referer&.username
       end
 
       def artist_commentary_title
@@ -134,7 +134,11 @@ module Source
       end
 
       def artist_commentary_desc
-        deviation_extended.dig("descriptionText", "html", "markup") || api_metadata["description"]
+        if deviation_extended.dig("descriptionText", "html", "type") == "writer"
+          deviation_extended.dig("descriptionText", "html", "markup")
+        else
+          api_metadata["description"]
+        end
       end
 
       def tags
@@ -151,30 +155,78 @@ module Source
 
       def dtext_artist_commentary_desc
         DText.from_html(artist_commentary_desc, base_url: "https://www.deviantart.com", allowed_shortlinks: ["deviantart"]) do |element|
-          # Convert embedded thumbnails of journal posts to 'deviantart #123'
-          # links. Strip embedded thumbnails of image posts. Example:
-          # https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927.
-          if element.name == "a" && element["data-sigil"] == "thumb"
+          case element.name
+
+          # Convert embedded thumbnails of journal posts to 'deviantart #123' links. Strip embedded thumbnails of image posts.
+          # Example: https://sa-dui.deviantart.com/art/Commission-Meinos-Kaen-695905927
+          in "a" if element["data-sigil"] == "thumb"
             element.name = "span"
 
             # <a href="https://sa-dui.deviantart.com/journal/About-Commissions-223178193" data-sigil="thumb" class="thumb lit" ...>
-            if element["class"].split.include?("lit")
+            if element.classes.include?("lit")
               deviation_id = element["href"][/-(\d+)\z/, 1].to_i
               element.content = "deviantart ##{deviation_id}"
             else
               element.content = ""
             end
-          end
 
           # Ignore <sub> and <small> tags.
-          if element.name.in?(%w[sub small])
+          in "sub" | "small"
             element.name = "div"
-          end
 
-          if element.name == "a" && element["href"].present?
+          # A large image inside a link.
+          in "a" if element.classes.include?("draft-thumb")
+            element.name = "p"
+            element.inner_html = %{<a href="#{element["href"]}">#{element["href"]}</a>}
+
+          # An external link
+          in "a" if element["href"].present?
             element["href"] = element["href"].gsub(%r{\Ahttps?://www\.deviantart\.com/users/outgoing\?}i, "")
+
+          # The WYSIWYG editor uses <span> tags for bold, italic, and underlined text.
+          in "span" if element["style"].present?
+            element.inner_html = "<u>#{element.inner_html}</u>" if element["style"].include?("text-decoration:underline") && element.parent&.name != "a"
+            element.inner_html = "<i>#{element.inner_html}</i>" if element["style"].include?("font-style:italic")
+            element.inner_html = "<b>#{element.inner_html}</b>" if element["style"].include?("font-weight:bold")
+
+          # A paragraph in the WYSIWYG editor.
+          in "div" if element.classes.intersect?(%w[daeditor-paragraph])
+            element.name = "p"
+
+          # An image gallery.
+          in "div" if element.classes.intersect?(%w[daeditor-torpedo-grid])
+            element.name = "ul"
+
+          # An image in an image gallery.
+          in "div" if element.classes.intersect?(%w[daeditor-torpedo-grid-item])
+            element.name = "li"
+
+          # A small profile picture linking to someone's profile page.
+          in "img" if element.parent&.name == "a" && Source::URL.profile_url?(element.parent["href"])
+            element["alt"] = ":#{element["alt"]}:"
+
+          # An embedded emoticon.
+          in "img" if element["data-embed-type"] == "emoticon"
+            element["alt"] = ":#{element["alt"]}:"
+
+          # Ignore alt text in image links.
+          in "img"
+            element["alt"] = "[image]"
+
+          # An embedded Youtube video.
+          in "iframe"
+            element.name = "p"
+            element.inner_html = %{<a href="#{element["src"]}">#{element["src"]}</a>}
+
+          # Ignore random commas outside of paragraphs. These are only present when using api_metadata["description"]
+          # to get the commentary.
+          in "text" if element.parent&.attr("class") == "daeditor-fluid"
+            element.content = nil
+
+          else
+            nil
           end
-        end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+        end
       end
 
       def deviation_id
@@ -210,12 +262,7 @@ module Source
 
         script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
         json = script[/window.__INITIAL_STATE__ = JSON.parse\("(.*)"\);/, 1]
-        unescaped_json = json.to_s.gsub('\\"', '"').gsub("\\\\", "\\")
-        return {} if unescaped_json.blank?
-
-        JSON.parse(unescaped_json).with_indifferent_access
-      rescue JSON::ParserError
-        {}
+        json.to_s.gsub('\\"', '"').gsub("\\\\", "\\").parse_json || {}
       end
 
       memoize def api_client
@@ -233,7 +280,7 @@ module Source
 
       memoize def api_metadata
         return {} if uuid.nil?
-        api_client.metadata(uuid)[:metadata].first
+        api_client.metadata(uuid)[:metadata].first || {}
       end
 
       memoize def api_download

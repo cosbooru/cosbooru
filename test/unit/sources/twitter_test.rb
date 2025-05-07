@@ -2,6 +2,16 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
+    context "A Twitter profile picture sample image" do
+      strategy_should_work(
+        "https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs_400x400.jpeg",
+        image_urls: %w[https://pbs.twimg.com/profile_images/417182061145780225/ttN6_CSs.jpeg],
+        media_files: [{ file_size: 203_927, width: 1252, height: 1252 }],
+        page_url: nil,
+        profile_urls: %w[https://twitter.com/intent/user?user_id=417182061145780225]
+      )
+    end
+
     context "A https://twitter.com/:username/status/:id url" do
       strategy_should_work(
         "https://twitter.com/motty08111213/status/943446161586733056",
@@ -17,8 +27,8 @@ module Sources
           { file_size: 188_553 },
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"],
         dtext_artist_commentary_desc: <<~EOS.chomp
           岩本町芸能社女優部のタレント3名がHPに公開されました。
@@ -41,8 +51,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -57,8 +67,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -73,8 +83,8 @@ module Sources
           "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
         ],
         profile_url: "https://twitter.com/motty08111213",
-        artist_name: "丸茂_えのぐマネージャー",
-        tag_name: "motty08111213",
+        display_name: "丸茂_えのぐマネージャー",
+        username: "motty08111213",
         tags: ["岩本町芸能社", "女優部"]
       )
     end
@@ -117,6 +127,15 @@ module Sources
       )
     end
 
+    context "A /tweet_video/ URL" do
+      strategy_should_work(
+        "https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4",
+        image_urls: ["https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4"],
+        media_files: [{ file_size: 542_833 }],
+        page_url: nil
+      )
+    end
+
     context "A tweet with an animated gif" do
       strategy_should_work(
         "https://twitter.com/i/web/status/1252517866059907073",
@@ -135,8 +154,8 @@ module Sources
           https://video.twimg.com/tweet_video/FeWVcf4VQAAIPTe.mp4
         ],
         page_url: "https://twitter.com/twotenky/status/1577831592227000320",
-        tag_name: "twotenky",
-        artist_name: "通天機",
+        display_name: "通天機",
+        username: "twotenky",
         profile_url: "https://twitter.com/twotenky",
         artist_commentary_desc: "動画と静止画がセットでお得と聞いて https://t.co/hWvKoHLN7y",
         dtext_artist_commentary_desc: "動画と静止画がセットでお得と聞いて",
@@ -151,8 +170,8 @@ module Sources
         page_url: "https://twitter.com/Strangestone/status/556440271961858051",
         profile_url: "https://twitter.com/Strangestone",
         profile_urls: ["https://twitter.com/Strangestone", "https://twitter.com/intent/user?user_id=93332575"],
-        tag_name: "Strangestone",
-        artist_name: "比村奇石",
+        display_name: "比村奇石",
+        username: "Strangestone",
         dtext_artist_commentary_desc: "ブレザーが描きたかったのでJK鈴谷"
       )
     end
@@ -164,9 +183,9 @@ module Sources
         page_url: "https://twitter.com/shoka_bg/status/1644344692107268097",
         profile_url: "https://twitter.com/shoka_bg",
         profile_urls: ["https://twitter.com/shoka_bg", "https://twitter.com/intent/user?user_id=1109709388049051649"],
-        tag_name: "shoka_bg",
+        display_name: "shooka @土曜 西 “ね” 41a",
+        username: "shoka_bg",
         tags: %w[ブルアカ],
-        artist_name: "shooka @土曜 西 “ね” 41a",
         dtext_artist_commentary_desc: <<~EOS.chomp
           風紀委員の実態
           "#ブルアカ":[https://twitter.com/hashtag/ブルアカ]
@@ -181,8 +200,8 @@ module Sources
         page_url: "https://twitter.com/loveremi_razoku/status/1637647185969041408",
         profile_url: "https://twitter.com/loveremi_razoku",
         profile_urls: ["https://twitter.com/loveremi_razoku", "https://twitter.com/intent/user?user_id=293443351"],
-        tag_name: "loveremi_razoku",
-        artist_name: "ラブレミ@うぉるやふぁんくらぶ",
+        display_name: "ラブレミ@うぉるやふぁんくらぶ",
+        username: "loveremi_razoku",
         tags: [],
         dtext_artist_commentary_desc: <<~EOS.chomp
           「ラリアッ党の野望チョコ」
@@ -220,9 +239,9 @@ module Sources
         page_url: "https://twitter.com/emurin/status/912861472916508672",
         profile_url: "https://twitter.com/emurin",
         profile_urls: ["https://twitter.com/emurin", "https://twitter.com/intent/user?user_id=30642502"],
-        tag_name: "emurin",
+        display_name: "えむりん",
+        username: "emurin",
         tags: %w[odaibako],
-        artist_name: "えむりん",
         dtext_artist_commentary_desc: <<~EOS.chomp
           > ほわほわ系クーデレギロチンおねがいします <https://odaibako.net/detail/request/277bac5ea1b34b1abc7ac21dd1031690> "#odaibako":[https://twitter.com/hashtag/odaibako]
 
@@ -238,9 +257,9 @@ module Sources
         page_url: "https://twitter.com/enaiC31/status/1644997451626221568",
         profile_url: "https://twitter.com/enaiC31",
         profile_urls: ["https://twitter.com/enaiC31", "https://twitter.com/intent/user?user_id=1444938344891240452"],
-        tag_name: "enaiC31",
+        display_name: "えない🚀",
+        username: "enaiC31",
         tags: [],
-        artist_name: "えない🚀",
         dtext_artist_commentary_desc: <<~EOS.chomp
           すろぉもぉしょん💊
         EOS
@@ -256,9 +275,9 @@ module Sources
         page_url: "https://twitter.com/nounproject/status/540944400767922176",
         profile_url: "https://twitter.com/nounproject",
         profile_urls: ["https://twitter.com/nounproject", "https://twitter.com/intent/user?user_id=88996186"],
-        tag_name: "nounproject",
+        display_name: "Noun Project",
+        username: "nounproject",
         tags: [],
-        artist_name: "Noun Project",
         dtext_artist_commentary_desc: <<~EOS.chomp
           More is better. Unlimited is best. NounPro Members now get unlimited icon downloads <http://bit.ly/1yn2KWn>
         EOS
@@ -292,23 +311,59 @@ module Sources
       )
     end
 
+    context "A direct image url with a referer url from a different site" do
+      strategy_should_work(
+        "https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg",
+        referer: "https://www.pixiv.net/en/artworks/60344190",
+        image_urls: ["https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig"],
+        media_files: [{ file_size: 842_373 }],
+        page_url: nil
+      )
+    end
+
     context "A deleted tweet" do
       strategy_should_work(
         "https://twitter.com/masayasuf/status/870734961778630656",
         deleted: true,
-        tag_name: "masayasuf",
+        username: "masayasuf",
         profile_url: "https://twitter.com/masayasuf",
-        dtext_artist_commentary_desc: nil,
+        dtext_artist_commentary_desc: ""
       )
     end
 
     context "A tweet from a suspended user" do
       strategy_should_work(
         "https://twitter.com/tanso_panz/status/1192429800717029377",
-        tag_name: "tanso_panz",
+        username: "tanso_panz",
         profile_url: "https://twitter.com/tanso_panz",
         image_urls: [],
-        dtext_artist_commentary_desc: nil,
+        dtext_artist_commentary_desc: ""
+      )
+    end
+
+    context "A https://fxtwitter.com/:username/status/:id url" do
+      strategy_should_work(
+        "https://fxtwitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
+        ],
+        profile_url: "https://twitter.com/motty08111213"
+      )
+    end
+
+    context "A https://vxtwitter.com/:username/status/:id url" do
+      strategy_should_work(
+        "https://vxtwitter.com/motty08111213/status/943446161586733056",
+        page_url: "https://twitter.com/motty08111213/status/943446161586733056",
+        image_urls: [
+          "https://pbs.twimg.com/media/DRfKHmgV4AAycFB.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHioVoAALRlK.jpg:orig",
+          "https://pbs.twimg.com/media/DRfKHgHU8AE7alV.jpg:orig",
+        ],
+        profile_url: "https://twitter.com/motty08111213"
       )
     end
 
@@ -328,6 +383,17 @@ module Sources
         "https://pbs.twimg.com/profile_banners/16298441/1394248006/600x200",
         image_urls: ["https://pbs.twimg.com/profile_banners/16298441/1394248006/1500x500"],
         media_files: [{ file_size: 108_605 }],
+        page_url: nil,
+        profile_url: nil
+      )
+    end
+
+    context "An /ad_img/ image sample" do
+      strategy_should_work(
+        "https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=small",
+        image_urls: ["https://pbs.twimg.com/ad_img/1415875929608396801/pklSzcPz?format=jpg&name=orig"],
+        media_files: [{ file_size: 159_186 }],
+        page_url: nil,
         profile_url: nil
       )
     end
@@ -372,7 +438,7 @@ module Sources
       strategy_should_work(
         "https://twitter.com/VG_Worklog/status/1587457941418160128",
         dtext_artist_commentary_desc: <<~EOS.chomp
-          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]\x20
+          Sound by: "@RealAudiodude":[https://twitter.com/RealAudiodude]
           Download: <https://mega.nz/folder/i80gVL7L#111g2XX7bIJ-2KnAHxMt0w>
           Support: <https://www.patreon.com/vgerotica>
         EOS
@@ -419,6 +485,123 @@ module Sources
       )
     end
 
+    context "A tweet with alt text" do
+      strategy_should_work(
+        "https://x.com/maruyo_/status/1521844593804906496",
+        image_urls: %w[
+          https://pbs.twimg.com/media/FRu0eYvVgAA83Et.jpg:orig
+          https://pbs.twimg.com/media/FRu0eYwVEAAso2d.jpg:orig
+          https://pbs.twimg.com/media/FRu0eY2UUAE54PD.jpg:orig
+          https://pbs.twimg.com/media/FRu0eY9VcAEZluY.jpg:orig
+        ],
+        media_files: [
+          { file_size: 215_152 },
+          { file_size: 131_131 },
+          { file_size: 151_909 },
+          { file_size: 128_702 }
+        ],
+        page_url: "https://twitter.com/maruyo_/status/1521844593804906496",
+        profile_urls: %w[https://twitter.com/maruyo_ https://twitter.com/intent/user?user_id=115694863],
+        display_name: "まるよ",
+        username: "maruyo_",
+        tags: [
+          ["スーパーカブ", "https://twitter.com/hashtag/スーパーカブ"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          GWなので再放送です☺
+          "#スーパーカブ":[https://twitter.com/hashtag/スーパーカブ]
+
+          [quote]
+          h6. Image Description
+
+          江ノ電カブネキからすっかりネタに走ってますがたまにまじめに描いてはいるのです。トークショーからもうそろそろ１か月でスタンプラリーももうすぐ終わりですね。5/8までなのでまだ間に合いますYO
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          これはメタルギアがネタですねｗ
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          トークショー脳内作画。礼子さんがおしとやかで小熊はそのまんまという感じですｗ バイク歴は真逆なのでライディング講座をするとか面白かったです。現地にいた人は優勝。なんと外からでも見ることができるようにしてくれるという神対応だったので最後まで居残った人は全員見られたはず（と思う）
+          [/quote]
+
+          [quote]
+          h6. Image Description
+
+          情報量の多い画像です。配役はすぐこれだ！と思ったわけですｗ
+          [/quote]
+        EOS
+      )
+    end
+
+    context "A tweet with alt text containing multiple paragraphs" do
+      strategy_should_work(
+        "https://x.com/yamada999_anime/status/1642195121319071748",
+        image_urls: %w[https://pbs.twimg.com/media/FsjUfK9aYAYjmvP.jpg:orig],
+        media_files: [{ file_size: 1_656_293 }],
+        page_url: "https://twitter.com/yamada999_anime/status/1642195121319071748",
+        profile_urls: %w[https://twitter.com/yamada999_anime https://twitter.com/intent/user?user_id=1559447246646935552],
+        display_name: "TVアニメ「山田くんとLv999の恋をする」公式",
+        username: "yamada999_anime",
+        tags: [
+          ["山田999", "https://twitter.com/hashtag/山田999"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          💕••┈┈┈┈┈┈┈┈•• 💕
+          𝗕𝗹𝘂-𝗿𝗮𝘆&𝗗𝗩𝗗 𝗩𝗼𝗹.𝟭
+          𝟲.𝟮𝟴 𝗢𝗡 𝗦𝗔𝗟𝗘
+          🎮••┈┈┈┈┈┈┈┈•• 🎮
+
+          『山田くんとLv999の恋をする』
+          Blu-ray&DVD発売決定🎮
+
+          Vol.1は6/28発売💜
+
+          描き下ろしジャケットイラスト解禁💫
+
+          ▼CMはこちら
+          <https://youtu.be/ZNbTEIawZN4>
+
+          "#山田999":[https://twitter.com/hashtag/山田999]
+
+          [quote]
+          h6. Image Description
+
+          『山田くんとLv999の恋をする 1』
+          2023.6.28(wed) Release
+
+          完全生産限定版 Blu-ray 6,800円+税
+          完全生産限定版 DVD 5,800円+税
+          収録話数：Lv.01/Lv.02
+
+          🎮完全生産限定版特典🎮
+          ●原作：ましろ描き下ろし全巻収納BOX
+          ●キャラクターデザイン：濱田邦彦描き下ろし三方背ケース仕様
+          ●ランダムトレカ（※各巻に全3種中ランダム1枚を封入予定）
+          ●特製ブックレット（8P）
+          ●特典CD
+          水瀬いのり・内山昂輝のラジオLv999～気のせいかな。リスナーとのこの距離の名前、知ってるよ～ vol.1
+          ●特典映像
+          ①PV・CM集
+          ②ノンクレジットOPED
+          [/quote]
+        EOS
+      )
+    end
+
+    context "A Twitter artist with only an intent URL in the artist profile" do
+      should "find the artist" do
+        @artist = create(:artist, url_string: "https://twitter.com/intent/user?user_id=940159421677690880")
+        assert_equal([@artist], Source::Extractor.find("https://twitter.com/ebihurya332/status/1759409576095711667").artists)
+      end
+    end
+
     should "Parse Twitter URLs correctly" do
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg"))
       assert(Source::URL.image_url?("https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg:small"))
@@ -430,6 +613,7 @@ module Sources
       assert(Source::URL.page_url?("https://twitter.com/i/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/i/web/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://twitter.com/BOW999/statuses/1261877313349640194"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194/photo/1"))
       assert(Source::URL.page_url?("https://twitter.com/BOW999/status/1261877313349640194?s=19"))
       assert(Source::URL.page_url?("https://twitter.com/@BOW999/status/1261877313349640194"))
@@ -437,6 +621,7 @@ module Sources
       assert(Source::URL.page_url?("https://x.com/i/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://x.com/i/web/status/1261877313349640194"))
       assert(Source::URL.page_url?("https://x.com/BOW999/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://x.com/BOW999/statuses/1261877313349640194"))
 
       assert(Source::URL.profile_url?("https://www.twitter.com/irt_5433"))
       assert(Source::URL.profile_url?("https://www.twitter.com/@irt_5433"))
@@ -450,13 +635,43 @@ module Sources
       assert(Source::URL.profile_url?("https://x.com/intent/user?screen_name=ryuudog_NFT"))
       assert(Source::URL.profile_url?("https://x.com/i/user/889592953"))
 
+      assert(Source::URL.page_url?("https://vxtwitter.com/i/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://vxtwitter.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://vxtwitter.com/@BOW999/status/1261877313349640194"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://vxtwitter.com/i/user/889592953"))
+
+      assert(Source::URL.page_url?("https://fxtwitter.com/i/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://fxtwitter.com/i/web/status/1261877313349640194"))
+      assert(Source::URL.page_url?("https://fxtwitter.com/@BOW999/status/1261877313349640194"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/irt_5433"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/intent/user?user_id=1485229827984531457"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/intent/user?screen_name=ryuudog_NFT"))
+      assert(Source::URL.profile_url?("https://fxtwitter.com/i/user/889592953"))
+
       assert_not(Source::URL.profile_url?("https://twitter.com/home"))
+      assert_not(Source::URL.profile_url?("https://t.co/Dxn7CuVErW"))
+      assert_not(Source::URL.profile_url?("https://pic.twitter.com/Dxn7CuVErW"))
+
+      assert_not(Source::URL.bad_link?("https://pbs.twimg.com/profile_banners/780804311529906176/1475001696"))
+      assert_not(Source::URL.bad_source?("https://pbs.twimg.com/profile_banners/780804311529906176/1475001696"))
+      assert_not(Source::URL.bad_link?("https://twitter.com/merry_bongbong/header_photo"))
+      assert_not(Source::URL.bad_source?("https://twitter.com/merry_bongbong/header_photo"))
 
       assert_nil(Source::URL.parse("https://twitter.com/i/status/1261877313349640194").username)
       assert_nil(Source::URL.parse("https://twitter.com/i/web/status/1261877313349640194").username)
+      assert_nil(Source::URL.parse("https://t.co/Dxn7CuVErW").try(:username))
+      assert_nil(Source::URL.parse("https://pic.twitter.com/Dxn7CuVErW").try(:username))
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999/status/1261877313349640194").username)
       assert_equal("BOW999", Source::URL.parse("https://twitter.com/@BOW999").username)
+
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fixvx.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fixupx.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://twittpr.com/BOW999/status/1261877313349640194").page_url)
+      assert_equal("https://twitter.com/BOW999/status/1261877313349640194", Source::URL.parse("https://fxtwitter.com/BOW999/status/1261877313349640194.jpg").page_url)
     end
   end
 end

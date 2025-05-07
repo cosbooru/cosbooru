@@ -32,6 +32,7 @@ class MediaAsset < ApplicationRecord
   has_many :uploads, through: :upload_media_assets
   has_many :uploaders, through: :uploads, class_name: "User", foreign_key: :uploader_id
   has_many :ai_tags
+  has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :dtext_links, -> { embedded_media_asset }, foreign_key: :link_target
   has_many :embedding_wiki_pages, through: :dtext_links, source: :model, source_type: "WikiPage"
 
@@ -440,6 +441,7 @@ class MediaAsset < ApplicationRecord
         purge_cached_urls!
         update!(status: :expunged)
         ModAction.log("expunged media asset ##{id} (md5=#{md5})", :media_asset_expunge, subject: self, user: current_user) if log
+        pending_moderation_reports.update!(status: :handled, updater: current_user)
       end
     rescue StandardError
       update!(status: :failed)
@@ -452,6 +454,7 @@ class MediaAsset < ApplicationRecord
         purge_cached_urls!
         update!(status: :deleted)
         ModAction.log("deleted media asset ##{id} (md5=#{md5})", :media_asset_delete, subject: self, user: current_user) if log
+        pending_moderation_reports.update!(status: :handled, updater: current_user)
       end
     rescue StandardError
       update!(status: :failed)
@@ -572,7 +575,10 @@ class MediaAsset < ApplicationRecord
   end
 
   def source_urls
-    urls = upload_media_assets.map { |uma| Source::URL.page_url(uma.source_url) || uma.page_url || uma.source_url }
+    urls = upload_media_assets.map do |uma|
+      Source::URL.page_url(uma.source_url) || Source::URL.page_url(uma.page_url) || uma.page_url || uma.source_url
+    end
+
     urls += [post.normalized_source] if post&.normalized_source.present?
 
     urls.compact.select do |url|

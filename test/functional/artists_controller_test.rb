@@ -185,6 +185,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(any_name_matches: "masao", order: "post_count").with { @masao }
         should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
         should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
+        should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 https://example.com/1234").with { @masao }
 
         context "ignoring whitespace" do
           should respond_to_search(url_matches: " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 ").with { @masao }
@@ -299,6 +300,17 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
       should "not fail for Pixiv bad IDs" do
         assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=0")
+      end
+
+      should "find an artist with an inactive artist URL" do
+        @artist = create(:artist, url_string: "-https://www.pixiv.net/users/1843825")
+        assert_artist_found(@artist.name, "https://www.pixiv.net/users/1843825")
+      end
+
+      should "find the artist when given a profile URL" do
+        assert_artist_found(create(:artist, url_string: "http://www.tinami.com/creator/profile/10262").name, "http://www.tinami.com/creator/profile/10262")
+        assert_artist_found(create(:artist, url_string: "https://seiga.nicovideo.jp/user/illust/14767435").name, "https://seiga.nicovideo.jp/user/illust/14767435")
+        assert_artist_found(create(:artist, url_string: "https://fantia.jp/fanclubs/15340").name, "https://fantia.jp/fanclubs/15340")
       end
     end
   end

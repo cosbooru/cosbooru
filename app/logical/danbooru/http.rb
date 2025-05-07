@@ -24,7 +24,7 @@ module Danbooru
     class FileTooLargeError < Error; end
 
     Danbooru::Http::HtmlAdapter.register
-    Danbooru::Http::JsonAdapter.register
+    Danbooru::Http::JSONAdapter.register
     Danbooru::Http::XmlAdapter.register
     Danbooru::Http::Cache.register
     Danbooru::Http::Logger.register
@@ -42,7 +42,7 @@ module Danbooru
     attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :parsed_get, :parsed_post, :redirect_url, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :proxy, :public_only, :with_legacy_ssl, :download_media, to: :new
     end
 
     # The default HTTP client.
@@ -50,7 +50,7 @@ module Danbooru
       Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding": "gzip")
-        .use(normalize_uri: { normalizer: ->(uri) { HTTP::URI.parse(Addressable::URI.encode_component(uri, "[[:ascii:]&&[^ ]]")) } }) # XXX Percent-encode Unicode and space characters to avoid "URI::InvalidURIError: URI must be ascii only" error
+        .use(normalize_uri: { normalizer: method(:normalize_uri) })
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
@@ -70,6 +70,27 @@ module Danbooru
     # The default HTTP client for API calls to internal services controlled by Danbooru.
     def self.internal
       new.headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+    end
+
+    # Normalizes the URI before performing a request. Percent-encodes special characters to avoid "URI must be ascii only"
+    # and "bad URI(is not URI?)" errors.
+    def self.normalize_uri(uri)
+      parsed_uri = Addressable::URI.parse(uri)
+
+      normalized_path = parsed_uri.path.split(%r{(/)}).map do |segment|
+        next segment if segment == "/"
+        segment = Addressable::URI.unencode_component(segment)
+        segment = Addressable::URI.encode_component(segment, Addressable::URI::CharacterClasses::PATH.gsub(%r{\\/}, ""))
+        segment
+      end.join
+
+      HTTP::URI.new(
+        scheme: parsed_uri.scheme,
+        authority: parsed_uri.authority,
+        path: normalized_path,
+        query: Addressable::URI.encode_component(parsed_uri.query, "[[:ascii:]&&[^ ]]"),
+        fragment: parsed_uri.fragment
+      )
     end
 
     def initialize
@@ -112,8 +133,12 @@ module Danbooru
       parsed_request(:post, url, **options)
     end
 
-    def follow(*args)
-      dup.tap { |o| o.http = o.http.follow(*args) }
+    def follow(max_redirects: MAX_REDIRECTS)
+      use(redirector: { max_redirects: })
+    end
+
+    def no_follow
+      disable_feature(:redirector)
     end
 
     def max_size(size)
@@ -142,6 +167,14 @@ module Danbooru
 
     def use(*args)
       dup.tap { |o| o.http = o.http.use(*args) }
+    end
+
+    def disable_feature(*features)
+      dup.tap do |o|
+        options = o.http.default_options.dup
+        options.features = options.features.without(*features)
+        o.http = o.http.branch(options)
+      end
     end
 
     def cache(expires_in)
@@ -178,10 +211,14 @@ module Danbooru
       end
     end
 
-    # @return [Danbooru::URL, nil] Return the URL that the given URL redirects to, or nil on error.
-    def redirect_url(url)
-      redirect_url = head(url)&.uri
-      Danbooru::URL.parse(redirect_url)
+    # Return the URL that the given URL redirects to, or nil on error. This does not follow multiple redirects.
+    #
+    # @param method [String] The HTTP method to use, GET or HEAD. HEAD may be faster, but may fail for some sites.
+    # @return [Danbooru::URL, nil] The URL this URL redirects to, or nil on error.
+    def redirect_url(url, method: "HEAD")
+      response = no_follow.request(method.downcase, url)
+      return nil unless response.status.redirect?
+      Danbooru::URL.parse(response.headers["Location"])
     end
 
     concerning :DownloadMethods do
@@ -221,6 +258,7 @@ module Danbooru
     # @param options [Hash] the URL parameters
     # @return [HTTP::Response] the HTTP response
     def request(method, url, format: nil, **options)
+      url = url.to_s
       response = http.send(method, url, **options)
 
       if format
@@ -231,17 +269,17 @@ module Danbooru
 
       response
     rescue OpenSSL::SSL::SSLError
-      fake_response(590)
+      fake_response(590, method, url)
     rescue ValidatingSocket::ProhibitedIpError
-      fake_response(591)
+      fake_response(591, method, url)
     rescue HTTP::Redirector::TooManyRedirectsError
-      fake_response(596)
+      fake_response(596, method, url)
     rescue HTTP::TimeoutError
-      fake_response(597)
-    rescue HTTP::ConnectionError
-      fake_response(598)
+      fake_response(597, method, url)
+    rescue HTTP::ConnectionError, Resolv::ResolvError
+      fake_response(598, method, url)
     rescue HTTP::Error
-      fake_response(599)
+      fake_response(599, method, url)
     end
 
     # Perform a HTTP request for the given URL, raising an error on 4xx or 5xx
@@ -276,8 +314,8 @@ module Danbooru
       response.parse
     end
 
-    def fake_response(status)
-      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: nil)
+    def fake_response(status, method, url)
+      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: ::HTTP::Request.new(verb: method, uri: url))
     end
   end
 end

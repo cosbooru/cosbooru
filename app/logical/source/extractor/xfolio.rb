@@ -6,15 +6,11 @@ class Source::Extractor::Xfolio < Source::Extractor
     Danbooru.config.xfolio_session.present?
   end
 
-  def match?
-    Source::URL::Xfolio === parsed_url
-  end
-
   def image_urls
     if work_id.present? && image_id.present?
       ["https://xfolio.jp/user_asset.php?id=#{image_id}&work_id=#{work_id}&work_image_id=#{image_id}&type=work_image"]
     elsif page.present?
-      page&.search(".article__wrap_img").map do |wrap_img|
+      page&.css(".article__wrap_img").to_a.map do |wrap_img|
         a = wrap_img.search("a").first
         img = wrap_img.search("img").first
         if a
@@ -42,11 +38,7 @@ class Source::Extractor::Xfolio < Source::Extractor
     parsed_url.username || parsed_referer&.username
   end
 
-  def tag_name
-    username
-  end
-
-  def artist_name
+  def display_name
     page&.search(".creatorInfo").to_a.first&.attr("data-creator-name")
   end
 
@@ -71,10 +63,8 @@ class Source::Extractor::Xfolio < Source::Extractor
   end
 
   def tags
-    data = page&.search(".article--detailInfo__tags").to_a.first&.attr("data-tags")
-    return [] unless data
-
-    JSON.parse(data).map do |tag| [tag["name"], tag["link"]] end
+    tags = page&.at(".article--detailInfo__tags")&.attr("data-tags")&.parse_json.to_a
+    tags.map { |tag| [tag["name"], tag["link"]] }
   end
 
   memoize def page
@@ -84,5 +74,4 @@ class Source::Extractor::Xfolio < Source::Extractor
   def http
     super.cookies(xfolio_session: Danbooru.config.xfolio_session)
   end
-
 end

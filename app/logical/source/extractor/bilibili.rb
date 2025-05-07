@@ -4,41 +4,61 @@
 module Source
   class Extractor
     class Bilibili < Source::Extractor
-      def match?
-        Source::URL::Bilibili === parsed_url
-      end
-
       def image_urls
         if parsed_url&.full_image_url.present?
           [parsed_url.full_image_url]
-        elsif data.present?
-          image_urls = data.dig("modules", "module_dynamic", "major", "draw", "items").to_a.pluck("src")
-          image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
-        elsif article_id.present?
-          page&.search("#article-content img").to_a.pluck("data-src").compact.map { |u| Source::URL.parse(URI.join("https://", u)).full_image_url || u }
-        else
+        elsif parsed_url.image_url?
           [parsed_url.original_url]
+        elsif post_json.present?
+          image_urls = post_json.dig("modules", "module_dynamic", "major", "opus", "pics").to_a.pluck("url")
+          image_urls.to_a.compact.map { |u| Source::URL.parse(u).full_image_url || u }
+        elsif article_json.present?
+          article_image_urls
+        else
+          []
+        end
+      end
+
+      memoize def article_image_urls
+        return [] unless article_json.present?
+
+        artist_commentary_desc.to_s.parse_html.css("img").filter_map do |img|
+          # Skip:
+          #   <img data-src="//i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png" class="cut-off-5">
+          #   <img data-src="//i0.hdslb.com/bfs/article/card/1-1card458718717_web.png" width="1320" height="188" data-size="37499" aid="458718717" class="video-card nomal" type="nomal">
+          #   <img data-src="//i0.hdslb.com/bfs/article/card/ef6b00f9d998c52e9a4bffb9051235c7ab288719.png" width="1320" height="224" data-size="44498" aid="20190469" class="article-card" type="normal">
+          #   <img alt="琉绮RUKI立绘.png" width="280" height="522">
+          #
+          # Keep:
+          #   <img data-src="//i0.hdslb.com/bfs/article/cf18da941f612502e994d8b9f991175dbfbbc7d9.png" width="650" height="180" data-size="11948" class="seamless" type="seamlessImage">
+          #   <img data-src="//i0.hdslb.com/bfs/article/82f9cb60d3f83b73a7c550d3142d65bc772a2527.png" width="476" height="2112" data-size="533862">
+          #   <img data-src="//i0.hdslb.com/bfs/article/watermark/ec0897d1aa461471149315f4b24e18a8a609853f.png" width="750" height="929" data-size="1486140">
+          next if img["class"]&.match?(/card|cut-off/) || img["data-src"].blank?
+
+          url = URI.join("https://", img["data-src"]).to_s
+          Source::URL.parse(url).full_image_url || url
         end
       end
 
       def page_url
-        t_work_page || parsed_url.page_url || parsed_referer&.page_url
+        work_page || parsed_url.page_url || parsed_referer&.page_url
       end
 
-      def t_work_page
-        return unless t_work_id.present?
-        "https://t.bilibili.com/#{data["id_str"]}"
-      end
-
-      def artist_commentary_title
-        if article_id.present?
-          page&.at(".article-container .title")&.text&.squish&.strip
+      def work_page
+        if post_json["id_str"].present?
+          "https://t.bilibili.com/#{post_json["id_str"]}"
+        elsif article_json["cvid"].present?
+          "https://www.bilibili.com/read/cv#{article_json["cvid"]}/"
         end
       end
 
+      def artist_commentary_title
+        post_json.dig("modules", "module_dynamic", "major", "opus", "title") || article_json.dig("readInfo", "title")
+      end
+
       def artist_commentary_desc
-        if t_work_id.present?
-          data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
+        if post_json.present?
+          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.map do |text_node|
             case text_node["type"]
             when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
               "<a href='#{URI.join("https://", text_node["jump_url"])}'>#{text_node["text"]}</a>"
@@ -50,8 +70,10 @@ module Source
               text_node["text"]
             end
           end.join
-        elsif article_id.present?
-          page&.at("#article-content")&.to_html
+        elsif article_json.present?
+          article_json.dig("readInfo", "content")
+        else
+          nil
         end
       end
 
@@ -60,29 +82,28 @@ module Source
       end
 
       def tags
-        data.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
-          n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
-        end.map do |tag|
-          tag_name = tag["text"].gsub(/(^#|#$)/, "")
-          [tag_name, "https://t.bilibili.com/topic/name/#{tag_name}"]
+        if post_json.present?
+          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
+            n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
+          end.map do |tag|
+            tag_name = tag["text"].gsub(/(^#|#$)/, "")
+            [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+          end
+        elsif article_json.present?
+          article_json.dig("readInfo", "tags").to_a.map do |tag|
+            [tag["name"], "https://search.bilibili.com/article?keyword=#{Danbooru::URL.escape(tag["name"])}"]
+          end
+        else
+          []
         end
       end
 
-      def artist_name
-        if t_work_id.present?
-          data.dig("modules", "module_author", "name")
-        elsif article_id.present?
-          page&.at(".article-container .up-name")&.text&.squish&.strip
-        end
+      def display_name
+        post_json.dig("modules", "module_author", "name") || article_json.dig("readInfo", "author", "name")
       end
 
       def tag_name
-        return unless artist_id.present?
-        "bilibili_#{artist_id}"
-      end
-
-      def other_names
-        [artist_name].compact
+        "bilibili_#{artist_id}" if artist_id.present?
       end
 
       def artist_id
@@ -90,17 +111,11 @@ module Source
       end
 
       def artist_id_from_data
-        if t_work_id.present?
-          data.dig("modules", "module_author", "mid")
-        elsif article_id.present?
-          artist_url = page&.at(".article-container .up-name")&.[]("href")
-          Source::URL.parse(URI.join("https://", artist_url))&.artist_id
-        end
+        post_json.dig("modules", "module_author", "mid") || article_json.dig("readInfo", "author", "mid")
       end
 
       def profile_url
-        return nil if artist_id.blank?
-        "https://space.bilibili.com/#{artist_id}"
+        "https://space.bilibili.com/#{artist_id}" if artist_id.present?
       end
 
       def t_work_id
@@ -127,19 +142,27 @@ module Source
       end
 
       memoize def page
-        http.cache(1.minute).parsed_get(page_url)
+        url = parsed_url.page_url || parsed_referer&.page_url
+        http.cache(1.minute).parsed_get(url)
       end
 
-      memoize def data
+      memoize def post_json
         return {} if t_work_id.blank?
 
-        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}") || {}
+        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}&features=itemOpusStyle") || {}
 
         if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
           data.dig("data", "item", "orig")
         else
           data.dig("data", "item").to_h
         end
+      end
+
+      memoize def article_json
+        return {} if article_id.nil? || page.nil?
+
+        script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
+        script[/window.__INITIAL_STATE__=(.*);\(function\(\){[^"]*}\(\)\);\z/, 1]&.parse_json || {}
       end
     end
   end

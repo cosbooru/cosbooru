@@ -1,21 +1,24 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class BlueskyTest < ActiveSupport::TestCase
+    setup do
+      skip "Bluesky credentials not configured" unless Source::Extractor::Bluesky.enabled?
+    end
 
     context "A post url with 'app.bsky.embed.images.view' embed" do
       strategy_should_work(
         "https://bsky.app/profile/ixy.bsky.social/post/3kkvo4d4jd32g",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_url: "https://bsky.app/profile/ixy.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/ixy.bsky.social",
           "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         ],
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
-        artist_name: "Ixy(いくしー)",
-        tag_name: "ixy",
+        display_name: "Ixy(いくしー)",
+        username: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
       )
@@ -31,10 +34,10 @@ module Sources
           "https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:ekm5wgpt6xhazl7xaipt5ewy&cid=bafkreidzr5uo4mlxxssdluiyhvvbi7k4aner7teuuvex5t6ock3h2byxrm",
         ],
         media_files: [
-          { file_size: 773999 },
-          { file_size: 953927 },
-          { file_size: 829658 },
-          { file_size: 831440 },
+          { file_size: 773_999 },
+          { file_size: 953_927 },
+          { file_size: 829_658 },
+          { file_size: 831_440 },
         ],
         profile_url: "https://bsky.app/profile/yourbaguette.bsky.social",
         profile_urls: [
@@ -42,10 +45,16 @@ module Sources
           "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy",
         ],
         page_url: "https://bsky.app/profile/did:plc:ekm5wgpt6xhazl7xaipt5ewy/post/3kjarhifsmg26",
-        artist_name: "Baguette",
-        tag_name: "yourbaguette",
+        display_name: "Baguette",
+        username: "yourbaguette",
         tags: ["Art", "FanArt", "Digimon", "SteinsGate", "Omori", "FFXIV"],
-        dtext_artist_commentary_desc: "Thanks for the opportunity Bison ! \n\nI'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time ! \n\n#Art #FanArt #Digimon #SteinsGate #Omori #FFXIV",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          Thanks for the opportunity Bison !
+
+          I'm Baguette, and I mostly draw fanarts of whatever obsession I have ! I will move in Sweden in a week, work on my art and aim to open a little shop this year while working part time !
+
+          "#Art":[https://bsky.app/hashtag/Art] "#FanArt":[https://bsky.app/hashtag/FanArt] "#Digimon":[https://bsky.app/hashtag/Digimon] "#SteinsGate":[https://bsky.app/hashtag/SteinsGate] "#Omori":[https://bsky.app/hashtag/Omori] "#FFXIV":[https://bsky.app/hashtag/FFXIV]
+        EOS
       )
     end
 
@@ -53,17 +62,31 @@ module Sources
       strategy_should_work(
         "https://bsky.app/profile/go-guiltism.bsky.social/post/3klgth6lilt2l",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:owc2r2dsewj3hk73rtd746zh&cid=bafkreieuhplc7fpbvi3suvacaf2dqxzvuu4hgl5o6eifqb76tf3uopldmi"],
-        media_files: [{ file_size: 162135 }],
+        media_files: [{ file_size: 162_135 }],
         profile_url: "https://bsky.app/profile/go-guiltism.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/go-guiltism.bsky.social",
           "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh",
         ],
         page_url: "https://bsky.app/profile/did:plc:owc2r2dsewj3hk73rtd746zh/post/3klgth6lilt2l",
-        artist_name: "Hi-GO!",
-        tag_name: "go-guiltism",
+        display_name: "Hi-GO!",
+        username: "go-guiltism",
         tags: [],
         dtext_artist_commentary_desc: "Copy-X FullArmed 2",
+      )
+    end
+
+    context "A post with a video" do
+      strategy_should_work(
+        "https://bsky.app/profile/tuyoki.bsky.social/post/3l47ij5osb32u",
+        image_urls: %w[https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:mymwxdm4zedrqufkotuxn72k&cid=bafkreih2h3eretfhugjzao5af3jc5zxfydsdyvyijhfi7ij4et55jqrqfi],
+        media_files: [{ file_size: 1_172_768 }],
+        page_url: "https://bsky.app/profile/did:plc:mymwxdm4zedrqufkotuxn72k/post/3l47ij5osb32u",
+        profile_urls: %w[https://bsky.app/profile/tuyoki.bsky.social https://bsky.app/profile/did:plc:mymwxdm4zedrqufkotuxn72k],
+        display_name: "temmie",
+        username: "tuyoki",
+        tags: [],
+        dtext_artist_commentary_desc: "victory pose"
       )
     end
 
@@ -71,17 +94,40 @@ module Sources
       strategy_should_work(
         "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_url: "https://bsky.app/profile/ixy.bsky.social",
         profile_urls: [
           "https://bsky.app/profile/ixy.bsky.social",
           "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w",
         ],
         page_url: "https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w/post/3kkvo4d4jd32g",
-        artist_name: "Ixy(いくしー)",
-        tag_name: "ixy",
+        display_name: "Ixy(いくしー)",
+        username: "ixy",
         tags: [],
         dtext_artist_commentary_desc: "らき☆すた原作２０周年おめでとうございます",
+      )
+    end
+
+    context "A post with Unicode tags" do
+      strategy_should_work(
+        "https://bsky.app/profile/mzmanjo.bsky.social/post/3l46kshfnjt2t",
+        image_urls: %w[https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:4ix5icku4nehfgpkyhtrpto6&cid=bafkreiblyhv7hrjeaft44lx2l2kdtqcru5uzqumimnlhqopjh2gvyvm7ca],
+        media_files: [{ file_size: 475_001 }],
+        page_url: "https://bsky.app/profile/did:plc:4ix5icku4nehfgpkyhtrpto6/post/3l46kshfnjt2t",
+        profile_urls: %w[https://bsky.app/profile/mzmanjo.bsky.social https://bsky.app/profile/did:plc:4ix5icku4nehfgpkyhtrpto6],
+        display_name: "アンジョー",
+        username: "mzmanjo",
+        tags: [
+          ["100日チャレンジ", "https://bsky.app/hashtag/100日チャレンジ"],
+          ["逃げ若", "https://bsky.app/hashtag/逃げ若"],
+          ["逃げ上手の若君", "https://bsky.app/hashtag/逃げ上手の若君"],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp
+          8日目 北条時行
+          "#100日チャレンジ":[https://bsky.app/hashtag/100日チャレンジ]
+          "#逃げ若":[https://bsky.app/hashtag/逃げ若] "#逃げ上手の若君":[https://bsky.app/hashtag/逃げ上手の若君]
+        EOS
       )
     end
 
@@ -89,7 +135,7 @@ module Sources
       strategy_should_work(
         "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:3jogsxcisdcdzwjobhxbav2w/bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4@jpeg",
         image_urls: ["https://bsky.social/xrpc/com.atproto.sync.getBlob?did=did:plc:3jogsxcisdcdzwjobhxbav2w&cid=bafkreiawa4vn5k37h2mlpwuhaqmeog3hsfe3z47iot7reqxjlff6juyge4"],
-        media_files: [{ file_size: 398747 }],
+        media_files: [{ file_size: 398_747 }],
         profile_urls: ["https://bsky.app/profile/did:plc:3jogsxcisdcdzwjobhxbav2w"],
       )
     end

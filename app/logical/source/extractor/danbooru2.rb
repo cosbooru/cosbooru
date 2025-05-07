@@ -7,11 +7,7 @@ module Source
   class Extractor
     # The class is called `Danbooru2` instead of `Danbooru` to avoid ambiguity with the top-level `Danbooru` class.
     class Danbooru2 < Source::Extractor
-      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
-
-      def match?
-        Source::URL::Danbooru2 === parsed_url
-      end
+      delegate :artist_name, :profile_url, :display_name, :username, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
 
       def image_urls
         if parsed_url.full_image_url.present?
@@ -73,7 +69,9 @@ module Source
         end
 
         def sub_extractor
-          @sub_extractor ||= Source::Extractor.find(api_response[:source], default: nil)
+          return nil if parent_extractor.present?
+
+          @sub_extractor ||= Source::Extractor.find(api_response[:source], default_extractor: nil, parent_extractor: self)
         end
       end
     end

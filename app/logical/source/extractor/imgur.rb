@@ -10,10 +10,6 @@ module Source
       # 2019, so hardcoding it should be fine.
       IMGUR_CLIENT_ID = "546c25a59c58ad7"
 
-      def match?
-        Source::URL::Imgur === parsed_url
-      end
-
       def image_urls
         # For .mp4 files (e.g. https://i.imgur.com/Kp9TdlX.mp4), we have to use the API to tell whether the original image is a .gif or not.
         if parsed_url.image_url? && parsed_url.file_ext == "mp4"
@@ -26,7 +22,7 @@ module Source
       end
 
       def image_urls_from_api
-        v1_api_response.dig(:media).to_a.pluck(:url).presence || v3_api_response.dig(:images).to_a.pluck(:link)
+        v1_api_response[:media].to_a.pluck(:url).presence || v3_api_response[:images].to_a.pluck(:link)
       end
 
       def page_url
@@ -38,12 +34,12 @@ module Source
       end
 
       def profile_url
-        "https://imgur.com/user/#{artist_name}" if artist_name
+        "https://imgur.com/user/#{username}" if username
       end
 
-      def artist_name
+      def username
         # v3_api_response[:account_url] is actually just the username
-        v1_api_response.dig(:account, :username).presence || v3_api_response[:account_url]
+        v1_api_response.dig(:account, :username).presence || v3_api_response[:account_url] || parsed_url.username || parsed_referer&.username
       end
 
       # XXX Each image in an album can have a separate title, tags, and description.

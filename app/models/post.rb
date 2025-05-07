@@ -439,7 +439,7 @@ class Post < ApplicationRecord
 
     # XXX should be a `validate` hook instead of `before_validation` hook
     def validate_new_tags
-      return if CurrentUser.user.is_builder?
+      return if CurrentUser.user.nil? || CurrentUser.user.is_builder?
 
       new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
 
@@ -497,21 +497,24 @@ class Post < ApplicationRecord
         tags << "non-web_source"
       end
 
-      source_url = parsed_source
-      if source_url.present? && source_url.recognized?
-        # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
-        if source_url.image_url? && source_url.page_url.nil?
-          tags << "bad_link"
-        else
-          tags -= ["bad_link"]
-        end
+      # A bad_link is an image URL from a recognized site that can't be converted to a page URL.
+      case parsed_source&.bad_link?
+      when true
+        tags << "bad_link"
+      when false
+        tags -= ["bad_link"]
+      when nil
+        # it's unknown whether it's a bad link or not; don't add or remove the tag
+      end
 
-        # A bad_source is a source from a recognized site that isn't an image url or a page url.
-        if !source_url.image_url? && !source_url.page_url?
-          tags << "bad_source"
-        else
-          tags -= ["bad_source"]
-        end
+      # A bad_source is a source from a recognized site that isn't an image url or a page url.
+      case parsed_source&.bad_source?
+      when true
+        tags << "bad_source"
+      when false
+        tags -= ["bad_source"]
+      when nil
+        # it's unknown whether it's a bad source or not; don't add or remove the tag
       end
 
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
@@ -1883,12 +1886,7 @@ class Post < ApplicationRecord
   concerning :PixivMethods do
     def parse_pixiv_id
       self.pixiv_id = nil
-      return unless web_source?
-
-      site = Source::Extractor::Pixiv.new(source)
-      if site.match?
-        self.pixiv_id = site.illust_id
-      end
+      self.pixiv_id = parsed_source.work_id if parsed_source.is_a?(Source::URL::Pixiv)
     end
   end
 
@@ -1982,7 +1980,7 @@ class Post < ApplicationRecord
     end
 
     def validate_changed_tags
-      return if uploader == CurrentUser.user || CurrentUser.user.is_builder?
+      return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
 
       changed_tags = added_tags + removed_tags
 
@@ -2139,7 +2137,11 @@ class Post < ApplicationRecord
   end
 
   def self.normalize_source(source)
-    source.to_s.strip.unicode_normalize(:nfc)
+    if source&.match?(%r{\Ahttps?://}i)
+      source.to_s
+    else
+      source.to_s.strip.unicode_normalize(:nfc)
+    end
   end
 
   def mark_as_translated(params)

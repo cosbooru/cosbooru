@@ -277,8 +277,11 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("foo\nbar", DText.from_html("foo <br> bar"))
         assert_equal("h1. foo bar", DText.from_html("<h1>foo<br>bar</h1>"))
         assert_equal('"foo bar":[http://google.com]', DText.from_html('<a href="http://google.com">foo<br>bar</a>'))
-        assert_equal("* foo bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
         assert_equal('foo" bar baz ":[http://google.com]quux', DText.from_html('foo<a href="http://google.com">  bar  baz  </a>quux'))
+      end
+
+      should "ignore <script> tags" do
+        assert_equal("", DText.from_html("<script>alert('lol')</script>"))
       end
 
       should "not convert URLs with unsupported schemes to dtext links" do
@@ -294,6 +297,53 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("issue &num;1", DText.from_html('<a href="/image"><img src="/image.jpg" alt="issue #1"></a>'))
 
         assert_equal("issue #1", DText.from_html("issue #1", allowed_shortlinks: ["issue"]))
+      end
+
+      should "put headers on a line by themselves" do
+        assert_equal("foo\n\nh4. bar\n\nbaz", DText.from_html("<span>foo</span><h4>bar</h4><span>baz</span>"))
+      end
+
+      should "omit empty headers" do
+        assert_equal("", DText.from_html("<h4> </h4>"))
+        assert_equal("", DText.from_html("<h4><br></h4>"))
+      end
+
+      should "convert <hr> tags to [hr] tags" do
+        assert_equal("foo\n\n[hr]\n\nbar", DText.from_html("<p>foo</p><hr><p>bar</p>"))
+      end
+
+      should "convert <details> tags to [expand] blocks" do
+        assert_equal("[expand]\nfoo\n\nbar\n[/expand]", DText.from_html("<details><p>foo</p><p>bar</p></details>"))
+        assert_equal("[expand=title]\nfoo\n\nbar\n[/expand]", DText.from_html("<details><p>foo</p><p>bar</p><summary>title</summary></details>"))
+      end
+
+      should "convert <ul> and <ol> lists to DText" do
+        assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo</li><li>bar</li></ul>"))
+        assert_equal("* foo bar", DText.from_html("<ul><li>foo\nbar</li></ul>"))
+        assert_equal("* foo\n** bar", DText.from_html("<ul><li>foo<ul><li>bar</li></ul></li></ul>"))
+        assert_equal("* foo\n** bar", DText.from_html("<ol><li>foo<ol><li>bar</li></ol></li></ol>"))
+
+        assert_equal("* foo\n* bar", DText.from_html("<li>foo</li><li>bar</li>"))
+
+        assert_equal("* foo[br]bar", DText.from_html("<ul><li>foo<br>bar</li></ul>"))
+        assert_equal("* foo", DText.from_html("<ul><li>foo<br></li></ul>"))
+        assert_equal("* foo\n* bar", DText.from_html("<ul><li>foo<br></li><li>bar</li></ul>"))
+      end
+
+      should "convert <block-spoiler> tags to DText" do
+        assert_equal("foo\n\n[spoiler]\nbar\n[/spoiler]\n\nbaz", DText.from_html("<p>foo</p><block-spoiler>bar</block-spoiler><p>baz</p>"))
+      end
+
+      should "convert <inline-spoiler> tags to DText" do
+        assert_equal("foo [spoiler]bar[/spoiler] baz", DText.from_html("<p>foo <inline-spoiler>bar</inline-spoiler> baz</p>"))
+      end
+
+      should "convert <pre> tags to DText" do
+        assert_equal("foo\n\n[code]\nbar\n[/code]\n\nbaz", DText.from_html("<p>foo</p><pre>bar</pre><p>baz</p>"))
+      end
+
+      should "convert <code> tags to DText" do
+        assert_equal("foo [code]bar[/code] baz", DText.from_html("<p>foo <code>bar</code> baz</p>"))
       end
     end
 

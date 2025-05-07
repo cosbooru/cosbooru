@@ -5,10 +5,6 @@
 module Source
   class Extractor
     class ArcaLive < Source::Extractor
-      def match?
-        Source::URL::ArcaLive === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.full_image_url]
@@ -23,10 +19,6 @@ module Source
           url = "https:#{url}" if url.starts_with?("//")
           Source::URL.parse(url).try(:full_image_url)
         end
-      end
-
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
       end
 
       def profile_url
@@ -54,7 +46,7 @@ module Source
       memoize def page
         # We need to spoof both the User-Agent (done by default in `Danbooru::Http.external`) and the Accept header,
         # otherwise we start getting hCaptchas if the request rate is too high.
-        headers = { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
+        headers = { Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
         http.cache(1.minute).headers(headers).parsed_get(page_url)
       end
     end

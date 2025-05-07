@@ -1,6 +1,6 @@
 source 'https://rubygems.org/'
 
-ruby "~> 3.2.3"
+ruby "~> 3.3.2"
 
 gem 'dotenv-rails', require: "dotenv/load"
 
@@ -70,6 +70,7 @@ gem "bcrypt_pbkdf"
 gem "connection_pool"
 gem "rotp"
 gem "rqrcode"
+gem "kramdown"
 
 group :development do
   gem 'rubocop', require: false

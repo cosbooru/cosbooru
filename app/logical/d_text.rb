@@ -371,6 +371,8 @@ class DText
     bulk_update_requests = fragment.css("tag-request-embed").select { |node| node["data-type"] == "bulk-update-request" }.pluck("data-id").uniq
 
     { wiki_pages:, posts:, media_assets:, tag_aliases:, tag_implications:, bulk_update_requests: }
+  rescue DText::Error
+    { wiki_pages: [], posts: [], media_assets: [], tag_aliases: [], tag_implications: [], bulk_update_requests: [] }
   end
 
   # Return a list of external links mentioned in a string of DText.
@@ -619,19 +621,29 @@ class DText
       case element.name
       in "text"
         escape(element.content, allowed_shortlinks:).normalize_whitespace(eol: "\n").gsub(/ *\n+ */, "\n").gsub(/[ \n]+/, " ")
-      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a li h1 h2 h3 h4 h5 h6]) }
+      in "br" if element.ancestors.any? { |e| e.name.in?(%w[a h1 h2 h3 h4 h5 h6]) }
         " "
+      in "br" if element.ancestors.any? { |e| e.name == "li" } && element.next.present?
+        "[br]"
       in "br"
         "\n"
+      in "hr"
+        "\n\n[hr]\n\n"
       in ("p" | "ul" | "ol")
         content = html_to_dtext(element, **options, &block).strip
-        "#{content}\n\n"
+        "\n\n#{content}\n\n"
       in "blockquote"
         content = html_to_dtext(element, **options, &block).strip
-        "[quote]#{content}[/quote]\n\n" if content.present?
-      in "spoiler" # fake tag added by source extractors
+        "\n\n[quote]\n#{content}\n[/quote]\n\n" if content.present?
+      in "pre"
+        content = html_to_dtext(element, **options, &block)
+        "\n\n[code]\n#{content}\n[/code]\n\n" if content.present?
+      in "block-spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
-        "[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
+        "\n\n[spoiler]\n#{content}\n[/spoiler]\n\n" if content.present?
+      in "inline-spoiler" # fake tag added by source extractors
+        content = html_to_dtext(element, **options, &block).strip
+        "[spoiler]#{content}[/spoiler]" if content.present?
       in "small" unless element.ancestors.any? { |e| e.name == "small" }
         content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
@@ -647,13 +659,18 @@ class DText
       in "s" unless element.ancestors.any? { |e| e.name == "s" }
         content = html_to_dtext(element, **options, &block)
         "[s]#{content}[/s]" if content.present?
+      in "code" unless element.ancestors.any? { |e| e.name == "code" }
+        content = html_to_dtext(element, **options, &block)
+        "[code]#{content}[/code]" if content.present?
       in "li"
-        content = html_to_dtext(element, **options, &block).strip
-        "* #{content}\n" if content.present?
+        content = html_to_dtext(element, **options, &block).gsub(/\n+/, "\n").strip
+        depth = element.ancestors.count { _1.name in "ul" | "ol" }.clamp(1..)
+        list = "*" * depth
+        "#{list} #{content}\n" if content.present?
       in ("h1" | "h2" | "h3" | "h4" | "h5" | "h6")
         hn = element.name
         title = html_to_dtext(element, **options, &block).strip
-        "#{hn}. #{title}\n\n"
+        "\n\n#{hn}. #{title}\n\n" if title.present?
       in "a"
         title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s
@@ -690,8 +707,17 @@ class DText
         else
           ""
         end
-      in "comment"
-        # ignored
+      in "details"
+        title = element.at("summary")&.text.to_s.strip.tr("\n", " ").delete("]")
+        content = html_to_dtext(element, **options, &block).strip
+
+        if title.present? && content.present?
+          "[expand=#{title}]\n#{content}\n[/expand]\n\n"
+        elsif content.present?
+          "[expand]\n#{content}\n[/expand]\n\n"
+        end
+      in "comment" | "script" | "summary"
+        element.content = nil
       else
         html_to_dtext(element, **options, &block)
       end

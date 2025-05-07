@@ -4,10 +4,6 @@
 module Source
   class Extractor
     class PixivSketch < Source::Extractor
-      def match?
-        Source::URL::PixivSketch === parsed_url
-      end
-
       def image_urls
         if parsed_url.image_url?
           [parsed_url.full_image_url]
@@ -21,15 +17,15 @@ module Source
       end
 
       def profile_url
-        "https://sketch.pixiv.net/@#{artist_name}" if artist_name.present?
+        "https://sketch.pixiv.net/@#{username}" if username.present?
       end
 
-      def artist_name
-        api_response.dig("data", "user", "unique_name")
+      def display_name
+        api_response.dig("data", "user", "name")
       end
 
-      def other_names
-        [artist_name, display_name].compact
+      def username
+        api_response.dig("data", "user", "unique_name") || parsed_url.username || parsed_referer&.username
       end
 
       def profile_urls
@@ -59,10 +55,6 @@ module Source
         end
       end
 
-      def display_name
-        api_response.dig("data", "user", "name")
-      end
-
       def pixiv_profile_url
         "https://www.pixiv.net/users/#{pixiv_user_id}" if pixiv_user_id.present?
       end
@@ -74,10 +66,6 @@ module Source
       # curl https://sketch.pixiv.net/api/items/5835314698645024323.json | jq
       memoize def api_response
         http.cache(1.minute).parsed_get(api_url) || {}
-      end
-
-      def page_url
-        parsed_url.page_url || parsed_referer&.page_url
       end
 
       def api_url

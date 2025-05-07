@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class SourcesControllerTest < ActionDispatch::IntegrationTest
   context "The sources controller" do
@@ -32,6 +32,12 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
 
       should "work for a HTML response with mode=json" do
         get source_path, params: { url: "https://twitter.com/ttguweiz/status/1794358058526892509", mode: "json" }
+
+        assert_response :success
+      end
+
+      should "work for a HTML response with mode=test" do
+        get source_path, params: { url: "https://twitter.com/ttguweiz/status/1794358058526892509", mode: "test" }
 
         assert_response :success
       end
