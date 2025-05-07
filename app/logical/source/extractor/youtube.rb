@@ -104,25 +104,22 @@ class Source::Extractor::Youtube < Source::Extractor
       return super(url)
     end
 
-    vcodec = video.dig(:video, :codec)
-    acodec = video.dig(:audio, :codec)
+    ext = validate_codecs!
 
-    raise Error, "Unsupported video codec: #{vcodec}" unless vcodec.in?(["h264", "vp9"])
-    raise Error, "Unsupported audio codec: #{acodec}" unless acodec.in?(["aac", "opus"])
-    raise Error, "Incompatible codecs: #{vcodec} + #{acodec}" unless video.dig(:video, :ext) == video.dig(:audio, :ext)
+    res = Danbooru::Tempfile.new(["danbooru-video-merge-#{parsed_url.video_id}", ".#{ext}"])
 
-    vresponse, vfile = http_downloader.download_file(video.dig(:video, :url))
-    aresponse, afile = http_downloader.download_file(video.dig(:audio, :url))
-
-    res = Danbooru::Tempfile.new(["danbooru-video-merge-#{parsed_url.video_id}", ".#{video.dig(:video, :ext)}"])
-
-    ffmpeg_out, status = Open3.capture2e("ffmpeg -i #{vfile.path.shellescape} -i #{afile.path.shellescape} -c copy -y #{res.path.shellescape}")
+    cmd = [
+      "ffmpeg",
+      "-i", video.dig(:video, :url).to_s,
+      "-i", video.dig(:audio, :url).to_s,
+      "-c", "copy", "-y",
+      res.path.to_s
+    ]
+    
+    ffmpeg_out, status = Open3.capture2e(*cmd)
     raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
     MediaFile.open(res)
-  ensure
-    vfile&.close
-    afile&.close
   end
 
   def community_post_id
@@ -161,6 +158,23 @@ class Source::Extractor::Youtube < Source::Extractor
 
   def video?
     parsed_url.video_id.present?
+  end
+
+  def validate_codecs!
+    vcodec = video.dig(:video, :codec).split(".").first
+    acodec = video.dig(:audio, :codec).split(".").first
+
+    if vcodec.in?(["vp9", "vp09", "av01"])
+      raise Error, "Incompatible codecs: #{vcodec} + #{acodec}" unless acodec == "opus"
+
+      "webm"
+    elsif vcodec.in?(["h264", "avc1", "av01"])
+      raise Error, "Incompatible codecs: #{vcodec} + #{acodec}" unless acodec.in?(["aac", "mp4a"])
+
+      "mp4"
+    else
+      raise Error, "Unknown codecs: #{vcodec} + #{acodec}"
+    end
   end
 
   memoize def page
