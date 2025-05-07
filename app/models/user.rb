@@ -152,6 +152,8 @@ class User < ApplicationRecord
   has_many :uploads, foreign_key: :uploader_id, dependent: :destroy
   has_many :upload_media_assets, through: :uploads, dependent: :destroy
   has_many :mod_actions, as: :subject, dependent: :destroy
+  has_many :reactions, as: :model, dependent: :destroy
+  has_many :site_credentials, foreign_key: :creator_id, dependent: :destroy
   belongs_to :inviter, class_name: "User", optional: true
 
   accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true
