@@ -49,6 +49,7 @@ x-base-template: &base-template
     DATABASE_URL: postgresql://postgres?pool=100
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_YT_CLIENT_URL: http://yt-client:6688
     DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
@@ -118,6 +119,9 @@ services:
     volumes:
       - "iqdb-data:/iqdb/data"
     command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
+
+  yt-client:
+    image: typea2/yt-client
 
   redis:
     image: redis

@@ -118,6 +118,7 @@ x-base-template: &base-template
     DANBOORU_REDIS_URL: redis://redis:6379
     # Changed below from port 5588 to 5589 --> no should not do this
     DANBOORU_IQDB_URL: http://iqdb:5588
+    DANBOORU_YT_CLIENT_URL: http://yt-client:6688
     # Dunno if it'll work but probably just reuse the autotagger from OYP:
     DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
 #   Fred's autotagger uses port 8000
@@ -202,6 +203,9 @@ services:
       - "iqdb-data:/iqdb/data"
     command: ["http", "0.0.0.0", "5588", "/iqdb/data/iqdb.sqlite"]
 
+  yt-client:
+    image: typea2/yt-client
+    
   redis:
     image: redis
 

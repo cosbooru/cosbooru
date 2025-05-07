@@ -767,6 +767,11 @@ module Danbooru
       # "http://localhost:3000/mock/iqdb"
     end
 
+    # The URL for the yt-dlp client service, used for i.e. YouTube uploads
+    def yt_client_url
+
+    end
+
     # The URL for the Danbooru Autotagger service (https://github.com/danbooru/autotagger). Optional.
     #
     # Used for the AI tagging feature. Set this to http://localhost:3000/mock/autotagger

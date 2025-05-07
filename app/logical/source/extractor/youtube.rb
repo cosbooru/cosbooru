@@ -22,7 +22,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def profile_url
-    handle_url
+    handle_url || channel_url
   end
 
   def profile_urls
@@ -30,7 +30,11 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def display_name
-    community_post.dig("authorText", "runs", 0, "text")
+    if video?
+      video[:channel] || video[:uploader]
+    else
+      community_post.dig("authorText", "runs", 0, "text")
+    end
   end
 
   def username
@@ -38,23 +42,38 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def tags
-    community_post.dig(:contentText, :runs).to_a.filter_map do |run|
-      url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)&.then { |u| Danbooru::URL.unescape(u) }
-      next unless url&.starts_with?("/hashtag/")
+    if video?
+      video[:tags].map do |tag|
+        [ tag, "https://www.youtube.com/#{tag}"]
+      end
+    else
+      community_post.dig(:contentText, :runs).to_a.filter_map do |run|
+        url = run.dig(:navigationEndpoint, :commandMetadata, :webCommandMetadata, :url)&.then { |u| Danbooru::URL.unescape(u) }
+        next unless url&.starts_with?("/hashtag/")
 
-      [url.delete_prefix("/hashtag/"), "https://www.youtube.com#{url}"]
+        [url.delete_prefix("/hashtag/"), "https://www.youtube.com#{url}"]
+      end
     end
   end
 
   def artist_commentary_title
+    video[:title] if video?
   end
 
   def artist_commentary_desc
-    community_post[:contentText]&.to_json
+    if video?
+      video[:description]
+    else
+      community_post[:contentText]&.to_json
+    end
   end
 
   def dtext_artist_commentary_desc
-    DText.from_html(html_artist_commentary_desc, base_url: "https://www.youtube.com")
+    if video?
+      DText.from_plaintext(video[:description])
+    else
+      DText.from_html(html_artist_commentary_desc, base_url: "https://www.youtube.com")
+    end
   end
 
   def html_artist_commentary_desc
@@ -83,12 +102,20 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def channel_id
-    parsed_url.try(:channel_id) || parsed_referer.try(:channel_id) || community_post.dig("authorEndpoint", "browseEndpoint", "browseId")
+    if video?
+      video[:channel_id]
+    else
+      parsed_url.try(:channel_id) || parsed_referer.try(:channel_id) || community_post.dig("authorEndpoint", "browseEndpoint", "browseId")
+    end
   end
 
   def handle
     # "/@Mirae_Somang" -> "Mirae_Somang"
-    parsed_url.try(:handle) || parsed_referer.try(:handle) || community_post.dig("authorEndpoint", "browseEndpoint", "canonicalBaseUrl")&.delete_prefix("/@")
+    if video?
+      video[:uploader_id]&.delete_prefix("@")
+    else
+      parsed_url.try(:handle) || parsed_referer.try(:handle) || community_post.dig("authorEndpoint", "browseEndpoint", "canonicalBaseUrl")&.delete_prefix("/@")
+    end
   end
 
   def channel_url
@@ -99,12 +126,20 @@ class Source::Extractor::Youtube < Source::Extractor
     "https://www.youtube.com/@#{handle}" if handle.present?
   end
 
+  def video?
+    parsed_url.video_id.present?
+  end
+
   memoize def page
     http.cache(1.minute).parsed_get(page_url) if community_post_id.present?
   end
 
   memoize def community_post_json
     page&.at('script[text()*="ytInitialData"]')&.text&.slice(/{.*}/)&.parse_json || {}
+  end
+
+  memoize def video
+    YtClient.new.info(:youtube, parsed_url.video_id) if video?
   end
 
   memoize def community_post
