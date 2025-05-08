@@ -5,7 +5,7 @@ module Source
   class Extractor
     class NicoSeiga < Source::Extractor
       def self.enabled?
-        Danbooru.config.nico_seiga_user_session.present?
+        SiteCredential.for_site("NiceSeiga").present?
       end
 
       def image_urls
@@ -119,20 +119,25 @@ module Source
 
       def http
         if parsed_url.oekaki_id.present?
-          super.with_legacy_ssl.cookies(skip_fetish_warning: "1", user_session: Danbooru.config.nico_seiga_user_session)
-        else
-          super.cookies(skip_fetish_warning: "1", user_session: Danbooru.config.nico_seiga_user_session)
+          http = super.with_legacy_ssl
         end
+
+        http.cookies(
+          skip_fetish_warning: "1",
+          user_session: credentials[:user_session]
+        ).headers(
+          "User-Agent": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36"
+        )
       end
 
       memoize def api_response
         if illust_id.present? || image_id.present?
           # curl "https://sp.seiga.nicovideo.jp/ajax/seiga/im4937663" | jq
           work_id = illust_id || image_id
-          http.cache(1.minute).parsed_get("https://sp.seiga.nicovideo.jp/ajax/seiga/im#{work_id}")&.dig("target_image") || {}
+          parsed_get("https://sp.seiga.nicovideo.jp/ajax/seiga/im#{work_id}")&.dig("target_image") || {}
         elsif manga_id.present?
           # curl "https://seiga.nicovideo.jp/api/theme/info?id=470189"
-          http.cache(1.minute).parsed_get("https://seiga.nicovideo.jp/api/theme/info?id=#{manga_id}")&.dig("response", "theme") || {}
+          parsed_get("https://seiga.nicovideo.jp/api/theme/info?id=#{manga_id}")&.dig("response", "theme") || {}
         else
           {}
         end
@@ -142,7 +147,7 @@ module Source
         return {} unless manga_id.present?
 
         # curl "https://api.nicomanga.jp/api/v1/app/manga/episodes/470189/frames?enable_webp=false" | jq
-        json = http.cache(1.minute).parsed_get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{manga_id}/frames?enable_webp=false") || {}
+        json = parsed_get("https://api.nicomanga.jp/api/v1/app/manga/episodes/#{manga_id}/frames?enable_webp=false") || {}
         json.dig("data", "result") || {}
       end
 
@@ -150,7 +155,7 @@ module Source
         return {} unless artist_id.present?
 
         # curl "https://seiga.nicovideo.jp/api/user/info?id=123720050"
-        xml = http.cache(1.minute).parsed_get("https://seiga.nicovideo.jp/api/user/info?id=#{artist_id}") || {}
+        xml = parsed_get("https://seiga.nicovideo.jp/api/user/info?id=#{artist_id}") || {}
         xml.dig("response", "user") || {}
       end
     end
