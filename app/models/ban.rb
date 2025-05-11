@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Ban < ApplicationRecord
+  FOREVER = 100.years
+  DURATIONS = [1.day, 3.days, 7.days, 1.month, 3.months, 6.months, 1.year, FOREVER]
+
   attribute :duration, :interval
   attribute :delete_posts, :boolean
   attribute :post_deletion_reason, :string
@@ -24,7 +27,7 @@ class Ban < ApplicationRecord
   belongs_to :banner, :class_name => "User"
 
   validates :duration, presence: true
-  validates :duration, inclusion: { in: [1.day, 3.days, 7.days, 1.month, 3.months, 6.months, 1.year, 100.years], message: "%{value} is not a valid ban duration" }, if: :duration_changed?
+  validates :duration, inclusion: { in: DURATIONS, message: "%{value} is not a valid ban duration" }, if: :duration_changed?
   validates :reason, visible_string: true
   validate :user, :validate_user_is_bannable, on: :create
   validate :validate_deletions, on: :create
