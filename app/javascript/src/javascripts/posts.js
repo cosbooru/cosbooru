@@ -36,8 +36,6 @@ Post.initialize_all = function() {
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
-    this.initialize_ugoira_player();
-    this.initialize_info_tabs();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-show").length) {
@@ -409,16 +407,6 @@ Post.initialize_post_sections = function() {
     e.preventDefault();
   });
 }
-
-Post.initialize_ugoira_player = function() {
-  if ($(".ugoira-container").length) {
-    let frame_delays = $("#image").data("ugoira-frame-delays");
-    let file_url = $(".image-container").data("file-url");
-
-    Post.ugoira = new Ugoira($(".ugoira-container"), frame_delays, file_url);
-    Post.ugoira.play();
-  }
-};
 
 Post.initialize_ruffle_player = function() {
   let $container = $(".ruffle-container[data-swf]");
