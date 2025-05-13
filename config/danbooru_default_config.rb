@@ -595,17 +595,6 @@ module Danbooru
     def inkbunny_password
     end
 
-    # Your Bluesky identifier and password. The identifier must include the domain that you see on your profile, ie "username.bsky.social"
-    def bluesky_identifier
-    end
-
-    def bluesky_password
-    end
-
-    # Your Reddit "reddit_session" cookie.
-    def reddit_session_cookie
-    end
-
     # Your Postype "PSE3" cookie. Login to Postype then use the devtools to find the "PSE3" cookie.
     # After creating your account, go to https://www.postype.com/account/settings and enable the "Viewing adult content
     # by foreigners" setting to see all content.
@@ -770,7 +759,6 @@ module Danbooru
 
     # The URL for the yt-dlp client service, used for i.e. YouTube uploads
     def yt_client_url
-
     end
 
     # The URL for the Danbooru Autotagger service (https://github.com/danbooru/autotagger). Optional.
