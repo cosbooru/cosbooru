@@ -32,7 +32,7 @@ class SessionLoader
 
     if user.present? && user.authenticate_password(password)
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
-      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil?
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && (ip_address.is_proxy? && !Danbooru.config.trusted_proxies.any? {|ip| Danbooru::IpAddress.new(ip).include?(ip_address)}) && user.totp.nil?
         UserEvent.create_from_request!(user, :failed_login, request)
         return nil
       elsif user.totp.present?
