@@ -113,6 +113,7 @@ class Source::Extractor::Youtube < Source::Extractor
       "-i", video.dig(:video, :url).to_s,
       "-i", video.dig(:audio, :url).to_s,
       "-c", "copy", "-y",
+      "-fflags", "+bitexact",
       res.path.to_s
     ]
     
