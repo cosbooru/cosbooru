@@ -115,7 +115,7 @@ Rails/I18nLocaleTexts:
 Rails/InverseOf:
   Enabled: false
 
-Railse/ToFormattedS:
+Rails/ToFormattedS:
   Enabled: false
 
 Style/Alias:
@@ -204,6 +204,8 @@ Style/SpecialGlobalVars:
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+  Exclude:
+    - "Gemfile"
 
 Style/StringLiteralsInInterpolation:
   Enabled: false
