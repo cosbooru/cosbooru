@@ -63,8 +63,6 @@ class Source::URL::Null < Source::URL
       "Curious Cat"
     in _, ("dlsite.com" | "dlsite.net" | "dlsite.jp")
       "DLSite"
-    in _, "dcinside.com"
-      "DC Inside"
     in _, "direct.me"
       "Direct.me"
     in _, "doujinshi.org"
