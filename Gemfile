@@ -72,6 +72,7 @@ gem "rotp"
 gem "rqrcode"
 gem "kramdown"
 gem "abbrev"
+gem "rubyzip", require: "zip"
 
 group :development do
   gem 'rubocop', require: false
