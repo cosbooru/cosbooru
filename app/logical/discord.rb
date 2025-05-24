@@ -21,8 +21,10 @@ module Discord
     def self.respond_to_id(model, shortlink = nil)
       shortlink ||= model.name.to_s.split("::").last.underscore
       respond(:"#{shortlink}_id", /#{shortlink.tr("_", " ")} #[0-9]+/i) do |event, text|
-        subject = model.find_by(id: text[/[0-9]+/].to_i)
-        subject.send_embed(event.channel) if subject.present?
+        CurrentUser.scoped(User.system, "127.0.0.1") do
+          subject = model.find_by(id: text[/[0-9]+/].to_i)
+          subject.send_embed(event.channel) if subject.present?
+        end
       end
     end
 
