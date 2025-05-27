@@ -1850,25 +1850,24 @@ ALTER SEQUENCE public.rate_limits_id_seq OWNED BY public.rate_limits.id;
 
 
 --
--- Name: reactions; Type: TABLE; Schema: public; Owner: -
+-- Name: saved_searches; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.reactions (
+CREATE TABLE public.saved_searches (
     id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    creator_id integer NOT NULL,
-    reaction_id integer NOT NULL,
-    model_type character varying NOT NULL,
-    model_id integer NOT NULL
+    user_id integer NOT NULL,
+    query character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    labels text[] DEFAULT '{}'::text[] NOT NULL
 );
 
 
 --
--- Name: reactions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: saved_searches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.reactions_id_seq
+CREATE SEQUENCE public.saved_searches_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1878,57 +1877,7 @@ CREATE SEQUENCE public.reactions_id_seq
 
 
 --
--- Name: reactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.reactions_id_seq OWNED BY public.reactions.id;
-
-
---
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.schema_migrations (
-    version character varying NOT NULL
-);
-
-
---
--- Name: site_credentials; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.site_credentials (
-    id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    site integer NOT NULL,
-    creator_id bigint NOT NULL,
-    is_enabled boolean DEFAULT true NOT NULL,
-    is_public boolean DEFAULT true NOT NULL,
-    status integer DEFAULT 0 NOT NULL,
-    usage_count integer DEFAULT 0 NOT NULL,
-    error_count integer DEFAULT 0 NOT NULL,
-    last_used_at timestamp(6) without time zone,
-    last_error_at timestamp(6) without time zone,
-    credential jsonb DEFAULT '{}'::jsonb NOT NULL,
-    metadata jsonb DEFAULT '{}'::jsonb NOT NULL
-);
-
-
---
--- Name: site_credentials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.site_credentials_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: site_credentials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: saved_searches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.saved_searches_id_seq OWNED BY public.saved_searches.id;
@@ -3003,14 +2952,7 @@ ALTER TABLE ONLY public.rate_limits ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: reactions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.reactions ALTER COLUMN id SET DEFAULT nextval('public.reactions_id_seq'::regclass);
-
-
---
--- Name: site_credentials id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: saved_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.saved_searches ALTER COLUMN id SET DEFAULT nextval('public.saved_searches_id_seq'::regclass);
@@ -5468,24 +5410,24 @@ CREATE UNIQUE INDEX index_rate_limits_on_key_and_action ON public.rate_limits US
 
 
 --
--- Name: index_reactions_on_creator_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_saved_searches_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_reactions_on_creator_id ON public.reactions USING btree (creator_id);
-
-
---
--- Name: index_reactions_on_model; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_reactions_on_model ON public.reactions USING btree (model_type, model_id);
+CREATE INDEX index_saved_searches_on_created_at ON public.saved_searches USING btree (created_at);
 
 
 --
--- Name: index_reactions_on_model_creator_reaction; Type: INDEX; Schema: public; Owner: -
+-- Name: index_saved_searches_on_labels; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_reactions_on_model_creator_reaction ON public.reactions USING btree (model_type, model_id, creator_id, reaction_id);
+CREATE INDEX index_saved_searches_on_labels ON public.saved_searches USING gin (labels);
+
+
+--
+-- Name: index_saved_searches_on_query; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_saved_searches_on_query ON public.saved_searches USING btree (query);
 
 
 --
@@ -5511,69 +5453,6 @@ CREATE INDEX index_sent_dmails_on_created_at ON public.dmails USING btree (creat
 
 --
 -- Name: index_sent_dmails_on_owner_id_and_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_sent_dmails_on_owner_id_and_created_at ON public.dmails USING btree (owner_id, created_at) WHERE (owner_id = from_id);
-
-
---
--- Name: index_site_credentials_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_creator_id ON public.site_credentials USING btree (creator_id);
-
-
---
--- Name: index_site_credentials_on_credential; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_credential ON public.site_credentials USING gin (credential);
-
-
---
--- Name: index_site_credentials_on_error_count; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_error_count ON public.site_credentials USING btree (error_count);
-
-
---
--- Name: index_site_credentials_on_is_enabled; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_is_enabled ON public.site_credentials USING btree (is_enabled);
-
-
---
--- Name: index_site_credentials_on_is_public; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_is_public ON public.site_credentials USING btree (is_public);
-
-
---
--- Name: index_site_credentials_on_last_error_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_last_error_at ON public.site_credentials USING btree (last_error_at);
-
-
---
--- Name: index_site_credentials_on_last_used_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_last_used_at ON public.site_credentials USING btree (last_used_at);
-
-
---
--- Name: index_site_credentials_on_metadata; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_site_credentials_on_metadata ON public.site_credentials USING gin (metadata);
-
-
---
--- Name: index_site_credentials_on_site; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_sent_dmails_on_owner_id_and_created_at ON public.dmails USING btree (owner_id, created_at) WHERE (owner_id = from_id);
@@ -6958,12 +6837,12 @@ ALTER TABLE ONLY public.upload_media_assets
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user", public;
+SET search_path TO public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250507024608'),
 ('20250502093010'),
 ('20250402125343'),
-('20250507024608'),
 ('20241023091114'),
 ('20240607200251'),
 ('20240607200250'),
@@ -7302,3 +7181,4 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
+
