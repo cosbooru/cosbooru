@@ -62,7 +62,7 @@ class MediaFile::Video < MediaFile
     #
     # https://github.com/FFmpeg/FFmpeg/blob/master/libavutil/pixfmt.h
     # CHANGED THIS: allow yuv420p10le and yuv444p
-    return false if !pix_fmt.in?(%w[yuv420p yuvj420p gbrp yuv420p10le yuv444p])
+    return false if pix_fmt.present? && !pix_fmt.in?(%w[yuv420p yuvj420p gbrp yuv420p10le yuv444p])
 
     true
   end
