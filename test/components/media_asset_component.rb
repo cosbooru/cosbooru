@@ -2,7 +2,7 @@ require "test_helper"
 
 class MediaAssetComponentTest < ViewComponent::TestCase
   def render_component(media_asset, **options)
-    render_inline(MediaAssetComponent.new(media_asset: media_asset, **options))
+    render_inline(MediaAssetComponent.new(media_asset: media_asset, current_user: User.system, **options))
   end
 
   context "The MediaAssetComponent" do

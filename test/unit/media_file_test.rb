@@ -635,10 +635,10 @@ class MediaFileTest < ActiveSupport::TestCase
 
       #assert_equal(true, MediaFile.open("test/files/mp4/test-audio-flac.mp4").is_supported?)
 
-      assert_equal(false, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/mp4/test-yuv420p10le-vp9.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-300x300-yuv444p-h264.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-yuv420p10le-av1.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-yuv420p10le-h264.mp4").is_supported?)
+      assert_equal(true, MediaFile.open("test/files/mp4/test-yuv420p10le-vp9.mp4").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-ac3.mp4").is_supported?)
       assert_equal(false, MediaFile.open("test/files/mp4/test-audio-mp2.mp4").is_supported?)
@@ -707,9 +707,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(true, MediaFile.open("test/files/webm/test-512x512.webm").is_supported?)
       assert_equal(true, MediaFile.open("test/files/webm/test-gbrp-vp9.webm").is_supported?)
       assert_equal(true, MediaFile.open("test/files/webm/test-av1.webm").is_supported?)
+      
+      assert_equal(true, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
 
       assert_equal(false, MediaFile.open("test/files/webm/test-512x512.mkv").is_supported?)
-      assert_equal(false, MediaFile.open("test/files/webm/test-yuv420p10le-vp9.webm").is_supported?)
       assert_equal(false, MediaFile.open("test/files/webm/test-hevc.webm").is_supported?)
       assert_equal(false, MediaFile.open("test/files/webm/test-aac.webm").is_supported?)
     end

@@ -6837,7 +6837,7 @@ ALTER TABLE ONLY public.upload_media_assets
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO public;
+SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20250507024608'),
