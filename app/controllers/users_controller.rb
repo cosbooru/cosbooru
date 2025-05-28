@@ -3,29 +3,9 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
-  rate_limit :create, rate: 1.0/5.minutes, burst: 10
+  around_action :set_timeout, only: [:profile, :show]
 
-  def new
-    @user = authorize User.new
-    @user.email_address = EmailAddress.new
-    respond_with(@user)
-  end
-
-  def edit
-    @user = authorize User.find(params[:id])
-    respond_with(@user)
-  end
-
-  def settings
-    @user = authorize CurrentUser.user
-
-    if @user.is_anonymous?
-      redirect_to login_path(url: settings_path)
-    else
-      params[:action] = "edit"
-      respond_with(@user, template: "users/edit")
-    end
-  end
+  rate_limit :create, rate: 1.0 / 5.minutes, burst: 5
 
   def index
     if params[:name].present?
@@ -48,6 +28,28 @@ class UsersController < ApplicationController
     @user = authorize User.find(params[:id])
     respond_with(@user, methods: @user.full_attributes) do |format|
       format.html.tooltip { render layout: false }
+    end
+  end
+
+  def new
+    @user = authorize User.new
+    @user.email_address = EmailAddress.new
+    respond_with(@user)
+  end
+
+  def edit
+    @user = authorize User.find(params[:id])
+    respond_with(@user)
+  end
+
+  def settings
+    @user = authorize CurrentUser.user
+
+    if @user.is_anonymous?
+      redirect_to login_path(url: settings_path)
+    else
+      params[:action] = "edit"
+      respond_with(@user, template: "users/edit")
     end
   end
 
