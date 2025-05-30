@@ -52,6 +52,6 @@ class Source::URL::CosplayerArchive < Source::URL
   def full_image_url
     # https://image7.cosp.jp/images/member/g/516/516768/13075578.jpg
     return unless image_server.present? && user_id.present? && image_id.present?
-    "https://#{@image_server}.cosp.jp/images/member/g/#{@user_id.to_s[0..2]}/#{@user_id}/#{@image_id}.jpg"
+    "https://#{@image_server}.cosp.jp/images/member/g/#{@user_id.to_s[...-3].to_i}/#{@user_id}/#{@image_id}.jpg"
   end
 end
