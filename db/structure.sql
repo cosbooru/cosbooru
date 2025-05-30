@@ -948,7 +948,8 @@ CREATE TABLE public.good_job_executions (
     error text,
     error_event smallint,
     error_backtrace text[],
-    process_id uuid
+    process_id uuid,
+    duration interval
 );
 
 
@@ -6840,6 +6841,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250530091115'),
 ('20250507024608'),
 ('20250502093010'),
 ('20250402125343'),
