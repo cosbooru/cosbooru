@@ -141,22 +141,10 @@ module Source
         parsed_url.t_work_id || parsed_referer&.t_work_id
       end
 
-      def article_id
-        parsed_url.article_id || parsed_referer&.article_id
-      end
-
-      def http
-        super.headers(
-          Referer: parsed_url.page_url || parsed_referer&.page_url || "https://www.bilibili.com",
-          "User-Agent": user_agent
-        )
-      end
-
       def user_agent
         # API requests fail unless we spoof the latest Firefox version. Firefox releases every 4 weeks.
-        # https://whattrainisitnow.com/calendar/
-        browser_ver = Time.use_zone("UTC") { 122 + ((Time.zone.today - Date.new(2024, 1, 23)).days.in_weeks.to_i / 4) }
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{browser_ver}.0) Gecko/20100101 Firefox/#{browser_ver}.0"
+        firefox_version = http.cache(5.minutes).parsed_get("https://whattrainisitnow.com/api/release/schedule/?version=release")&.dig("version")
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{firefox_version}) Gecko/20100101 Firefox/#{firefox_version}"
       end
 
       memoize def page
@@ -167,13 +155,8 @@ module Source
       memoize def post_json
         return {} if t_work_id.blank?
 
-        data = http.cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}&features=itemOpusStyle") || {}
-
-        if data.dig("data", "item", "orig", "id_str").present? # it means it's a repost
-          data.dig("data", "item", "orig")
-        else
-          data.dig("data", "item").to_h
-        end
+        data = http.headers("User-Agent": user_agent).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=#{t_work_id}&features=itemOpusStyle") || {}
+        data.dig("data", "item").to_h
       end
 
       memoize def article_json
