@@ -4,6 +4,10 @@
 # @see https://github.com/NanmiCoder/MediaCrawler/blob/main/media_platform/xhs/client.py
 # @see https://github.com/JoeanAmier/XHS-Downloader
 class Source::Extractor::Xiaohongshu < Source::Extractor
+  def self.enabled?
+    site_credentials.present?
+  end
+
   def image_urls
     if parsed_url.full_image_url.present?
       [parsed_url.full_image_url]
@@ -82,6 +86,10 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
 
   memoize def page_json
     page&.at('script[text()*="__INITIAL_STATE__"]')&.text&.slice(/{.*}/)&.gsub("undefined", "null")&.parse_json || {}
+  end
+
+  def http
+    super.cookies(gid: credentials[:session_cookie])
   end
 
   def http_downloader
