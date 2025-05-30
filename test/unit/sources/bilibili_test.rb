@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class BilibiliTest < ActiveSupport::TestCase
@@ -69,32 +69,30 @@ module Sources
       )
     end
 
-    context "A t.bilibili.com:id repost" do
+    context "A www.bilibili.com/opus/:id large cover post" do
+      strategy_should_work(
+        "https://www.bilibili.com/opus/1067620623766781959",
+        image_urls: %w[http://i0.hdslb.com/bfs/new_dyn/1a93adf45c9b7854f49e841f1f0ec82e2300677.jpg],
+        media_files: [{ file_size: 20_107_957 }],
+        page_url: "https://www.bilibili.com/opus/1067620623766781959",
+        profile_urls: %w[https://space.bilibili.com/2300677],
+        display_name: "SA小飒",
+        username: nil,
+        tags: [],
+        dtext_artist_commentary_title: "【百日绘day44】 玲纱",
+        dtext_artist_commentary_desc: "甜点部乐队之后肯定就是玲纱啦～最近看\"@Kieed \":[https://space.bilibili.com/25589919/dynamic]老师的直播学到了很多，非常喜欢老师的图，太好看了！！\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]\"[给心心]\":[https://i0.hdslb.com/bfs/emote/1597302b98827463f5b75c7cac1f29ea6ce572c4.png]"
+      )
+    end
+
+    context "A t.bilibili.com/:id quote-post" do
       strategy_should_work(
         "https://t.bilibili.com/723052706467414039?spm_id_from=333.999.0.0",
-        image_urls: %w[
-          https://i0.hdslb.com/bfs/new_dyn/fd40435a0ff15d2eed45da7c0f890bdf15817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/1beb12760dc8790f7443515307225ad015817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/113aacf139984f808721f50883e908b815817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/ad1537c506b87ce2c30e19e4ef54204715817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/4a098d62f90d17bf516e3edded670d5e15817819.jpg
-          https://i0.hdslb.com/bfs/new_dyn/89397fe05083ee25879962afba60a70515817819.jpg
-        ],
-        media_files: [
-          { file_size: 164_886 },
-          { file_size: 268_756 },
-          { file_size: 238_327 },
-          { file_size: 155_331 },
-          { file_size: 192_652 },
-          { file_size: 422_392 },
-        ],
-        page_url: "https://t.bilibili.com/722702993036673113",
-        profile_url: "https://space.bilibili.com/15817819",
-        profile_urls: %w[https://space.bilibili.com/15817819],
-        display_name: "星尘Official",
-        other_names: ["星尘Official"],
-        tag_name: "bilibili_15817819",
-        tags: %w[],
+        image_urls: [],
+        page_url: "https://t.bilibili.com/723052706467414039",
+        profile_urls: %w[https://space.bilibili.com/355143],
+        display_name: "原子Dan",
+        username: nil,
+        tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
           "[星尘_比心]":[http://i0.hdslb.com/bfs/emote/fd8aa275d5d91cdf71410bc1a738415fd6e2ab86.png]
@@ -113,13 +111,14 @@ module Sources
         other_names: ["凯迪拉克官方"],
         tag_name: "bilibili_476720460",
         tags: [
-          ["一起用原神痛车", "https://t.bilibili.com/topic/name/一起用原神痛车"],
-          ["凯迪拉克原神联名座驾", "https://t.bilibili.com/topic/name/凯迪拉克原神联名座驾"],
-          ["原神", "https://t.bilibili.com/topic/name/原神"],
-          ["凯迪拉克原神联动", "https://t.bilibili.com/topic/name/凯迪拉克原神联动"],
-          ["风起雷涌特别的旅途", "https://t.bilibili.com/topic/name/风起雷涌特别的旅途"],
-          ["凯迪拉克CT4", "https://t.bilibili.com/topic/name/凯迪拉克CT4"],
-          ["凯迪拉克XT4", "https://t.bilibili.com/topic/name/凯迪拉克XT4"],
+          ["一起用原神痛车", "https://search.bilibili.com/all?keyword=一起用原神痛车"],
+          ["凯迪拉克原神联名座驾", "https://search.bilibili.com/all?keyword=凯迪拉克原神联名座驾"],
+          ["原神", "https://search.bilibili.com/all?keyword=原神"],
+          ["凯迪拉克原神联动", "https://search.bilibili.com/all?keyword=凯迪拉克原神联动"],
+          ["风起雷涌特别的旅途", "https://search.bilibili.com/all?keyword=风起雷涌特别的旅途"],
+          ["凯迪拉克CT4", "https://search.bilibili.com/all?keyword=凯迪拉克CT4"],
+          ["凯迪拉克XT4", "https://search.bilibili.com/all?keyword=凯迪拉克XT4"],
+          ["一起用原神痛车", "https://www.bilibili.com/v/topic/detail/?topic_id=58016"],
         ],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp
@@ -188,12 +187,10 @@ module Sources
           { file_size: 184_165 },
           { file_size: 1_111_444 },
         ],
-        page_url: "https://www.bilibili.com/read/cv10137473/",
-        profile_url: "https://space.bilibili.com/413748120",
+        page_url: "https://www.bilibili.com/opus/498661195017002415",
         profile_urls: %w[https://space.bilibili.com/413748120],
         display_name: "VirtuaReal",
-        other_names: ["VirtuaReal"],
-        tag_name: "bilibili_413748120",
+        username: nil,
         tags: [
           ["出道新闻", "https://search.bilibili.com/article?keyword=出道新闻"],
           ["虚拟UP主", "https://search.bilibili.com/article?keyword=虚拟UP主"],
@@ -221,7 +218,7 @@ module Sources
 
           虽然她接受的理由是为了给master带来更多的快乐，但总之结果是这样就好了吧。
 
-          "勾檀Mayumi":[https://space.bilibili.com/690608693]的个人空间：<https://space.bilibili.com/690608693>
+          //space.bilibili.com/690608693的个人空间："网页链接":[https://space.bilibili.com/690608693]
 
           * 犬童Kendou
 
@@ -235,7 +232,7 @@ module Sources
 
           希望动物保护协会不会早日将其进行安置。——某听过布道的不知名红脸群众。
 
-          "犬童Kendou":[https://space.bilibili.com/690608701]的个人空间：<https://space.bilibili.com/690608701>
+          "犬童Kendou":[https://space.bilibili.com/690608701]的个人空间："网页链接":[https://space.bilibili.com/690608701]
 
           * 九十九Tsukumo
 
@@ -247,7 +244,7 @@ module Sources
 
           这位酷到爆的小姐并不希望利用家里的东西达成自己的目的——这太不黑手党了，但或许我们该为此感到庆幸，至少她没有用刀而是用直播这一和平的手段来达到她那可以说是和黑手党八竿子打不着的梦想了。
 
-          "九十九Tsukumo":[https://space.bilibili.com/690608702]的个人空间：<https://space.bilibili.com/690608702>
+          "九十九Tsukumo":[https://space.bilibili.com/690608702]的个人空间："网页链接":[https://space.bilibili.com/690608702]
 
           * 蕾米Remi
 
@@ -259,7 +256,7 @@ module Sources
 
           在我们的各方面思量下，最终我们为她架设起了最好的设备，想来这位海兔小姐的声音一定能让她直播间里的少年少女们为之愉悦吧。
 
-          "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间：<https://space.bilibili.com/690608687>
+          "蕾米Remi":[https://space.bilibili.com/690608687]的个人空间："网页链接":[https://space.bilibili.com/690608687]
 
           VirtuaReal Project [b]长期开启招募中[/b]！只需要你轻轻扫描以下链接上传答题卡和短视频， 就有机会加入VirtuaReal Project，来经历这场“宛如魔法般的体验“！
 

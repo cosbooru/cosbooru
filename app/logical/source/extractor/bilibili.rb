@@ -20,24 +20,14 @@ module Source
       end
 
       memoize def article_image_urls
-        return [] unless article_json.present?
+        urls = []
 
-        artist_commentary_desc.to_s.parse_html.css("img").filter_map do |img|
-          # Skip:
-          #   <img data-src="//i0.hdslb.com/bfs/article/4adb9255ada5b97061e610b682b8636764fe50ed.png" class="cut-off-5">
-          #   <img data-src="//i0.hdslb.com/bfs/article/card/1-1card458718717_web.png" width="1320" height="188" data-size="37499" aid="458718717" class="video-card nomal" type="nomal">
-          #   <img data-src="//i0.hdslb.com/bfs/article/card/ef6b00f9d998c52e9a4bffb9051235c7ab288719.png" width="1320" height="224" data-size="44498" aid="20190469" class="article-card" type="normal">
-          #   <img alt="琉绮RUKI立绘.png" width="280" height="522">
-          #
-          # Keep:
-          #   <img data-src="//i0.hdslb.com/bfs/article/cf18da941f612502e994d8b9f991175dbfbbc7d9.png" width="650" height="180" data-size="11948" class="seamless" type="seamlessImage">
-          #   <img data-src="//i0.hdslb.com/bfs/article/82f9cb60d3f83b73a7c550d3142d65bc772a2527.png" width="476" height="2112" data-size="533862">
-          #   <img data-src="//i0.hdslb.com/bfs/article/watermark/ec0897d1aa461471149315f4b24e18a8a609853f.png" width="750" height="929" data-size="1486140">
-          next if img["class"]&.match?(/card|cut-off/) || img["data-src"].blank?
+        urls += article_json.dig("detail", "modules", "module_top", "display", "album", "pics").to_a.pluck("url")
+        urls += article_json.dig("detail", "modules", "module_content", "paragraphs").to_a.select do |paragraph|
+          paragraph["para_type"] == 2
+        end.pluck(:pic).pluck(:pics).flatten.pluck(:url)
 
-          url = URI.join("https://", img["data-src"]).to_s
-          Source::URL.parse(url).full_image_url || url
-        end
+        urls
       end
 
       def page_url
@@ -70,11 +60,22 @@ module Source
               text_node["text"]
             end
           end.join
-        elsif article_json.present?
-          article_json.dig("readInfo", "content")
-        else
-          nil
-        end
+        end.join("<br><br>")
+      end
+
+      def post_commentary_desc
+        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.map do |text_node|
+          case text_node["type"]
+          when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
+            %{<a href="#{URI.join("https://", text_node["jump_url"])}">#{text_node["text"]}</a>}
+          when "RICH_TEXT_NODE_TYPE_EMOJI"
+            %{<a href="#{text_node.dig("emoji", "icon_url")}">#{text_node["text"]}</a>}
+          when "RICH_TEXT_NODE_TYPE_AT"
+            %{<a href="https://space.bilibili.com/#{text_node["rid"]}/dynamic">#{text_node["text"]}</a>}
+          else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
+            text_node["text"]
+          end
+        end.join("")
       end
 
       def dtext_artist_commentary_desc
@@ -86,15 +87,32 @@ module Source
           post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
             n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
           end.map do |tag|
-            tag_name = tag["text"].gsub(/(^#|#$)/, "")
-            [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
+            tag.dig("rich", "text").gsub(/(^#|#$)/, "")
           end
-        elsif article_json.present?
-          article_json.dig("readInfo", "tags").to_a.map do |tag|
-            [tag["name"], "https://search.bilibili.com/article?keyword=#{Danbooru::URL.escape(tag["name"])}"]
-          end
-        else
-          []
+        end
+
+        tag_names += article_json.dig("detail", "modules", "module_extend", "items").to_a.pluck("text")
+
+        tags = tag_names.map do |tag_name|
+          [tag_name, "https://search.bilibili.com/all?keyword=#{Danbooru::URL.escape(tag_name)}"]
+        end
+
+        if article_json.dig("detail", "modules", "module_topic").present?
+          tags << [
+            article_json.dig("detail", "modules", "module_topic", "name"),
+            "https://www.bilibili.com/v/topic/detail/?topic_id=#{article_json.dig("detail", "modules", "module_topic", "id")}",
+          ].compact
+        end
+
+        tags
+      end
+
+      def post_tags
+        post_json.dig("modules", "module_dynamic", "desc", "rich_text_nodes").to_a.select do |n|
+          n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
+        end.map do |tag|
+          tag_name = tag["text"].gsub(/(^#|#$)/, "")
+          [tag_name, "https://t.bilibili.com/topic/name/#{Danbooru::URL.escape(tag_name)}"]
         end
       end
 
