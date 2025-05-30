@@ -578,6 +578,7 @@ GEM
       activesupport (>= 5.2.0, < 8.1)
       concurrent-ruby (~> 1)
       method_source (~> 1.0)
+    webrick (1.9.1)
     websocket (1.2.11)
     websocket-client-simple (0.8.0)
       event_emitter
@@ -681,6 +682,7 @@ DEPENDENCIES
   terminal-table (~> 3.0)
   tzinfo-data
   view_component
+  webrick
   x25519
 
 RUBY VERSION
