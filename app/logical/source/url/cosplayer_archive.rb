@@ -27,6 +27,12 @@ class Source::URL::CosplayerArchive < Source::URL
     in _, _, "view_photo.aspx" if params["id"].present? && params["m"].present?
       @user_id = params["m"].to_i
       @image_id = params["id"].to_i
+
+    # https://cosp.jp/photo_search.aspx?n1=516768
+    in _, _, "photo_search.aspx" if params["n1"].present?
+      @user_id = params["n1"].to_i
+    else
+      nil
     end
   end
 
@@ -35,15 +41,17 @@ class Source::URL::CosplayerArchive < Source::URL
   end
 
   def page_url
-    "https://cosp.jp/view_photo.aspx?id=#{@image_id}&m=#{@user_id}" if image_id.present?
+    return unless user_id.present? && image_id.present?
+    "https://cosp.jp/view_photo.aspx?id=#{@image_id}&m=#{@user_id}"
   end
 
   def profile_url
-    "https://cosp.jp/prof.aspx?id=#{@user_id}"
+    "https://cosp.jp/prof.aspx?id=#{@user_id}" if user_id.present?
   end
 
   def full_image_url
     # https://image7.cosp.jp/images/member/g/516/516768/13075578.jpg
-    "https://#{@image_server}.cosp.jp/images/member/g/#{@user_id.to_s[0..2]}/#{@user_id}/#{@image_id}.jpg" if image_server.present?
+    return unless image_server.present? && user_id.present? && image_id.present?
+    "https://#{@image_server}.cosp.jp/images/member/g/#{@user_id.to_s[0..2]}/#{@user_id}/#{@image_id}.jpg"
   end
 end

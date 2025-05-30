@@ -36,22 +36,25 @@ class Source::Extractor::CosplayerArchive < Source::Extractor
   def image_urls
     [parsed_url.full_image_url] if parsed_url.full_image_url.present?
 
+    return [] unless page.present?
+
     [Source::URL.parse(page.at("#imgView").attr(:src)).full_image_url]
   end
 
   def display_name
-    user_link.text
+    user_link&.text
   end
 
   def username
-    "cosp_#{parsed_url.user_id}"
+    "cosp_#{parsed_url.user_id}" if parsed_url.user_id.present?
   end
 
   memoize def user_link
-    page.at("a[href^='/photo_search.aspx?n1=']")
+    page&.at("a[href^='/photo_search.aspx?n1=']")
   end
 
   memoize def page
+    return nil if parsed_url.page_url.blank?
     res = http.cache(1.minute).get(parsed_url.page_url)
 
     # Manually parse it because this site yields Shift-JIS
