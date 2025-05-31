@@ -48,18 +48,18 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def artist_commentary_title
-    page&.at('#detail-title')&.text&.strip
+    page&.at("#detail-title")&.text&.strip
   end
 
   def artist_commentary_desc
-    page&.at('#detail-desc')&.to_html&.gsub("\n", "<br>")
+    page&.at("#detail-desc")&.to_html&.gsub("\n", "<br>")
   end
 
   def dtext_artist_commentary_desc
     DText.from_html(artist_commentary_desc, base_url: "https://www.xiaohongshu.com") do |element|
       case element.name
       in "a" if element.classes.include?("tag")
-        href = CGI.unescape(element[:href].to_s)  # double-encoded
+        href = CGI.unescape(element[:href].to_s) # double-encoded
         tag = Addressable::URI.parse(href).query_values["keyword"].to_s
         element[:href] = "https://www.xiaohongshu.com/search_result?keyword=#{Danbooru::URL.escape(tag)}" if tag.present?
       else
@@ -89,7 +89,7 @@ class Source::Extractor::Xiaohongshu < Source::Extractor
   end
 
   def http
-    super.cookies(gid: credentials[:session_cookie])
+    super.cookies(webId: 1, web_session: 1)
   end
 
   def http_downloader
