@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
       rate_limiter.limit!
     end
 
-    skip_before_action :check_default_rate_limit, only: action, if: if_proc
+    skip_before_action :check_default_rate_limit, only: action
   end
 
   # Mark an action as for anonymous users only. The current user won't be loaded, instead the user will be set to the anonymous user.
@@ -118,99 +118,103 @@ class ApplicationController < ActionController::Base
       rate: CurrentUser.user.api_regen_multiplier,
       burst: 200,
       user: CurrentUser.user,
-      request: request,
+      request: request
     )
 
     headers["X-Rate-Limit"] = rate_limiter.to_json
     rate_limiter.limit!
   end
 
-  def rescue_exception(exception)
-    case exception
-    when ActionView::Template::Error
-      rescue_exception(exception.cause)
-    when ActiveRecord::QueryCanceled
-      render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
-    when ActionController::BadRequest
-      render_error_page(400, exception, message: exception.message)
-    when RequestBodyNotAllowedError
-      render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
-    when SessionLoader::AuthenticationFailure, CaptchaService::Error
-      render_error_page(401, exception, message: exception.message)
-    when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
-      render_error_page(403, exception, message: exception.message)
-    when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
-         User::PrivilegeError,
-         Pundit::NotAuthorizedError
-      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
-    when ActiveRecord::RecordNotFound
-      render_error_page(404, exception, message: "That record was not found.")
-    when ActionController::RoutingError
-      render_error_page(405, exception, message: exception.message)
-    when ActionController::UnknownFormat, ActionView::MissingTemplate
-      render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
-    when PaginationExtension::PaginationError
-      render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
-    when PostQuery::TagLimitError
-      render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-    when PostQuery::Error
-      render_error_page(422, exception, message: exception.message)
-    when RateLimiter::RateLimitError
-      render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
-    when PageRemovedError
-      render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
-    when Rack::Timeout::RequestTimeoutException
-      render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
-    when NotImplementedError
-      render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
-    when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
-      render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
-    else
-      raise exception if Rails.env.development? || Danbooru.config.debug_mode
+  concerning :ExceptionHandlingMethods do
+    def rescue_exception(exception)
+      case exception
+      when ActionView::Template::Error
+        rescue_exception(exception.cause)
+      when ActiveRecord::QueryCanceled
+        render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
+      when ActionController::BadRequest
+        render_error_page(400, exception, message: exception.message)
+      when RequestBodyNotAllowedError
+        render_error_page(400, exception, message: "Request body not allowed for #{request.method} request")
+      when SessionLoader::AuthenticationFailure, CaptchaService::Error
+        render_error_page(401, exception, message: exception.message)
+      when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
+        render_error_page(403, exception, message: exception.message)
+      when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
+          User::PrivilegeError,
+          Pundit::NotAuthorizedError
+        render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
+      when ActiveRecord::RecordNotFound
+        render_error_page(404, exception, message: "That record was not found.")
+      when ActionController::RoutingError
+        render_error_page(405, exception, message: exception.message)
+      when ActionController::UnknownFormat, ActionView::MissingTemplate
+        render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
+      when PaginationExtension::PaginationError
+        render_error_page(410, exception, template: "static/pagination_error", message: exception.message)
+      when PostQuery::TagLimitError
+        render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
+      when PostQuery::Error
+        render_error_page(422, exception, message: exception.message)
+      when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
+        render_error_page(422, exception, message: exception.message)
+      when RateLimiter::RateLimitError
+        render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
+      when PageRemovedError
+        render_error_page(451, exception, template: "static/page_removed_error", message: "This page has been removed because of a takedown request")
+      when Rack::Timeout::RequestTimeoutException
+        render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
+      when NotImplementedError
+        render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
+      when ActiveRecord::ConnectionNotEstablished, PG::ConnectionBad
+        render_error_page(503, exception, message: "The database is unavailable. Try again later.", layout: "blank")
+      else
+        raise exception if Rails.env.development? || Danbooru.config.debug_mode
+        render_error_page(500, exception)
+      end
+    end
 
-      Sentry.capture_exception(exception)
-      render_error_page(500, exception)
+    def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
+      @exception = exception
+      @expected = status < 500
+      @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
+      @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
+      format = :html unless format.in?(%i[html json xml js atom])
+
+      @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
+
+      # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
+      layout = "blank" if CurrentUser.user.nil?
+
+      if @exception
+        DanbooruLogger.log(@exception, expected: @expected)
+
+        ApplicationMetrics[:rails_exceptions_total][
+          exception: @exception.class.name,
+          controller: controller_name,
+          action: action_name,
+          expected: @expected.to_s,
+        ].increment
+      end
+
+      render template, layout: layout, status: status, formats: format
+    rescue ActionView::MissingTemplate
+      render "static/error", layout: layout, status: status, formats: format
     end
   end
 
-  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol, layout: "default")
-    @exception = exception
-    @expected = status < 500
-    @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
-    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
-    format = :html unless format.in?(%i[html json xml js atom])
-
-    @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
-
-    # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
-    layout = "blank" if CurrentUser.user.nil?
-
-    if @exception
-      DanbooruLogger.log(@exception, expected: @expected)
-
-      ApplicationMetrics[:rails_exceptions_total][
-        exception: @exception.class.name,
-        controller: controller_name,
-        action: action_name,
-        expected: @expected.to_s,
-      ].increment
+  concerning :AuthenticationMethods do
+    def set_current_user
+      CurrentUser.request = request
+      SessionLoader.new(request).load
+      Sentry.set_user(id: CurrentUser.user.id, username: CurrentUser.user.name, email: CurrentUser.user.email_address&.address, ip_address: request.remote_ip)
     end
 
-    render template, layout: layout, status: status, formats: format
-  rescue ActionView::MissingTemplate
-    render "static/error", layout: layout, status: status, formats: format
-  end
-
-  def set_current_user
-    CurrentUser.request = request
-    SessionLoader.new(request).load
-    Sentry.set_user(id: CurrentUser.user.id, username: CurrentUser.user.name, email: CurrentUser.user.email_address&.address, ip_address: request.remote_ip)
-  end
-
-  def reset_current_user
-    CurrentUser.user = nil
-    CurrentUser.safe_mode = false
-    CurrentUser.request = nil
+    def reset_current_user
+      CurrentUser.user = nil
+      CurrentUser.safe_mode = false
+      CurrentUser.request = nil
+    end
     Sentry.set_user({})
   end
 
