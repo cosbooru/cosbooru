@@ -26,7 +26,7 @@ class ModerationReport < ApplicationRecord
   scope :media_asset, -> { where(model_type: "MediaAsset") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
-  enum status: {
+  enum :status, {
     pending: 0,
     rejected: 1,
     handled: 2,
