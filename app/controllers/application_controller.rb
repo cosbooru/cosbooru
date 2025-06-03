@@ -178,8 +178,6 @@ class ApplicationController < ActionController::Base
         render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
       when PostQuery::Error
         render_error_page(422, exception, message: exception.message)
-      when UpgradeCode::InvalidCodeError, UpgradeCode::RedeemedCodeError, UpgradeCode::AlreadyUpgradedError
-        render_error_page(422, exception, message: exception.message)
       when RateLimiter::RateLimitError
         render_error_page(429, exception, message: "You're doing that too fast. Wait a minute and try again.")
       when PageRemovedError
@@ -215,7 +213,7 @@ class ApplicationController < ActionController::Base
           exception: @exception.class.name,
           controller: controller_name,
           action: action_name,
-          expected: @expected.to_s,
+          expected: @expected.to_s
         ].increment
       end
 
