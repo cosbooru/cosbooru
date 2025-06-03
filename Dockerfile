@@ -29,23 +29,16 @@ ARG OPENRESTY_VERSION="1.27.1.2"
 ARG NODE_VERSION="22.16.0"
 ARG UBUNTU_VERSION="24.04"
 
-ARG MOZJPEG_URL="https://github.com/mozilla/mozjpeg/archive/refs/tags/v${MOZJPEG_VERSION}.tar.gz"
-ARG VIPS_URL="https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz"
-ARG FFMPEG_URL="https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n${FFMPEG_VERSION}.tar.gz"
-ARG EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz"
-ARG OPENRESTY_URL="https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz"
-ARG RUBY_URL="https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR_VERSION}/ruby-${RUBY_VERSION}.tar.gz"
-
 
 # The base layer for everything.
 FROM ubuntu:$UBUNTU_VERSION AS base
 SHELL ["/bin/bash", "-xeuo", "pipefail", "-O", "globstar", "-O", "dotglob", "-c"]
 
-ARG RUBY_MINOR_VERSION
+ARG RUBY_MAJOR_VERSION
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV LANG=C.UTF-8
 ENV GEM_HOME=/home/danbooru/bundle
-ENV GEM_PATH=/home/danbooru/bundle/ruby/$RUBY_MINOR_VERSION:/usr/local/lib/ruby/gems/$RUBY_MINOR_VERSION
+ENV GEM_PATH=/home/danbooru/bundle/ruby/${RUBY_MAJOR_VERSION}.0:/usr/local/lib/ruby/gems/${RUBY_MAJOR_VERSION}.0
 ENV PATH=$GEM_HOME/bin:$PATH
 
 RUN <<EOS
@@ -147,7 +140,7 @@ EOS
 
 # Build FFmpeg. Output is in /usr/local.
 FROM build-base AS build-ffmpeg
-ARG FFMPEG_URL
+ARG FFMPEG_VERSION
 ARG FFMPEG_BUILD_DEPS="nasm libvpx-dev libdav1d-dev zlib1g-dev openssl libssl-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
   --disable-ffplay --enable-network --enable-openssl --disable-doc --disable-static --enable-shared \
