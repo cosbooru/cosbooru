@@ -4,7 +4,7 @@ ruby "~> 3.4.4"
 
 gem 'dotenv-rails', require: "dotenv/load"
 
-gem "rails", "~> 7.1"
+gem "rails", "~> 7.2"
 gem "pg"
 gem "simple_form"
 gem "sanitize"
@@ -78,7 +78,7 @@ gem "webrick"
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
-  #gem 'meta_request'
+  # gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
