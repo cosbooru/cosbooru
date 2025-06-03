@@ -13,7 +13,6 @@
       <div x-show="showReason">
         <%= f.input :post_deletion_tags, as: :string, label: "With tags", placeholder: "(optional)", input_html: { "@input": "nukeEnabled = !!$event.target.value" } %>
         <%= f.input :post_deletion_tags_nuke, as: :boolean, label: "Remove existing tags", input_html: { "x-bind:disabled": "!nukeEnabled" } %>
-        <%= f.input :post_deletion_metadata_nuke, as: :boolean, label: "Remove AI metadata" %>
       </div>
     <% end %>
     <%= f.input :delete_comments, as: :boolean %>
