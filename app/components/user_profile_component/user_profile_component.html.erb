@@ -139,7 +139,7 @@
         <tr>
           <th>Unposted Uploads</th>
           <td>
-            <%= link_to user.unposted_upload_count, template.user_uploads_path(user, search: { is_posted: false }) %>
+            <%= link_to user.unposted_upload_count, user_uploads_path(user, search: { is_posted: false }) %>
           </td>
         </tr>
       <% end %>
@@ -203,12 +203,10 @@
           <td><%= link_to user.artist_commentary_version_count, artist_commentary_versions_path(search: { updater_id: user.id }) %></td>
         </tr>
 
-        <% if PoolVersion.enabled? %>
-          <tr>
-            <th>Pool Changes</th>
-            <td><%= link_to user.pool_version_count, pool_versions_path(search: { updater_id: user.id }) %></td>
-          </tr>
-        <% end %>
+        <tr>
+          <th>Pool Changes</th>
+          <td><%= link_to user.pool_version_count, pool_versions_path(search: { updater_id: user.id }) %></td>
+        </tr>
 
         <% if Danbooru.config.forum_enabled?.to_s.truthy? %>
           <tr>
