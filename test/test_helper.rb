@@ -1,16 +1,16 @@
 ENV["RAILS_ENV"] = "test"
 
-require 'simplecov'
+require "simplecov"
 require_relative "../config/environment"
-require 'rails/test_help'
+require "rails/test_help"
 
-Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
-Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
+Dir["#{Rails.root.join("test/factories/*.rb")}"].sort.each { |file| require file }
+Dir["#{Rails.root.join("test/test_helpers/*.rb")}"].sort.each { |file| require file }
 
 Minitest::Reporters.use!([
   Minitest::Reporters::ProgressReporter.new,
   Minitest::Reporters::HtmlReporter.new(reports_dir: "tmp/html-test-results"),
-  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results")
+  Minitest::Reporters::JUnitReporter.new("tmp/junit-test-results"),
 ])
 
 Shoulda::Matchers.configure do |config|
@@ -30,7 +30,9 @@ class ActiveSupport::TestCase
   include DatabaseTestHelper
   include IqdbTestHelper
   include UploadTestHelper
-  include SourceTestHelper
+  include ExtractorTestHelper
+  include UrlTestHelper
+  extend StripeTestHelper
   extend NormalizeAttributeHelper
 
   unless Danbooru.config.debug_mode
@@ -67,8 +69,8 @@ class ActiveSupport::TestCase
     Cache.clear
   end
 
-  def as(user, &block)
-    CurrentUser.scoped(user, &block)
+  def as(user, &)
+    CurrentUser.scoped(user, &)
   end
 
   def assert_search_equals(expected_results, current_user: User.anonymous, **params)
@@ -115,3 +117,5 @@ class ActionDispatch::IntegrationTest
     method_authenticated(:delete, url, user, **options)
   end
 end
+
+module Source::Tests; end
