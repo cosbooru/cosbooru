@@ -5853,6 +5853,17 @@ CREATE INDEX index_user_events_on_ip_addr ON public.user_events USING btree (ip_
 
 
 --
+-- Name: index_user_events_on_ip_addr_subnet; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_ip_addr_subnet ON public.user_events USING btree (network(set_masklen(ip_addr,
+CASE
+    WHEN (family(ip_addr) = 4) THEN 24
+    ELSE 64
+END)));
+
+
+--
 -- Name: index_user_events_on_metadata; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6849,6 +6860,10 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250603085358'),
+('20250601164359'),
+('20250601164357'),
+('20250601164355'),
 ('20250530193107'),
 ('20250530193106'),
 ('20250530091115'),
@@ -7193,4 +7208,3 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
-
