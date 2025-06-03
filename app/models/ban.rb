@@ -11,7 +11,8 @@ class Ban < ApplicationRecord
   attribute :post_deletion_tags_nuke, :boolean
   attribute :delete_forum_posts, :boolean
   attribute :delete_comments, :boolean
-  attribute :delete_votes, :boolean
+  attribute :delete_post_votes, :boolean
+  attribute :delete_comment_votes, :boolean
 
   dtext_attribute :reason, inline: true # defines :dtext_reason
 
@@ -66,8 +67,12 @@ class Ban < ApplicationRecord
       errors.add(:post_deletion_reason, "is required")
     end
 
-    if delete_votes && !Pundit.policy!(banner, PostVote.new).destroy?
-      errors.add(:delete_votes, "is not allowed by #{banner.level_string}")
+    if delete_post_votes && !Pundit.policy!(banner, PostVote.new).destroy?
+      errors.add(:delete_post_votes, "is not allowed by #{banner.level_string}")
+    end
+
+    if delete_comment_votes && !Pundit.policy!(banner, CommentVote.new).destroy?
+      errors.add(:delete_comment_votes, "is not allowed by #{banner.level_string}")
     end
   end
 
@@ -135,32 +140,19 @@ class Ban < ApplicationRecord
 
   def delete_user_data
     if delete_posts
-      user.posts.pending.parallel_find_each do |post|
-        if post_deletion_tags.present?
-          if post_deletion_tags_nuke
-            post.update!(tag_string: post_deletion_tags)
-          else
-            post.update!(tag_string: "#{post.tag_string} #{post_deletion_tags}".strip)
-          end
-        end
+      user.posts.pending.find_each do |post|
         post.delete!(post_deletion_reason)
       end
     end
 
-    if delete_forum_posts
-      user.forum_topics.undeleted.each(&:soft_delete!)
-      user.forum_posts.undeleted.each(&:soft_delete!)
-    end
+    user.forum_topics.undeleted.find_each(&:soft_delete!) if delete_forum_posts
+    user.forum_posts.undeleted.find_each(&:soft_delete!) if delete_forum_posts
+    user.comments.undeleted.find_each(&:soft_delete!) if delete_comments
+    user.post_votes.undeleted.find_each(&:soft_delete!) if delete_post_votes
 
-    if delete_comments
-      user.comments.undeleted.each(&:soft_delete!)
-    end
-
-    if delete_votes
-      user.post_votes.undeleted.each(&:soft_delete!)
-      user.comment_votes.undeleted.each do |vote|
-        vote.updater = banner
-        vote.soft_delete!
+    if delete_comment_votes
+      user.comment_votes.undeleted.find_each do |vote|
+        vote.soft_delete!(updater: banner)
       end
     end
   end
