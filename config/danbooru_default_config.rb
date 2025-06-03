@@ -451,6 +451,12 @@ module Danbooru
       []
     end
 
+    # If a new user uploads a post with any of these AI tags, the post will be blocked.
+    def new_uploader_blocked_ai_tags
+      # "tag1,>50% or tag2,>75% or tag3,>90%"
+      nil
+    end
+
     def niche_tags
       []
     end
@@ -933,7 +939,7 @@ module Danbooru
     end
 
     def forum_post_max_video_size
-      16.megabyte
+      16.megabytes
     end
 
     def forum_post_max_large_emoji

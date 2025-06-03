@@ -148,10 +148,10 @@ class Post < ApplicationRecord
       translated_description: translated_commentary_desc,
     )
 
-    metadata = if load_metadata
-      AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
+    if load_metadata
+      metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
     else
-      AIMetadata.new(updater: CurrentUser.user)
+      metadata = AIMetadata.new(updater: CurrentUser.user)
     end
 
     metadata.assign_attributes({
@@ -260,7 +260,7 @@ class Post < ApplicationRecord
       is_image? && image_width.present? && image_width > Danbooru.config.large_image_width
     end
 
-    alias has_large has_large?
+    alias_method :has_large, :has_large?
 
     def large_image_width
       if has_large?
@@ -302,7 +302,7 @@ class Post < ApplicationRecord
 
     # XXX
     def current_image_size
-      has_large? && CurrentUser.default_image_size == "large" ? "large" : "original"
+      (has_large? && CurrentUser.default_image_size == "large") ? "large" : "original"
     end
   end
 
@@ -448,7 +448,7 @@ class Post < ApplicationRecord
 
       new_tags = post_edit.effective_added_tag_names.select { |name| !Tag.exists?(name: name) }
 
-      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f/MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_new_tags", user: CurrentUser.user, cost: new_tags.size, rate: MAX_NEW_TAGS.to_f / MAX_NEW_TAGS_INTERVAL, burst: MAX_NEW_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't create more than #{MAX_NEW_TAGS.to_i} new tags per #{MAX_NEW_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort # XXX This causes a transaction rollback which means the rate limit doesn't get properly updated.
       end
@@ -468,13 +468,13 @@ class Post < ApplicationRecord
       end
 
       case image_width * image_height
-      when 0..(768*512)
+      when 0..(768 * 512)
         tags << "lowres"
-      when (768*512)...(1920*1080)
+      when (768 * 512)...(1920 * 1080)
         # do nothing
-      when (1920*1080)...(2560*1440)
+      when (1920 * 1080)...(2560 * 1440)
         tags << "highres"
-      when (2560*1440)..(3840*2160)
+      when (2560 * 1440)..(3840 * 2160)
         tags << "absurdres"
       else
         tags << "incredibly_absurdres"
@@ -631,7 +631,7 @@ class Post < ApplicationRecord
 
         end
       end
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -704,10 +704,8 @@ class Post < ApplicationRecord
 
     def typed_tags(name)
       @typed_tags ||= {}
-      @typed_tags[name] ||= begin
-        tag_array.select do |tag|
-          tag_categories[tag] == TagCategory.mapping[name]
-        end
+      @typed_tags[name] ||= tag_array.select do |tag|
+        tag_categories[tag] == TagCategory.mapping[name]
       end
     end
 
@@ -774,7 +772,7 @@ class Post < ApplicationRecord
       ancestors = []
       parent = self.parent
 
-      while parent.present? && !self.in?(ancestors)
+      while parent.present? && !in?(ancestors)
         ancestors << parent
         parent = parent.parent
       end
@@ -829,7 +827,7 @@ class Post < ApplicationRecord
 
       parent.update_has_children_flag if parent.present?
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
-    rescue
+    rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let
       # the edit fail because then it will create a new post version even if
       # the edit didn't go through.
@@ -853,7 +851,7 @@ class Post < ApplicationRecord
       return true if has_active_children?
       return true if has_children? && CurrentUser.user.show_deleted_children?
       return true if has_children? && is_deleted?
-      return false
+      false
     end
 
     def has_visible_children
@@ -970,7 +968,6 @@ class Post < ApplicationRecord
     def calculate_version
       1 + versions.maximum(:version).to_i
     end
-
 
     def create_new_version
       previous = versions.last
@@ -1144,16 +1141,14 @@ class Post < ApplicationRecord
         relation = left_outer_joins(:comments).group(:id).select("posts.*")
         relation = relation.select("COUNT(comments.id) AS comment_count")
         relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = TRUE)  AS deleted_comment_count")
-        relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = FALSE) AS active_comment_count")
-        relation
+        relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = FALSE) AS active_comment_count")
       end
 
       def with_note_stats
         relation = left_outer_joins(:notes).group(:id).select("posts.*")
         relation = relation.select("COUNT(notes.id) AS note_count")
         relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = TRUE)  AS active_note_count")
-        relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = FALSE) AS deleted_note_count")
-        relation
+        relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = FALSE) AS deleted_note_count")
       end
 
       def with_flag_stats
@@ -1163,28 +1158,24 @@ class Post < ApplicationRecord
 
       def with_appeal_stats
         relation = left_outer_joins(:appeals).group(:id).select("posts.*")
-        relation = relation.select("COUNT(post_appeals.id) AS appeal_count")
-        relation
+        relation.select("COUNT(post_appeals.id) AS appeal_count")
       end
 
       def with_approval_stats
         relation = left_outer_joins(:approvals).group(:id).select("posts.*")
-        relation = relation.select("COUNT(post_approvals.id) AS approval_count")
-        relation
+        relation.select("COUNT(post_approvals.id) AS approval_count")
       end
 
       def with_replacement_stats
         relation = left_outer_joins(:replacements).group(:id).select("posts.*")
-        relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
-        relation
+        relation.select("COUNT(post_replacements.id) AS replacement_count")
       end
 
       def with_child_stats
         relation = left_outer_joins(:children).group(:id).select("posts.*")
         relation = relation.select("COUNT(children_posts.id) AS child_count")
         relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = TRUE)  AS deleted_child_count")
-        relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = FALSE) AS active_child_count")
-        relation
+        relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = FALSE) AS active_child_count")
       end
 
       def with_pool_stats
@@ -1195,16 +1186,14 @@ class Post < ApplicationRecord
         relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = TRUE) AS deleted_pool_count")
         relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
         relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
-        relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
-        relation
+        relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
       end
 
       def with_queued_at
         relation = group(:id)
         relation = relation.left_outer_joins(:flags, :appeals)
         relation = relation.select("posts.*")
-        relation = relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
-        relation
+        relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
       end
 
       def with_stats(tables)
@@ -1467,7 +1456,7 @@ class Post < ApplicationRecord
       end
 
       def rating_matches(rating)
-        where(rating: rating.downcase.split(/,/).map(&:first))
+        where(rating: rating.downcase.split(",").map(&:first))
       end
 
       def source_matches(source, quoted = false)
@@ -1794,7 +1783,7 @@ class Post < ApplicationRecord
           where("posts.score > 0 and posts.created_at >= ?", 2.days.ago).reorder(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
 
         when "rank2"
-          where("posts.score > 0 and posts.created_at >= ?", 7.days.ago).reorder(Arel.sql(<<~SQL
+          where("posts.score > 0 and posts.created_at >= ?", 7.days.ago).reorder(Arel.sql(<<~SQL,
             (posts.score + posts.fav_count + 7) / log(3, posts.views + 100) / (case
               when rating = 'e' then 3.5
               when rating = 'q' then 3.0
@@ -1803,7 +1792,7 @@ class Post < ApplicationRecord
             end)
             DESC
           SQL
-          ))
+                                                                                         ))
 
         when "modqueue", "modqueue_desc"
           with_queued_at.reorder("queued_at DESC, posts.id DESC")
@@ -1862,15 +1851,15 @@ class Post < ApplicationRecord
       def search(params, current_user)
         q = search_attributes(
           params,
-          [:id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
-          :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
-          :image_height, :tag_count, :has_children, :has_active_children,
-          :is_pending, :is_flagged, :is_deleted, :is_banned,
-          :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-          :uploader, :approver, :parent,
-          :artist_commentary, :flags, :appeals, :notes, :comments, :children,
-          :approvals, :replacements, :media_metadata],
-          current_user: current_user
+          %i[id created_at updated_at rating source pixiv_id fav_count
+             score up_score down_score md5 file_ext file_size image_width
+             image_height tag_count has_children has_active_children
+             is_pending is_flagged is_deleted is_banned
+             last_comment_bumped_at last_commented_at last_noted_at
+             uploader approver parent
+             artist_commentary flags appeals notes comments children
+             approvals replacements media_metadata],
+          current_user: current_user,
         )
 
         if params[:tags].present?
@@ -1955,7 +1944,7 @@ class Post < ApplicationRecord
     def validate_no_parent_cycles
       return unless parent_id_changed?
 
-      if self.in?(ancestors)
+      if in?(ancestors)
         errors.add(:base, "Post cannot have itself as a parent")
         throw :abort # Abort to avoid additional error about parent-child chain being more than 4 levels deep
       end
@@ -1984,12 +1973,22 @@ class Post < ApplicationRecord
       end
     end
 
+    def post_is_not_allowed
+      return if uploader.posts.active.exists?
+
+      blocked_tags = Danbooru.config.new_uploader_blocked_ai_tags
+      if blocked_tags.present? && ai_tags_match?(blocked_tags)
+        errors.add(:base, "Post failed, try again later")
+        throw :abort # Don't bother returning other validation errors
+      end
+    end
+
     def validate_changed_tags
       return if CurrentUser.user.nil? || uploader == CurrentUser.user || CurrentUser.user.is_builder?
 
       changed_tags = added_tags + removed_tags
 
-      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f/MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
+      if RateLimiter.limited?(action: "post:validate_changed_tags", user: CurrentUser.user, cost: changed_tags.size, rate: MAX_CHANGED_TAGS.to_f / MAX_CHANGED_TAGS_INTERVAL, burst: MAX_CHANGED_TAGS, minimum_points: -0.1)
         errors.add(:base, "You can't add or remove more than #{MAX_CHANGED_TAGS.to_i} tags per #{MAX_CHANGED_TAGS_INTERVAL.inspect}. Wait a while and try again")
         throw :abort
       end
@@ -2074,8 +2073,8 @@ class Post < ApplicationRecord
     end
 
     def discord_image(channel)
-      return if (rating != 'g' && !channel.nsfw?) || !visible?(User.anonymous)
-      url = file_size > 8.megabytes ? media_asset.variant(:sample).file_url : file_url
+      return if (rating != "g" && !channel.nsfw?) || !visible?(User.anonymous)
+      url = (file_size > 8.megabytes) ? media_asset.variant(:sample).file_url : file_url
       Discordrb::Webhooks::EmbedImage.new(url: url)
     end
 
@@ -2099,7 +2098,7 @@ class Post < ApplicationRecord
       timestamp = "#{created_at.strftime("%F")}"
 
       Discordrb::Webhooks::EmbedFooter.new(
-        text: "#{post_info} | #{file_info} | #{timestamp}"
+        text: "#{post_info} | #{file_info} | #{timestamp}",
       )
     end
   end
@@ -2109,6 +2108,9 @@ class Post < ApplicationRecord
       Post.increment_counter(:views, post_id)
     end
   end
+
+  # @param tags [String] The AI tag query.
+  delegate :ai_tags_match?, to: :media_asset
 
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "g" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
@@ -2168,7 +2170,7 @@ class Post < ApplicationRecord
   end
 
   def create_ai_metadata
-    metadata = AIMetadata.new_from_metadata(self.media_asset.metadata)
+    metadata = AIMetadata.new_from_metadata(media_asset.metadata)
     metadata.post = self
     metadata
   end
