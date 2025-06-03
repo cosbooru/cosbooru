@@ -3,8 +3,6 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
-  around_action :set_timeout, only: [:profile, :show]
-
   rate_limit :create, rate: 1.0 / 5.minutes, burst: 5
 
   def index
@@ -86,7 +84,7 @@ class UsersController < ApplicationController
 
     if !CaptchaService.new.verify_request(request)
       @user.errors.add(:base, "Invalid captcha, try again.")
-    elsif @user.email_address&.valid? && @user.email_address&.invalid?(:deliverable)
+    elsif @user.email_address&.valid? && @user.email_address.invalid?(:deliverable)
       @user.errors.add(:email_address, "is invalid or can't receive mail")
     elsif @user.save
       session[:user_id] = @user.id
