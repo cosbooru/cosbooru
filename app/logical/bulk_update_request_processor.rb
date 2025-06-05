@@ -10,8 +10,8 @@ class BulkUpdateRequestProcessor
   attr_reader :bulk_update_request
 
   delegate :script, :forum_topic, :approver, to: :bulk_update_request
-  validate :validate_script
   validate :validate_script_length
+  validate :validate_script
 
   # @param bulk_update_request [BulkUpdateRequest] the BUR
   def initialize(bulk_update_request)
@@ -164,6 +164,7 @@ class BulkUpdateRequestProcessor
   def validate_script_length
     if commands.size > Danbooru.config.bur_max_length
       errors.add(:base, "Bulk update request is too long (maximum size: #{Danbooru.config.bur_max_length} lines). Split your request into smaller chunks and try again.")
+      throw :abort
     end
   end
 
