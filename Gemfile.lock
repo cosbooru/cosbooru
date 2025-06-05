@@ -666,6 +666,7 @@ DEPENDENCIES
   stackprof
   terminal-table (~> 3.0)
   tzinfo-data
+  useragent
   view_component
   webrick
   x25519
