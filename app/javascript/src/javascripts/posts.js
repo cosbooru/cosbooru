@@ -1,10 +1,10 @@
 import CurrentUser from './current_user'
 import Utility from './utility'
+import { delay }  from './utility'
 import Notice from './notice'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
-import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
 let Post = {};
@@ -87,7 +87,7 @@ Post.initialize_gestures = function() {
   if (hasPrev) {
     hammer.on("swiperight", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
-      await Utility.delay(200);
+      await delay(200);
       Post.swipe_prev(e);
     });
   }
@@ -95,7 +95,7 @@ Post.initialize_gestures = function() {
   if (hasNext) {
     hammer.on("swipeleft", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
-      await Utility.delay(200);
+      await delay(200);
       Post.swipe_next(e);
     });
   }

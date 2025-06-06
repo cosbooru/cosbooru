@@ -1,5 +1,4 @@
-import Post from "./posts";
-import Utility from "./utility";
+import { splitWords } from "./utility";
 import uniq from "lodash/uniq";
 
 export default class TagCounter {
@@ -21,7 +20,7 @@ export default class TagCounter {
 
   get tagCount() {
     let tagString = this.$target.val().toLowerCase();
-    let tags = uniq(Utility.splitWords(tagString));
+    let tags = uniq(splitWords(tagString));
     return tags.length;
   }
 

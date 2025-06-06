@@ -1,5 +1,5 @@
 import SourceDataComponent from "./source_data_component.js";
-import Utility from './utility';
+import { splitWords } from './utility';
 import Alpine from 'alpinejs';
 
 Alpine.store("relatedTags", {
@@ -121,8 +121,8 @@ RelatedTag.update_selected = function(e) {
 }
 
 RelatedTag.current_tags = function() {
-  let tagString = ($("#post_tag_string").val() || "").toLowerCase();
-  return Utility.splitWords(tagString);
+  let tagString = $("#post_tag_string").val().toLowerCase();
+  return splitWords(tagString);
 }
 
 RelatedTag.toggle_tag = function(e) {
