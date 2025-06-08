@@ -21,8 +21,8 @@ class MediaAssetPolicy < ApplicationPolicy
     !record.removed? && (record.post.blank? || record.post.visible?(user))
   end
 
-  def reportable?
-    record.post.blank?
+  def rate_limit_for_image(**_options)
+    { rate: 5.0 / 1.second, burst: 50 }
   end
 
   def api_attributes

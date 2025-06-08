@@ -3,7 +3,7 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
-  rate_limit :create, rate: 1.0 / 5.minutes, burst: 5
+  around_action :set_timeout, only: [:profile, :show]
 
   def index
     if params[:name].present?
@@ -33,6 +33,28 @@ class UsersController < ApplicationController
     @user = authorize User.new
     @user.email_address = EmailAddress.new
     respond_with(@user)
+  end
+
+  def new
+    @user = authorize User.new
+    @user.email_address = EmailAddress.new
+    respond_with(@user)
+  end
+
+  def edit
+    @user = authorize User.find(params[:id])
+    respond_with(@user)
+  end
+
+  def settings
+    @user = authorize CurrentUser.user
+
+    if @user.is_anonymous?
+      redirect_to login_path(url: settings_path)
+    else
+      params[:action] = "edit"
+      respond_with(@user, template: "users/edit")
+    end
   end
 
   def edit
@@ -72,7 +94,7 @@ class UsersController < ApplicationController
       level: user_verifier.initial_level,
       name: params[:user][:name],
       password: params[:user][:password],
-      password_confirmation: params[:user][:password_confirmation]
+      password_confirmation: params[:user][:password_confirmation],
     )
 
     user_verifier.log! if user_verifier.requires_verification?
