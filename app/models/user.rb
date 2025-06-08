@@ -90,9 +90,9 @@ class User < ApplicationRecord
   attribute :note_update_count, default: 0
   attribute :unread_dmail_count, default: 0
   attribute :favorite_count, default: 0
-  attribute :per_page, default: Danbooru.config.posts_per_page.to_i
+  attribute :per_page, default: -> { Danbooru.config.posts_per_page.to_i }
   attribute :theme, default: :auto
-  attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
+  attribute :upload_points, default: -> { Danbooru.config.initial_upload_points.to_i }
   attribute :bit_prefs, default: 0
   attribute :is_deleted, default: false
 
@@ -597,7 +597,7 @@ class User < ApplicationRecord
       max_updated_at = ForumTopic.visible(self).active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
-      return max_updated_at > last_forum_read_at
+      max_updated_at > last_forum_read_at
     end
   end
 
@@ -679,7 +679,7 @@ class User < ApplicationRecord
 
     # Flags are unlimited if you're an approver.
     def has_unlimited_flags?
-      return true if is_approver?
+      true if is_approver?
     end
 
     def upload_limit
@@ -788,7 +788,7 @@ class User < ApplicationRecord
         User.where(id: id).update_all(
           post_upload_count: posts.count,
           post_update_count: post_versions.count,
-          note_update_count: note_versions.count
+          note_update_count: note_versions.count,
         )
       end
     end
@@ -813,11 +813,11 @@ class User < ApplicationRecord
 
       q = search_attributes(
         params,
-        [:id, :created_at, :updated_at, :name, :level, :is_deleted, :post_upload_count, :post_update_count,
-         :note_update_count, :favorite_count, :posts, :note_versions, :artist_commentary_versions, :post_appeals,
-         :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts,
-         :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter],
-        current_user: current_user
+        %i[id created_at updated_at name level is_deleted post_upload_count post_update_count
+           note_update_count favorite_count posts note_versions artist_commentary_versions post_appeals
+           post_approvals artist_versions comments wiki_page_versions feedback forum_topics forum_posts
+           forum_post_votes tag_aliases tag_implications bans inviter],
+        current_user: current_user,
       )
 
       if params[:name_matches].present?
@@ -911,7 +911,7 @@ class User < ApplicationRecord
       timestamp = "#{created_at.strftime("%F")}"
 
       Discordrb::Webhooks::EmbedFooter.new(
-        text: "#{positive_feedback_count}⇧ #{neutral_feedback_count}😐 #{negative_feedback_count}⇩ | Joined #{timestamp}"
+        text: "#{positive_feedback_count}⇧ #{neutral_feedback_count}😐 #{negative_feedback_count}⇩ | Joined #{timestamp}",
       )
     end
   end
