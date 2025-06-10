@@ -67,7 +67,7 @@ Post.initialize_info_tabs = function() {
 }
 
 Post.initialize_gestures = function() {
-  if (!isTouchscreen() || CurrentUser.data("disable-mobile-gestures")) {
+  if (!isMobile() || CurrentUser.data("disable-mobile-gestures")) {
     return;
   }
   var $body = $("body");
