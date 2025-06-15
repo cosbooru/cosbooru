@@ -18,6 +18,7 @@ class PostVersionsController < ApplicationController
   end
 
   def search
+    authorize PostVersion
   end
 
   def undo
