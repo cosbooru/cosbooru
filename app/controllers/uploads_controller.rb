@@ -2,18 +2,7 @@
 
 class UploadsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  skip_before_action :verify_authenticity_token, only: [:create], if: -> { request.xhr? }
-
-  def new
-    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
-    respond_with(@upload)
-  end
-
-  def create
-    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
-    @upload.save
-    respond_with(@upload)
-  end
+  skip_before_action :verify_authenticity_token, only: [:create]
 
   def index
     @mode = params.fetch(:mode, "gallery")
@@ -42,9 +31,36 @@ class UploadsController < ApplicationController
     elsif @upload.media_asset_count == 1
       @upload_media_asset = @upload.upload_media_assets.first
       @post = Post.new_from_upload(@upload_media_asset, add_artist_tag: true, load_metadata: true, source: @upload_media_asset.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys)
-      respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
+      respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
     else
-      respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
+      respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
+    end
+  end
+
+  def new
+    @upload = authorize Upload.new(uploader: CurrentUser.user, source: params[:url], referer_url: params[:ref], **permitted_attributes(Upload))
+    respond_with(@upload)
+  end
+
+  def create
+    @upload = authorize Upload.new(uploader: CurrentUser.user, **permitted_attributes(Upload))
+    @upload.save
+    respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
+  end
+
+  def destroy
+    @upload = authorize Upload.find(params[:id])
+    @upload.update(is_deleted: true)
+
+    respond_with(@upload, location: Routes.uploads_path, notice: "Upload was deleted.")
+  end
+
+  def undelete
+    @upload = authorize Upload.find(params[:id])
+    @upload.update(is_deleted: false)
+
+    respond_with(@upload, notice: "Upload was undeleted.") do |format|
+      format.html { redirect_to uploads_path }
     end
   end
 
