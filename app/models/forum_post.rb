@@ -9,7 +9,8 @@ class ForumPost < ApplicationRecord
   # attr_readonly :topic_id # XXX broken by accepts_nested_attributes_for in ForumTopic
   attr_accessor :creator_ip_addr
 
-  dtext_attribute :body, media_embeds: true # defines :dtext_body
+  # defines :dtext_body
+  dtext_attribute :body, media_embeds: { max_embeds: 5, max_large_emoji: 1, max_small_emoji: 100, max_video_size: 1.megabyte, sfw_only: true }
 
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -26,7 +27,6 @@ class ForumPost < ApplicationRecord
   validates :body, visible_string: true, length: { maximum: 200_000 }, if: :body_changed?
   validate :validate_deletion_of_original_post
   validate :validate_undeletion_of_post
-  validate :validate_body
 
   before_save :handle_reports_on_deletion
   before_create :autoreport_spam
@@ -41,7 +41,7 @@ class ForumPost < ApplicationRecord
   mentionable(
     message_field: :body,
     title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    body: ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n}}
+    body: ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.new(body).extract_mention("@#{user_name}")}\n[/quote]\n}},
   )
 
   module SearchMethods
@@ -105,33 +105,6 @@ class ForumPost < ApplicationRecord
   def validate_undeletion_of_post
     if topic.is_deleted? && !is_deleted?
       errors.add(:base, "Can't undelete post without undeleting the topic first")
-    end
-  end
-
-  def validate_body
-    if dtext_body.block_emoji_names.count > MAX_LARGE_EMOJI
-      errors.add(:base, "Can't include more than #{MAX_LARGE_EMOJI} #{"sticker".pluralize(MAX_LARGE_EMOJI)}")
-    end
-
-    if dtext_body.inline_emoji_names.count > MAX_SMALL_EMOJI
-      errors.add(:base, "Can't include more than #{MAX_SMALL_EMOJI} #{"emoji".pluralize(MAX_SMALL_EMOJI)}")
-    end
-
-    if dtext_body.embedded_media.count > MAX_IMAGES
-      errors.add(:base, "Can't include more than #{MAX_IMAGES} #{"image".pluralize(MAX_IMAGES)}")
-      return # don't check the actual images if the user included too many images
-    end
-
-    if dtext_body.embedded_posts.any? { _1.is_video? && _1.file_size > MAX_VIDEO_SIZE } || dtext_body.embedded_media_assets.any? { _1.is_video? && _1.file_size > MAX_VIDEO_SIZE }
-      errors.add(:base, "Can't include videos larger than #{MAX_VIDEO_SIZE.to_fs(:human_size)}")
-    end
-
-    if dtext_body.embedded_posts.any? { |embedded_post| embedded_post.is_nsfw? }
-      errors.add(:base, "Can't post NSFW images")
-    end
-
-    if dtext_body.embedded_media_assets.any? { |embedded_asset| embedded_asset.is_ai_nsfw? }
-      errors.add(:base, "Can't post NSFW images")
     end
   end
 
