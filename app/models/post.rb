@@ -72,6 +72,7 @@ class Post < ApplicationRecord
   before_save :has_enough_tags
   before_save :update_tag_post_counts
   before_save :update_tag_category_counts
+  before_create :remove_blank_artist_commentary
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -121,52 +122,19 @@ class Post < ApplicationRecord
 
   has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
 
-  def self.new_from_upload(
-    upload_media_asset,
-    tag_string: nil,
-    rating: nil,
-    parent_id: nil,
-    source: nil,
-    artist_commentary_title: nil,
-    artist_commentary_desc: nil,
-    translated_commentary_title: nil,
-    translated_commentary_desc: nil,
-    prompt: nil,
-    negative_prompt: nil,
-    ai_metadata: {},
-    is_pending: nil,
-    load_metadata: false,
-    add_artist_tag: false
-  )
+  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary: {}, is_pending: nil, add_artist_tag: false)
     upload = upload_media_asset.upload
     media_asset = upload_media_asset.media_asset
 
     # XXX depends on CurrentUser
-    commentary = ArtistCommentary.new(
-      original_title: artist_commentary_title,
-      original_description: artist_commentary_desc,
-      translated_title: translated_commentary_title,
-      translated_description: translated_commentary_desc,
-    )
-
-    if load_metadata
-      metadata = AIMetadata.new_from_metadata(media_asset&.metadata.to_h)
-    else
-      metadata = AIMetadata.new(updater: CurrentUser.user)
-    end
-
-    metadata.assign_attributes({
-      prompt: ai_metadata[:prompt],
-      negative_prompt: ai_metadata[:negative_prompt],
-      parameters: ai_metadata.without(:prompt, :negative_prompt),
-    }.compact_blank)
+    commentary = ArtistCommentary.new(**artist_commentary)
 
     if add_artist_tag
       tag_string = "#{tag_string} #{upload_media_asset.source_extractor&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
       tag_string += " " if tag_string.present?
     end
 
-    post = Post.new(
+    Post.new(
       uploader: upload.uploader,
       md5: media_asset&.md5,
       file_ext: media_asset&.file_ext,
@@ -178,8 +146,7 @@ class Post < ApplicationRecord
       rating: rating,
       parent_id: parent_id,
       is_pending: !upload.uploader.is_contributor? || is_pending.to_s.truthy?,
-      artist_commentary: (commentary if commentary.any_field_present?),
-      ai_metadata: (metadata if metadata.any_field_present?),
+      artist_commentary: commentary,
     )
   end
 
@@ -2069,6 +2036,18 @@ class Post < ApplicationRecord
       if tags.count(&:general?) < 10
         warnings.add(:base, "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads")
       end
+    end
+  end
+
+  concerning :ArtistCommentaryMethods do
+    def remove_blank_artist_commentary
+      self.artist_commentary = nil if !artist_commentary&.any_field_present?
+    end
+  end
+
+  concerning :ArtistCommentaryMethods do
+    def remove_blank_artist_commentary
+      self.artist_commentary = nil if !artist_commentary&.any_field_present?
     end
   end
 
