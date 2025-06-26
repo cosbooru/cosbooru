@@ -8,7 +8,7 @@
     <%= render(TabPanelComponent.new(classes: "horizontal-tab-panel fixed-width-container") do |t| %>
       <% t.panel("Basic", active: true) do %>
         <%= edit_form_for @user do |f| %>
-          <fieldset id="basic-settings-section">
+          <div id="basic-settings-section">
             <div class="input">
               <label>Name</label>
               <p><%= link_to "Change your name", change_name_user_path(@user) %></p>
@@ -38,9 +38,8 @@
             <%= f.input :receive_email_notifications, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Receive an email when you receive a new dmail." %>
             <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
             <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
-            <%= f.input :show_niche_posts, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Display posts containing contentious content." %>
-            <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, input_html: { data: {autocomplete: "tag-query"}} %>
-          </fieldset>
+            <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
+          </div>
 
           <%= f.button :submit, "Submit" %>
         <% end %>
@@ -48,7 +47,7 @@
 
       <% t.panel("Advanced") do %>
         <%= edit_form_for @user do |f| %>
-          <fieldset id="advanced-settings-section">
+          <div id="advanced-settings-section">
             <div class="input">
               <label>Account</label>
               <p>
@@ -73,9 +72,9 @@
             <%= f.input :disable_post_tooltips, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable advanced tooltips when hovering over thumbnails" %>
             <%= f.input :enable_desktop_mode, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Use the desktop layout on mobile" %>
 
-            <%= f.input :favorite_tags, label: "Frequent tags", hint: "A list of tags that you use often. They will appear when using the list of Related Tags.", input_html: { data: { autocomplete: "tag-query" } } %>
-            <%= f.input :custom_style, label: "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, hint: "CSS rules to apply to the whole site." %>
-          </fieldset>
+            <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
+            <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
+          </div>
           <%= f.button :submit, "Submit" %>
         <% end %>
       <% end %>
