@@ -8,7 +8,7 @@
   <%= subnav_link_to "Changes", pool_versions_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
-    <li>|</li>
+    <%= subnav_divider %>
     <%= subnav_link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %>
     <% if policy(@pool).update? %>
       <%= subnav_link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %>
