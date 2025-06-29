@@ -116,6 +116,7 @@ class User < ApplicationRecord
   has_many :ai_metadata_versions, foreign_key: :updater_id, dependent: :destroy
   has_many :artist_versions, foreign_key: :updater_id, dependent: :destroy
   has_many :artist_commentary_versions, foreign_key: :updater_id, dependent: :destroy
+  has_many :bulk_update_requests
   has_many :comments, foreign_key: :creator_id, dependent: :destroy
   has_many :comment_votes, dependent: :destroy
   has_many :wiki_page_versions, foreign_key: :updater_id, dependent: :destroy
