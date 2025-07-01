@@ -19,39 +19,23 @@ class NewsUpdatesController < ApplicationController
     respond_with(@news_update)
   end
 
-  def update
-    @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.update(permitted_attributes(@news_update))
-    respond_with(@news_update, location: news_updates_path)
-  end
-
   def create
     @news_update = authorize NewsUpdate.new(creator: CurrentUser.user, **permitted_attributes(NewsUpdate))
     @news_update.save
     respond_with(@news_update, :location => news_updates_path)
   end
 
-  def destroy
+  def update
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.soft_delete!
-    respond_with(@news_update) do |format|
-      format.js { flash[:notice] = "Deleted" }
-      format.html do
-        flash[:notice] = "Deleted"
-        redirect_to news_updates_path
-      end
-    end
+    @news_update.update(updater: CurrentUser.user, **permitted_attributes(@news_update))
+
+    respond_with(@news_update, location: news_updates_path)
   end
 
-  def undelete
+  def destroy
     @news_update = authorize NewsUpdate.find(params[:id])
-    @news_update.undelete
-    respond_with(@news_update) do |format|
-      format.js { flash[:notice] = "Undeleted" }
-      format.html do
-        flash[:notice] = "Undeleted"
-        redirect_to news_updates_path
-      end
-    end
+    @news_update.soft_delete!(updater: CurrentUser.user)
+
+    respond_with(@news_update, location: news_updates_path)
   end
 end

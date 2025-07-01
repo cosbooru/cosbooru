@@ -4,9 +4,7 @@ class NewsUpdate < ApplicationRecord
   attr_accessor :duration_in_days
 
   belongs_to :creator, class_name: "User"
-  belongs_to_updater
-  scope :recent, -> { where("created_at >= ?", 2.weeks.ago).order(created_at: :desc).limit(5) }
-  scope :active, -> { recent.where(is_deleted: false) }
+  belongs_to :updater, class_name: "User", default: -> { creator }
 
   deletable
   scope :active, -> { undeleted.where("created_at + duration >= ?", Time.zone.now) }
