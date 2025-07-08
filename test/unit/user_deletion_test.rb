@@ -110,6 +110,7 @@ class UserDeletionTest < ActiveSupport::TestCase
       perform_enqueued_jobs { @deletion.delete! }
 
       assert_equal(0, @user.api_keys.count)
+      assert_equal(0, @user.user_events.api_key_delete.count)
     end
 
     should "remove the user's forum topic visits" do
