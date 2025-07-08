@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class EmailAddressTest < ActiveSupport::TestCase
   context "EmailAddress" do
@@ -17,12 +17,13 @@ class EmailAddressTest < ActiveSupport::TestCase
       should_not allow_value("foo@example").for(:address)
       should_not allow_value("fooqq@.com").for(:address)
       should_not allow_value('foo"bar"@gmail.com').for(:address)
-      should_not allow_value('foo<bar>@gmail.com').for(:address)
+      should_not allow_value("foo<bar>@gmail.com").for(:address)
       should_not allow_value("foo@foo.-bar.com").for(:address)
       should_not allow_value("foo@127.0.0.1").for(:address)
       should_not allow_value("foo@localhost").for(:address)
       should_not allow_value("evazion@danbooru.donmai.us").for(:address)
       should_not allow_value("blahblah@donmai.moe").for(:address)
+      should_not allow_value("#{"x" * 100}@example.com").for(:address)
     end
 
     context "normalization" do
