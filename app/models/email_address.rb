@@ -3,16 +3,22 @@
 class EmailAddress < ApplicationRecord
   BANNED_DOMAIN_REGEX = Regexp.union(Danbooru.config.blacklisted_email_domains).freeze
 
-  belongs_to :user, inverse_of: :email_address
+  attr_accessor :request, :updater
 
   attribute :address
   attribute :normalized_address
+
+  belongs_to :user, inverse_of: :email_address
 
   validates :address, presence: true, format: { message: "is invalid", with: Danbooru::EmailAddress::EMAIL_REGEX, multiline: true }, length: { maximum: 100 }, if: :address_changed?
   validates :normalized_address, presence: true, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_domain, on: :create
   validate :validate_deliverable, on: :deliverable
+
+  after_destroy :create_mod_action
+  after_save :create_mod_action, if: :saved_change_to_address?
+  after_save :update_email_address, if: :saved_change_to_address?
 
   def self.visible(user)
     if user.is_moderator?
@@ -25,6 +31,7 @@ class EmailAddress < ApplicationRecord
   def address=(value)
     value = Danbooru::EmailAddress.correct(value)&.to_s || value
     self.normalized_address = Danbooru::EmailAddress.parse(value)&.canonicalized_address&.to_s || value
+    self.is_verified = false
     super
   end
 
@@ -74,6 +81,24 @@ class EmailAddress < ApplicationRecord
       if user.is_restricted? && !is_restricted?
         user.update!(level: User::Levels::MEMBER, is_verified: is_verified?)
       end
+    end
+  end
+
+  def update_email_address
+    if saved_change_to_address? && !user.previously_new_record?
+      UserMailer.with_request(request).email_change_confirmation(user).deliver_later
+    end
+  end
+
+  def create_mod_action
+    return if user.previously_new_record?
+
+    if user == updater
+      UserEvent.create_from_request!(user, :email_change, request)
+    elsif address_before_last_save.present?
+      ModAction.log("changed user ##{user.id}'s email from #{address_before_last_save} to #{address}", :email_address_update, subject: user, user: updater)
+    else
+      ModAction.log("changed user ##{user.id}'s email to #{address}", :email_address_update, subject: user, user: updater)
     end
   end
 
