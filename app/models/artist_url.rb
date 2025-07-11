@@ -57,7 +57,7 @@ class ArtistURL < ApplicationRecord
 
   def self.normalized_url_like(url)
     url = url.downcase.gsub(%r{\Ahttps?://|/\z}i, "") # "https://example.com/A/B/C/" => "example.com/a/b/c"
-    url = url + "/" unless url.include?("*")
+    url += "/" unless url.include?("*")
     where_like("regexp_replace(lower(artist_urls.url), '^https?://|/$', '', 'g') || '/'", url) # this is indexed
   end
 
@@ -84,7 +84,7 @@ class ArtistURL < ApplicationRecord
       true
     when %r{twitter\.com/intent}i
       true
-    when %r{(?:www|com|dic)\.nicovideo\.jp}i
+    when /(?:www|com|dic)\.nicovideo\.jp/i
       true
     when %r{pawoo\.net/web/accounts}i
       true
@@ -105,11 +105,8 @@ class ArtistURL < ApplicationRecord
 
   # The sort order of sites in artist URL lists.
   def priority
-    sites = %w[
-      Pixiv Twitter
-      Anifty ArtStation Baraag Bilibili BCY Booth Civitai Deviant\ Art Fantia Ci-En Foundation Furaffinity Hentai\ Foundry Lofter Newgrounds Nico\ Seiga Nijie Pawoo Fanbox Pixiv\ Sketch Plurk Reddit Arca.live DC\ Inside Skeb Tinami Tumblr Weibo Misskey.io Misskey.art Misskey.design Xfolio
-      Ask.fm Facebook FC2 Gumroad Instagram Ko-fi Livedoor Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Twitch Youtube
-      Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
+    sites = [
+      "Pixiv", "Twitter", "Anifty", "ArtStation", "Baraag", "Bilibili", "BCY", "Booth", "Deviant Art", "Fantia", "Foundation", "Furaffinity", "Hentai Foundry", "Huashijie", "Lofter", "Newgrounds", "Nico Seiga", "Nijie", "Pawoo", "Fanbox", "Pixiv Sketch", "Plurk", "Reddit", "Arca.live", "DC Inside", "Skeb", "Tinami", "Tumblr", "Weibo", "Misskey.io", "Misskey.art", "Misskey.design", "Xfolio", "Ask.fm", "Facebook", "FC2", "Gumroad", "Instagram", "Ko-fi", "Livedoor", "Mihuashi", "Mixi.jp", "Patreon", "Piapro.jp", "Picarto", "Privatter", "Sakura.ne.jp", "Stickam", "Twitch", "Youtube", "Amazon", "Circle.ms", "DLSite", "Doujinshi.org", "Erogamescape", "Mangaupdates", "Melonbooks", "Toranoana", "Wikipedia",
     ]
 
     sites.index(site_name) || 1000
@@ -120,7 +117,7 @@ class ArtistURL < ApplicationRecord
   end
 
   def url=(url)
-    super(url)
+    super
     @parsed_url = Source::URL.parse(url)
   end
 

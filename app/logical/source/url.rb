@@ -122,6 +122,7 @@ module Source
       Source::URL::DcInside,
       Source::URL::CosplayerArchive,
       Source::URL::Marshmallow,
+      Source::URL::Huashijie,
     ]
 
     # Parse a URL into a subclass of Source::URL, or raise an exception if the URL is not a valid HTTP or HTTPS URL.
