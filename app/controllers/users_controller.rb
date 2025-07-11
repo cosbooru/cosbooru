@@ -126,6 +126,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def promote
+    @user = authorize User.find(params[:id])
+    respond_with(@user)
+  end
+
+  def demote
+    @user = authorize User.find(params[:id])
+    respond_with(@user)
+  end
+
   def deactivate
     if params[:id].present?
       @user = authorize User.find(params[:id])
