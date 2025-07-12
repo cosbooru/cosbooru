@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
   def assert_promoted_to(new_level, user, promoter)
@@ -32,11 +32,12 @@ class UserTest < ActiveSupport::TestCase
         @owner = create(:owner_user)
       end
 
-      should "allow moderators to promote users up to contributor level" do
+      should "allow moderators to promote users up to approver level" do
         assert_promoted_to(User::Levels::GOLD, @user, @mod)
         assert_promoted_to(User::Levels::PLATINUM, @user, @mod)
         assert_promoted_to(User::Levels::BUILDER, @user, @mod)
         assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @mod)
 
         assert_not_promoted_to(User::Levels::APPROVER, @user, @mod)
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
@@ -48,7 +49,9 @@ class UserTest < ActiveSupport::TestCase
         assert_promoted_to(User::Levels::GOLD, @user, @admin)
         assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
         assert_promoted_to(User::Levels::BUILDER, @user, @admin)
-        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @admin)
+        assert_promoted_to(User::Levels::CONTRIBUTOR, @user, @mod)
+        assert_promoted_to(User::Levels::APPROVER, @user, @admin)
+        assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
 
         assert_not_promoted_to(User::Levels::APPROVER, @user, @admin)
         assert_not_promoted_to(User::Levels::MODERATOR, @user, @admin)
@@ -103,6 +106,12 @@ class UserTest < ActiveSupport::TestCase
         assert_not_promoted_to(User::Levels::MEMBER, @owner, @owner)
       end
 
+      should "not allow users to be promoted to an invalid level" do
+        assert_not_promoted_to(User::Levels::ANONYMOUS, @user, @mod)
+        assert_not_promoted_to(-1, @user, @mod)
+        assert_not_promoted_to(1, @user, @mod)
+      end
+
       should "create a neutral feedback" do
         @user.promote_to!(User::Levels::GOLD, @mod)
         assert_equal("You have been promoted to a Gold level account from Member.", @user.feedback.last.body)
@@ -117,7 +126,7 @@ class UserTest < ActiveSupport::TestCase
         end
 
         assert(@user.dmails.exists?(from: bot, to: @user, title: "Your account has been updated"))
-        refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
+        assert_not(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
       end
 
       should "max out the user's upload points when promoting to contributor or higher" do
@@ -148,24 +157,24 @@ class UserTest < ActiveSupport::TestCase
       assert(user.is_gold?)
 
       user = FactoryBot.create(:user, level: User::Levels::ADMIN)
-      assert(!user.is_owner?)
+      assert_not(user.is_owner?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
       user = FactoryBot.create(:user, level: User::Levels::MODERATOR)
-      assert(!user.is_admin?)
+      assert_not(user.is_admin?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
       user = FactoryBot.create(:user, level: User::Levels::GOLD)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
+      assert_not(user.is_admin?)
+      assert_not(user.is_moderator?)
       assert(user.is_gold?)
 
       user = FactoryBot.create(:user)
-      assert(!user.is_admin?)
-      assert(!user.is_moderator?)
-      assert(!user.is_gold?)
+      assert_not(user.is_admin?)
+      assert_not(user.is_moderator?)
+      assert_not(user.is_gold?)
     end
 
     context "name" do
@@ -184,7 +193,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should "be less than 25 characters long" do
-        user = build(:user, name: "a"*25)
+        user = build(:user, name: "a" * 25)
         user.save
         assert_equal(["Name must be less than 25 characters long"], user.errors.full_messages)
       end
@@ -276,7 +285,7 @@ class UserTest < ActiveSupport::TestCase
       should "work for names containing asterisks or backslashes" do
         @user1 = build(:user, name: "user*1")
         @user2 = build(:user, name: "user*2")
-        @user3 = build(:user, name: "user\*3")
+        @user3 = build(:user, name: "user*3")
 
         @user1.save(validate: false)
         @user2.save(validate: false)
@@ -284,7 +293,7 @@ class UserTest < ActiveSupport::TestCase
 
         assert_equal(@user1.id, User.find_by_name("user*1").id)
         assert_equal(@user2.id, User.find_by_name("user*2").id)
-        assert_equal(@user3.id, User.find_by_name("user\*3").id)
+        assert_equal(@user3.id, User.find_by_name("user*3").id)
       end
     end
 
@@ -332,15 +341,15 @@ class UserTest < ActiveSupport::TestCase
       should "match wildcards" do
         user1 = build(:user, name: "foo")
         user2 = build(:user, name: "foo*bar")
-        user3 = build(:user, name: "bar\*baz")
+        user3 = build(:user, name: "bar*baz")
 
         user1.save(validate: false)
         user2.save(validate: false)
         user3.save(validate: false)
 
         assert_search_equals([user2, user1], name: "foo*")
-        assert_search_equals(user2, name: "foo\*bar")
-        assert_search_equals(user3, name: "bar\\\*baz")
+        assert_search_equals(user2, name: "foo*bar")
+        assert_search_equals(user3, name: "bar\\*baz")
       end
     end
 
@@ -361,6 +370,23 @@ class UserTest < ActiveSupport::TestCase
 
     context "during validation" do
       subject { build(:user) }
+
+      context "of level" do
+        should allow_value(User::Levels::RESTRICTED).for(:level)
+        should allow_value(User::Levels::MEMBER).for(:level)
+        should allow_value(User::Levels::GOLD).for(:level)
+        should allow_value(User::Levels::PLATINUM).for(:level)
+        should allow_value(User::Levels::BUILDER).for(:level)
+        should allow_value(User::Levels::CONTRIBUTOR).for(:level)
+        should allow_value(User::Levels::APPROVER).for(:level)
+        should allow_value(User::Levels::MODERATOR).for(:level)
+        should allow_value(User::Levels::ADMIN).for(:level)
+        should allow_value(User::Levels::OWNER).for(:level)
+
+        should_not allow_value(User::Levels::ANONYMOUS).for(:level)
+        should_not allow_value(-1).for(:level)
+        should_not allow_value(1).for(:level)
+      end
 
       context "of blacklisted tags" do
         should normalize_attribute(:blacklisted_tags).from(" foo\n bar \n baz ").to("foo\nbar\nbaz")
