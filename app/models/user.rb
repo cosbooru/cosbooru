@@ -183,8 +183,7 @@ class User < ApplicationRecord
 
   module BanMethods
     def unban!
-      self.is_banned = false
-      save
+      update!(is_banned: bans.active.exists?)
     end
 
     def ban_expired?
