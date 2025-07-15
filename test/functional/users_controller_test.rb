@@ -656,6 +656,22 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(20, @user.reload.per_page)
       end
 
+      context "for a Member-level user" do
+        should "allow disabling the private favorites option" do
+          @user = create(:user, enable_private_favorites: true)
+          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: false }}
+
+        assert_redirected_to edit_user_path(@user)
+        assert_equal("xyz", @user.reload.favorite_tags)
+      end
+
+      should "not allow a user to update another user's settings" do
+        put_auth user_path(@user), create(:owner_user), params: { user: { per_page: 123 }}
+
+        assert_response 403
+        assert_equal(20, @user.reload.per_page)
+      end
+
       context "changing the level" do
         should "not work" do
           @owner = create(:owner_user)
