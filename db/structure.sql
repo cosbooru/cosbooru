@@ -2169,7 +2169,7 @@ CREATE TABLE public.user_events (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     user_id integer NOT NULL,
-    user_session_id integer NOT NULL,
+    user_session_id integer,
     category integer NOT NULL,
     ip_addr inet,
     session_id uuid,
@@ -6860,6 +6860,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250716150524'),
 ('20250603085358'),
 ('20250530193107'),
 ('20250530193106'),
