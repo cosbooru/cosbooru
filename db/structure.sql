@@ -2211,7 +2211,8 @@ CREATE TABLE public.user_events (
     user_agent character varying,
     metadata jsonb,
     fingerprint jsonb,
-    fingerprint_hash text
+    fingerprint_hash text,
+    login_session_id bigint
 );
 
 
@@ -5964,6 +5965,13 @@ END)));
 
 
 --
+-- Name: index_user_events_on_login_session_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_login_session_id ON public.user_events USING btree (login_session_id);
+
+
+--
 -- Name: index_user_events_on_metadata; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6706,6 +6714,14 @@ ALTER TABLE ONLY public.bulk_update_requests
 
 
 --
+-- Name: user_events fk_rails_89475bdf6f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_events
+    ADD CONSTRAINT fk_rails_89475bdf6f FOREIGN KEY (login_session_id) REFERENCES public.login_sessions(id);
+
+
+--
 -- Name: login_sessions fk_rails_8c949dd2cd; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6968,6 +6984,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250718142035'),
 ('20250716202530'),
 ('20250716150524'),
 ('20250603085358'),
@@ -7315,4 +7332,3 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20100205162521'),
 ('20100204214746'),
 ('20100204211522');
-
