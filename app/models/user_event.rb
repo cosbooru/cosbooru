@@ -112,34 +112,14 @@ class UserEvent < ApplicationRecord
 
   concerning :ConstructorMethods do
     class_methods do
-      # Build an event but don't save it yet. The caller is expected to update the user, which will save the event.
-      def build_from_request(user, category, request)
-        json, hash = if request.params[:fp].present?
-          json, hash = Base64.decode64(request.params[:fp] || "").split("\n")
-          parsed_json = Danbooru::JSON.parse(json) || {invalid: true}
-          if !hash&.match(/[a-z0-9]{32}/) && parsed_json[:invalid].nil?
-            # Hash was absent for some reason. May occur without HTTPS context.
-            hash = Digest::SHA512.hexdigest(json)[...32]
-            # Should be the same as the JS result, but that is not guaranteed
-            # if the JSON is parsed to a hash then dumped back to a JSON string.
-          elsif parsed_json[:invalid].nil?
-            hash = "00000000000000000000000000000000" unless hash&.match(/[a-z0-9]{32}/)
-          end
-          [parsed_json, hash]
-        else
-          [nil, nil]
-        end
-
+      # @param user [User] The user who performed the event, or the user whose account was affected by the event.
+      # @param category [Symbol] The event category, e.g. :login, :logout, :user_creation, etc.
+      # @param request [ActionDispatch::Request] The HTTP request that triggered the event.
+      def create_from_request!(user, category, request)
         ip_addr = request.remote_ip
         IpGeolocation.create_or_update!(ip_addr)
 
-        user.user_events.build(user: user, category: category, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
-      end
-
-      def create_from_request!(...)
-        event = build_from_request(...)
-        event.save!
-        event
+        create!(user: user, category: category, ip_addr: ip_addr, session_id: request.session[:session_id], user_agent: request.user_agent)
       end
     end
   end
