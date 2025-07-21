@@ -2212,7 +2212,7 @@ CREATE TABLE public.user_events (
     metadata jsonb,
     fingerprint jsonb,
     fingerprint_hash text,
-    login_session_id bigint
+    login_session_id uuid
 );
 
 
@@ -6718,7 +6718,7 @@ ALTER TABLE ONLY public.bulk_update_requests
 --
 
 ALTER TABLE ONLY public.user_events
-    ADD CONSTRAINT fk_rails_89475bdf6f FOREIGN KEY (login_session_id) REFERENCES public.login_sessions(id);
+    ADD CONSTRAINT fk_rails_89475bdf6f FOREIGN KEY (login_session_id) REFERENCES public.login_sessions(login_id);
 
 
 --
@@ -6984,6 +6984,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20250720155738'),
 ('20250718142035'),
 ('20250716202530'),
 ('20250716150524'),
