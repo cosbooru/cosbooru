@@ -3,7 +3,6 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
 
-  around_action :set_timeout, only: [:profile, :show]
   verify_captcha only: :create
 
   def index

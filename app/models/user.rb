@@ -121,7 +121,6 @@ class User < ApplicationRecord
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validates :level, inclusion: { in: User::Levels.constants.map { |c| User::Levels.const_get(c) } }, if: :level_changed?
   validates :level, exclusion: { in: [User::Levels::ANONYMOUS] }, if: :level_changed?
-  validate :validate_enable_private_favorites, on: :update
   validate :validate_blacklisted_tags, if: :blacklisted_tags_changed?
   validate :validate_favorite_tags, if: :favorite_tags_changed?
   validate :validate_custom_css, if: :custom_style_changed?

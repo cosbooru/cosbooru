@@ -1,5 +1,6 @@
 import { splitWords } from "./utility";
 import uniq from "lodash/uniq";
+import Post from "./posts";
 
 export default class TagCounter {
   static highCount = Post.HIGH_TAG_COUNT;

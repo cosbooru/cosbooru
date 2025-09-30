@@ -60,13 +60,6 @@
             <%= f.input :show_deleted_posts, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Show deleted posts in searches" %>
             <%= f.input :show_deleted_children, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Show thumbnail borders on parent posts even if the children are deleted" %>
             <%= f.input :disable_categorized_saved_searches, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Don't show dialog box when creating a new saved search" %>
-            <% if policy(@user).can_enable_private_favorites? %>
-              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :boolean, wrapper: "stacked-toggle-switch", hint: "Make your favorites and upvotes private" %>
-            <% elsif @user.enable_private_favorites? %>
-              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :boolean, wrapper: "stacked-toggle-switch", hint: "Make your favorites and upvotes private. (Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to a Gold account", new_user_upgrade_path) + " first. (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe %>
-            <% else %>
-              <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :boolean, wrapper: "stacked-toggle-switch", hint: link_to("Upgrade to Gold to enable private favorites and upvotes", new_user_upgrade_path) %>
-            <% end %>
             <%= f.input :disable_tagged_filenames, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Don't include tags in image filenames" %>
             <%= f.input :disable_mobile_gestures, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable swipe left / swipe right gestures on mobile" %>
             <%= f.input :disable_post_tooltips, as: :boolean, wrapper: "stacked-toggle-switch", hint: "Disable advanced tooltips when hovering over thumbnails" %>

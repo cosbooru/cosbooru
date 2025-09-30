@@ -32,22 +32,22 @@ class SessionLoader
 
     if user.present? && user.authenticate_password(password)
       # Don't allow approvers or inactive accounts to login from proxies, unless the user has 2FA enabled.
-      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && (ip_address.is_proxy? && !Danbooru.config.trusted_proxies.any? {|ip| Danbooru::IpAddress.new(ip).include?(ip_address)}) && user.totp.nil?
+      if (user.is_approver? || user.last_logged_in_at < 6.months.ago) && ip_address.is_proxy? && user.totp.nil? && Danbooru.config.trusted_proxies.none? {|ip| Danbooru::IpAddress.new(ip).include?(ip_address)}
         UserEvent.create_from_request!(user, :failed_login, request)
         errors.add(:base, "You cannot login from a proxy unless you have 2FA enabled")
 
-        return nil
+        nil
       elsif user.totp.present?
         UserEvent.create_from_request!(user, :totp_login_pending_verification, request)
 
-        return user
+        user
       # Require email verification for builders without 2FA enabled who are logging in from a new location.
       elsif user.is_builder? && user.can_receive_email?(require_verified_email: false) && !user.authorized_ip?(ip_address)
         user_event = UserEvent.create_from_request!(user, :login_pending_verification, request)
         user.send_login_verification_email!(request, user_event)
         errors.add(:base, "New login location detected. Check your email to continue")
 
-        return nil
+        nil
       else
         login_user(user, :login)
         user
@@ -220,8 +220,8 @@ class SessionLoader
 
   # Sets the current API user based on the HTTP Basic Auth params.
   def authenticate_basic_auth
-    credentials = ::Base64.decode64(request.authorization.split(' ', 2).last || '')
-    login, api_key = credentials.split(/:/, 2)
+    credentials = ::Base64.decode64(request.authorization.split(" ", 2).last || "")
+    login, api_key = credentials.split(":", 2)
     DanbooruLogger.add_attributes("param", login: login)
     authenticate_api_key(login, api_key)
   end

@@ -32,7 +32,6 @@ class ActiveSupport::TestCase
   include UploadTestHelper
   include ExtractorTestHelper
   include UrlTestHelper
-  extend StripeTestHelper
   extend NormalizeAttributeHelper
 
   unless Danbooru.config.debug_mode
