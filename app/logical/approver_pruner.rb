@@ -10,7 +10,7 @@ module ApproverPruner
   module_function
 
   APPROVAL_PERIOD = 45.days
-  MINIMUM_APPROVALS = 30
+  MINIMUM_APPROVALS = 1
 
   # Get the list of inactive approvers.
   # @return [Array<User>] the list of inactive approvers
