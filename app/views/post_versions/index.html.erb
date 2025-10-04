@@ -21,7 +21,7 @@
       </div>
     <% end %>
 
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render BlacklistComponent.new(user: CurrentUser.user, inline: true) %>
 
     <% if @post_versions.length == 0 %>
       <%= render "post_sets/blank" %>
