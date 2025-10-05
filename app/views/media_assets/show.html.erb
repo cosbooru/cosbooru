@@ -37,12 +37,6 @@
                       <%= link_to "#{@media_asset.original.file_url}?download=1", download: @media_asset.original.file_name do %>
                         <%= download_icon %> Download
                       <% end %>
-
-                      <% if policy(@media_asset).reportable? %>
-                        <%= link_to new_moderation_report_path(moderation_report: { model_type: "MediaAsset", model_id: @media_asset.id }), remote: true, title: "Report this media asset to the moderators" do %>
-                          <%= flag_icon  %> Report
-                        <% end %>
-                      <% end %>
                     <% end %>
 
                     <% menu.with_item(hide_on_click: true) do %>
