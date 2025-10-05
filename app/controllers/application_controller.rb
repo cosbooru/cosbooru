@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   before_action :add_headers
   before_action :cause_error
   before_action :redirect_if_name_invalid?
-  after_action :verify_authorized, if: -> { !Rails.env.production? }
+  after_action :verify_authorized, if: -> { !Rails.env.local? }
   after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
@@ -202,46 +202,6 @@ class ApplicationController < ActionController::Base
       CurrentUser.request = nil
     end
     Sentry.set_user({})
-  end
-
-  concerning :AuthorizationMethods do
-    # Checks whether the current user is authorized to perform the current action. Also checks the rate limit for the action.
-    #
-    # @param record [ActiveRecord::Base, ActiveRecord::Relation] The record to authorize.
-    # @param action [String, nil] The name of the action to authorize. Defaults to the controller action name.
-    # @param policy_class [Class, nil] The policy class to use. If nil, the policy class will be determined by the record.
-    # @return [ActiveRecord::Base, ActiveRecord::Relation] The authorized record.
-    # @raise [Pundit::NotAuthorizedError] If the user is not authorized to perform the action.
-    # @see https://github.com/varvet/pundit
-    def authorize(record, action = nil, policy_class: nil)
-      super
-      check_rate_limit(record, policy_class: policy_class)
-      record
-    end
-
-    # Checks the rate limit for the current controller action. Looks up the corresponding policy class and calls
-    # `rate_limit_for_<action>` if it exists, or `rate_limit_for_read` or `rate_limit_for_write` if not.
-    #
-    # @raise [RateLimiter::RateLimitError] If the rate limit is exceeded.
-    def check_rate_limit(record, policy_class: nil)
-      policy = find_policy(record, policy_class: policy_class)
-      rate_limit = policy.rate_limit(action_name, request)
-      return if rate_limit.blank?
-
-      key = "#{controller_name}:#{action_name}"
-      rate_limiter = RateLimiter.build(action: key, **rate_limit.to_h, user: CurrentUser.user, request: request)
-
-      headers["X-Rate-Limit"] = rate_limiter.to_json
-      rate_limiter.limit!
-    end
-
-    def find_policy(record, policy_class: nil)
-      if policy_class
-        policy_class.new(pundit_user, record)
-      else
-        pundit.policy!(record)
-      end
-    end
   end
 
   concerning :AuthorizationMethods do
