@@ -22,8 +22,8 @@ module Source
       memoize def article_image_urls
         urls = []
 
-        urls += article_json.dig("detail", "modules", "module_top", "display", "album", "pics").to_a.pluck("url")
-        urls += article_json.dig("detail", "modules", "module_content", "paragraphs").to_a.select do |paragraph|
+        urls += article_json.dig("modules", "module_top", "display", "album", "pics").to_a.pluck("url")
+        urls += article_json.dig("modules", "module_content", "paragraphs").to_a.select do |paragraph|
           paragraph["para_type"] == 2
         end.pluck(:pic).pluck(:pics).flatten.pluck(:url)
 
@@ -35,7 +35,9 @@ module Source
       end
 
       def work_page
-        if post_json["id_str"].present?
+        if article_json["id_str"].present?
+          "https://www.bilibili.com/opus/#{article_json["id_str"]}"
+        elsif post_json["id_str"].present?
           "https://t.bilibili.com/#{post_json["id_str"]}"
         elsif article_json["cvid"].present?
           "https://www.bilibili.com/read/cv#{article_json["cvid"]}/"
@@ -43,22 +45,48 @@ module Source
       end
 
       def artist_commentary_title
-        post_json.dig("modules", "module_dynamic", "major", "opus", "title") || article_json.dig("readInfo", "title")
+        article_json.dig("modules", "module_title", "text") || post_json.dig("modules", "module_dynamic", "title")
       end
 
       def artist_commentary_desc
-        if post_json.present?
-          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.map do |text_node|
+        article_commentary_desc.presence || post_commentary_desc.presence
+      end
+
+      def article_commentary_desc
+        article_json.dig("modules", "module_content", "paragraphs").to_a.map do |paragraph|
+          case paragraph["para_type"]
+          when 1
+            nodes = paragraph.dig("text", "nodes")
+          when 5
+            nodes = paragraph.dig("list", "items").pluck("nodes").flatten
+          else
+            nodes = []
+          end
+
+          nodes.map do |text_node|
             case text_node["type"]
-            when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
-              "<a href='#{URI.join("https://", text_node["jump_url"])}'>#{text_node["text"]}</a>"
-            when "RICH_TEXT_NODE_TYPE_EMOJI"
-              "<a href='#{text_node.dig("emoji", "icon_url")}'>#{text_node["text"]}</a>"
-            when "RICH_TEXT_NODE_TYPE_AT"
-              "<a href='https://space.bilibili.com/#{text_node["rid"]}/dynamic'>#{text_node["text"]}</a>"
-            else # RICH_TEXT_NODE_TYPE_TEXT (text), unrecognized nodes, etc.
-              text_node["text"]
+            when "TEXT_NODE_TYPE_WORD"
+              text = text_node.dig("word", "words").gsub("\n", "<br>")
+              text = "<strong>#{text}</strong>" if text_node.dig("word", "style", "bold")
+              text
+            when "TEXT_NODE_TYPE_RICH"
+              rich = text_node["rich"]
+              case rich["type"]
+              when "RICH_TEXT_NODE_TYPE_BV", "RICH_TEXT_NODE_TYPE_TOPIC", "RICH_TEXT_NODE_TYPE_WEB"
+                text = "<a href='#{URI.join("https://", rich["jump_url"])}'>#{rich["text"]}</a>"
+              when "RICH_TEXT_NODE_TYPE_EMOJI"
+                text = "<a href='#{rich.dig("emoji", "icon_url")}'>#{rich["text"]}</a>"
+              when "RICH_TEXT_NODE_TYPE_AT"
+                text = "<a href='https://space.bilibili.com/#{rich["rid"]}/dynamic'>#{rich["text"]}</a>"
+              else
+                text = rich["text"]
+              end
+            else
+              text = ""
             end
+
+            text = "<li>#{text}</li>" if paragraph["para_type"] == 5
+            text
           end.join
         end.join("<br><br>")
       end
@@ -83,24 +111,30 @@ module Source
       end
 
       def tags
-        if post_json.present?
-          post_json.dig("modules", "module_dynamic", "major", "opus", "summary", "rich_text_nodes").to_a.select do |n|
-            n["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
+        article_tags.presence || post_tags.presence || []
+      end
+
+      def article_tags
+        tag_names = article_json.dig("modules", "module_content", "paragraphs").to_a.select do |paragraph|
+          paragraph["para_type"] == 1
+        end.flat_map do |paragraph|
+          paragraph.dig("text", "nodes").select do |text_node|
+            text_node["type"] == "TEXT_NODE_TYPE_RICH" && text_node["rich"]["type"] == "RICH_TEXT_NODE_TYPE_TOPIC"
           end.map do |tag|
             tag.dig("rich", "text").gsub(/(^#|#$)/, "")
           end
         end
 
-        tag_names += article_json.dig("detail", "modules", "module_extend", "items").to_a.pluck("text")
+        tag_names += article_json.dig("modules", "module_extend", "items").to_a.pluck("text")
 
         tags = tag_names.map do |tag_name|
           [tag_name, "https://search.bilibili.com/all?keyword=#{Danbooru::URL.escape(tag_name)}"]
         end
 
-        if article_json.dig("detail", "modules", "module_topic").present?
+        if article_json.dig("modules", "module_topic").present?
           tags << [
-            article_json.dig("detail", "modules", "module_topic", "name"),
-            "https://www.bilibili.com/v/topic/detail/?topic_id=#{article_json.dig("detail", "modules", "module_topic", "id")}",
+            article_json.dig("modules", "module_topic", "name"),
+            "https://www.bilibili.com/v/topic/detail/?topic_id=#{article_json.dig("modules", "module_topic", "id")}",
           ].compact
         end
 
@@ -117,7 +151,7 @@ module Source
       end
 
       def display_name
-        post_json.dig("modules", "module_author", "name") || article_json.dig("readInfo", "author", "name")
+        article_json.dig("modules", "module_author", "name") || post_json.dig("modules", "module_author", "name")
       end
 
       def tag_name
@@ -129,7 +163,7 @@ module Source
       end
 
       def artist_id_from_data
-        post_json.dig("modules", "module_author", "mid") || article_json.dig("readInfo", "author", "mid")
+        article_json.dig("modules", "module_author", "mid") || post_json.dig("modules", "module_author", "mid")
       end
 
       def profile_url
@@ -141,15 +175,14 @@ module Source
         parsed_url.t_work_id || parsed_referer&.t_work_id
       end
 
+      def article_id
+        parsed_url.article_id || parsed_referer&.article_id
+      end
+
       def user_agent
         # API requests fail unless we spoof the latest Firefox version. Firefox releases every 4 weeks.
         firefox_version = http.cache(5.minutes).parsed_get("https://whattrainisitnow.com/api/release/schedule/?version=release")&.dig("version")
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:#{firefox_version}) Gecko/20100101 Firefox/#{firefox_version}"
-      end
-
-      memoize def page
-        url = parsed_url.page_url || parsed_referer&.page_url
-        http.cache(1.minute).parsed_get(url)
       end
 
       memoize def post_json
@@ -160,10 +193,22 @@ module Source
       end
 
       memoize def article_json
-        return {} if article_id.nil? || page.nil?
+        opus_id = t_work_id
+        if article_id.present?
+          data = http.headers("User-Agent": user_agent).cache(1.minute).parsed_get("https://api.bilibili.com/x/article/view?id=#{article_id}") || {}
+          opus_id = data.dig("data", "dyn_id_str")
+        end
+        return {} if opus_id.blank?
 
-        script = page&.css("body script").to_a.map(&:text).grep(/window.__INITIAL_STATE__/).first.to_s
-        script[/window.__INITIAL_STATE__=(.*);\(function\(\){[^"]*}\(\)\);\z/, 1]&.parse_json || {}
+        data = http.headers("User-Agent": user_agent).cache(1.minute).parsed_get("https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/detail?id=#{opus_id}&features=htmlNewStyle") || {}
+        data = data.dig("data", "item").to_h
+
+        modules = data["modules"]
+        if modules.present?
+          data["modules"] = modules.each {|mod| mod.delete("module_type")}.reduce({}, :merge)
+        end
+
+        data
       end
     end
   end
