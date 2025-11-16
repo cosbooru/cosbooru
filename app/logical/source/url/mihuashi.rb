@@ -19,12 +19,16 @@ module Source
         # https://image-assets.mihuashi.com/permanent/5716548|-2025/07/11/20/lrItT-MRSxSjnXvyD5CNze8JucPI_2129.png!mobile.square.large
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/17/17/liJ2bnv1jJYdC5AihIPXobAmpeue_3326.jpg!w600.1x
         # https://image-assets.mihuashi.com/permanent/3684329|-2025/05/18/12/Fk7FRRsUA6QW80rthbEJULPuA5nQ_5546.jpg!sq300.2x
-        in "image-assets", "mihuashi.com", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
-          @full_image_url = to_s.split("!").first
-
         # https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg
-        in "image-assets", "mihuashi.com", "pfop", "permanent", /^\d+\|-\d{4}$/, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
+        # https://image-assets.mihuashi.com/44571|-2021/09/16/18/FvNAijlnNYfJtaVQdZNoDYHj9mPP.png!artwork.detail
+        in ("image-assets" | "activity-assets"), "mihuashi.com", *, /^(\d+)\|-\d{4}$/ => dir, /^\d{2}$/, /^\d{2}$/, /^\d{2}$/, /^([A-Za-z0-9_-]{28,}\.\w+)(?:!.+)?$/ => file
           @full_image_url = to_s.split("!").first.gsub("pfop/", "")
+          @user_id = dir.match(/^(\d+)\|-\d{4}$/)[1]
+
+        # https://image-assets.mihuashi.com/2016/12/08/13/gx77j3j5vdtseg9xqmmgovzxj4yhtwpm/红白_.jpg
+        # https://activity-assets.mihuashi.com/2019/05/03/09/yh2td3fkw381mtsjtn4p7ob1iyc2s25r/yh2td3fkw381mtsjtn4p7ob1iyc2s25r.png
+        in ("image-assets" | "activity-assets"), "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
+          @full_image_url = "https://#{subdomain}.mihuashi.com/#{year}/#{month}/#{day}/#{hour}/#{dir}/#{$1}"
 
         # https://images.mihuashi.com/2016/06/17/23/thpe8pgsekfzw23ammqnmdmtpdj6me22/Q板天子.png
         in "images", "mihuashi.com", /^\d{4}$/ => year, /^\d{2}$/ => month, /^\d{2}$/ => day, /^\d{2}$/ => hour, dir, /^([^!]+)(?:!.+)?$/ => file
