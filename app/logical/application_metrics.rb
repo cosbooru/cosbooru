@@ -86,7 +86,7 @@ class ApplicationMetrics
     comments = Comment.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
     comment_votes = CommentVote.group(:score).active.async_pluck(Arel.sql("score, COUNT(*)"))
     dtext_links = DtextLink.group(:link_type).async_pluck(Arel.sql("link_type, COUNT(*)"))
-    favorite_groups = FavoriteGroup.group(:is_public).async_pluck(Arel.sql("is_public, COUNT(*)"))
+    favorite_groups = FavoriteGroup.async_pluck(Arel.sql("COUNT(*)"))
     forum_posts = ForumPost.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
     forum_post_votes = ForumPostVote.group(:score).async_pluck(Arel.sql("score, COUNT(*)"))
     forum_topics = ForumTopic.group(:is_deleted).async_pluck(Arel.sql("is_deleted, COUNT(*)"))
@@ -179,9 +179,8 @@ class ApplicationMetrics
       metrics[:danbooru_dtext_links_total][link_type: link_type].set(count)
     end
 
-    favorite_groups.value.each do |is_public, count|
-      status = is_public ? "public" : "private"
-      metrics[:danbooru_favorite_groups_total][status: status].set(count)
+    favorite_groups.value.each do |count|
+      metrics[:danbooru_favorite_groups_total].set(count)
     end
 
     forum_posts.value.each do |deleted, count|
