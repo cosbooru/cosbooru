@@ -822,6 +822,10 @@ class User < ApplicationRecord
       comments.visible_for_search(:creator, CurrentUser.user).count
     end
 
+    def commented_posts_count
+      comments.visible_for_search(:creator, CurrentUser.user).distinct.count(:post_id)
+    end
+
     def favorite_group_count
       favorite_groups.visible(CurrentUser.user).count
     end
