@@ -121,7 +121,7 @@ class Comment < ApplicationRecord
   end
 
   def quoted_response
-    DText.new(body).quote(creator.name)
+    DText.new(body).quote(self)
   end
 
   concerning :DiscordMethods do

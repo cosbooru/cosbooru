@@ -171,7 +171,7 @@ class ForumPost < ApplicationRecord
   end
 
   def quoted_response
-    DText.new(body).quote(creator.name)
+    DText.new(body).quote(self)
   end
 
   def forum_topic_page
@@ -217,7 +217,7 @@ class ForumPost < ApplicationRecord
 
   def build_response
     dup.tap do |x|
-      x.body = x.quoted_response
+      x.body = quoted_response
     end
   end
 
