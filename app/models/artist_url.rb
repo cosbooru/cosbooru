@@ -82,9 +82,9 @@ class ArtistURL < ApplicationRecord
       true
     when %r{pixiv\.net/fanbox}i
       true
-    when %r{twitter\.com/intent}i
+    when %r{https://x\.com/intent}i
       true
-    when %r{twitter\.com/i/user}i
+    when %r{https://x\.com/i/user}i
       true
     when /(?:www|com|dic)\.nicovideo\.jp/i
       true
