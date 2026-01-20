@@ -2,8 +2,8 @@
 
 require "test_helper"
 
-module Sources
-  class PrivatterTest < ActiveSupport::TestCase
+module Source::Tests::Extractor
+  class PrivatterExtractorTest < ActiveSupport::ExtractorTestCase
     context "Privatter:" do
       context "A Privatter post URL" do
         strategy_should_work(

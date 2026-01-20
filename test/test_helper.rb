@@ -30,7 +30,6 @@ class ActiveSupport::TestCase
   include DatabaseTestHelper
   include IqdbTestHelper
   include UploadTestHelper
-  include ExtractorTestHelper
   include UrlTestHelper
   extend NormalizeAttributeHelper
 
@@ -126,3 +125,11 @@ class ActionDispatch::IntegrationTest
 end
 
 module Source::Tests; end
+
+class ActiveSupport::ExtractorTestCase < ActiveSupport::TestCase
+  include ExtractorTestHelper
+
+  setup do
+    skip "Skipping extractor tests as configured by the environment." if ENV["DANBOORU_SKIP_EXTRACTOR_TESTS"].truthy?
+  end
+end
