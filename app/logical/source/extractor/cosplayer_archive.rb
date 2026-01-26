@@ -60,4 +60,8 @@ class Source::Extractor::CosplayerArchive < Source::Extractor
     # Manually parse it because this site yields Shift-JIS
     HTTP::MimeType[res.mime_type].decode(res.to_s.force_encoding("shift_jis").encode("UTF-8"))
   end
+
+  def artist_commentary_desc
+    page.at("span.black_mui14150")&.text
+  end
 end
