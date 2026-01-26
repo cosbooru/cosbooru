@@ -4,16 +4,29 @@ module Sources
   class CosplayerArchiveTest < ActiveSupport::TestCase
     context "A normal post" do
       strategy_should_work(
-        "https://www.cosp.jp/view_photo.aspx?id=13075578&m=516768",
-        image_urls: %w[https://image7.cosp.jp/images/member/g/516/516768/13075578.jpg],
-        media_files: [{ file_size: 335_524 }],
-        page_url: "https://cosp.jp/view_photo.aspx?id=13075578&m=516768",
-        profile_urls: %w[https://cosp.jp/prof.aspx?id=516768],
-        display_name: "のはね",
-        username: "cosp_516768",
-        tags: [],
+        "https://www.cosp.jp/view_photo.aspx?id=9839344&m=243519",
+        image_urls: %w[https://image7.cosp.jp/images/member/g/243/243519/9839344.jpg],
+        media_files: [{ file_size: 322_827 }],
+        page_url: "https://cosp.jp/view_photo.aspx?id=9839344&m=243519",
+        profile_urls: %w[https://cosp.jp/prof.aspx?id=243519],
+        display_name: "ぷりん",
+        username: "cosp_243519",
+        tags: [
+          [
+            "ラブライブ! School idol project",
+            "https://cosp.jp/photo_search.aspx?n2=10514"
+          ],
+          [
+            "南ことり",
+            "https://cosp.jp/photo_search.aspx?n3=59425"
+          ],
+          [
+            "Snow halation",
+            "https://cosp.jp/photo_search.aspx?n6=34577"
+          ]
+        ],
         dtext_artist_commentary_title: "",
-        dtext_artist_commentary_desc: ""
+        dtext_artist_commentary_desc: "冬といえばスノハレ〜(*´ω`*人)♪"
       )
     end
 
