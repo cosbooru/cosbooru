@@ -60,4 +60,24 @@ class Source::Extractor::CosplayerArchive < Source::Extractor
     # Manually parse it because this site yields Shift-JIS
     HTTP::MimeType[res.mime_type].decode(res.to_s.force_encoding("shift_jis").encode("UTF-8"))
   end
+
+  def artist_commentary_desc
+    page.at("span.black_mui14150")&.text
+  end
+
+  def tags
+    return [] unless page.present?
+
+    page.search("a[href^='/photo_search.aspx?']").flat_map do |a|
+      uri = URI(a[:href])
+      params = CGI.parse(uri.query)
+      params.map do |key, values|
+        next unless %w[n2 n3 n4 n5 n6 n10].include?(key)
+        [
+          a.text.strip,
+          "https://cosp.jp#{a[:href]}"
+        ]
+      end
+    end.compact
+  end
 end
