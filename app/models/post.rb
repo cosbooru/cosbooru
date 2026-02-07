@@ -2043,12 +2043,6 @@ class Post < ApplicationRecord
     end
   end
 
-  concerning :ArtistCommentaryMethods do
-    def remove_blank_artist_commentary
-      self.artist_commentary = nil if !artist_commentary&.any_field_present?
-    end
-  end
-
   concerning :DiscordMethods do
     def discord_author
       Discordrb::Webhooks::EmbedAuthor.new(name: "@#{uploader.name}", url: uploader.discord_url)
