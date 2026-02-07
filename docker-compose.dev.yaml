@@ -29,8 +29,8 @@ x-base-template: &base-template
   #
   # If you set DANBOORU_IMAGE to something else, you have to use a development image because
   # production images don't contain the tools necessary to rebuild the JS/CSS files.
-  image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:development}
-
+  #image: ${DANBOORU_IMAGE:-ghcr.io/aibooruorg/aibooru:development}
+  image: cosbooru:development
   restart: unless-stopped
   stdin_open: true
   tty: true
@@ -52,7 +52,6 @@ x-base-template: &base-template
     DANBOORU_REDIS_URL: redis://redis:6379
     DANBOORU_IQDB_URL: http://iqdb:5588
     DANBOORU_YT_CLIENT_URL: http://yt-client:6688
-    DANBOORU_AUTOTAGGER_URL: http://autotagger:5000
     DANBOORU_IMAGE_STORAGE_PATH: /images
     SHAKAPACKER_DEV_SERVER_HOST: webpack
 
@@ -172,7 +171,7 @@ services:
       - "danbooru-images:/images"
 
   # autotagger:
-  #   image: ghcr.io/danbooru/autotagger:latest
+  #    image: ghcr.io/danbooru/autotagger:latest
   # This services requires the DANBOORU_AUTOTAGGER_URL env var to be uncommented further above.
 
   webpack:
