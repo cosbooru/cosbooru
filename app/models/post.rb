@@ -898,7 +898,7 @@ class Post < ApplicationRecord
 
     def merge_version?
       previous = versions.last
-      previous && previous.updater_id == CurrentUser.user.id && previous.updated_at > 1.hour.ago
+      previous && previous.updater_id == CurrentUser.user.id && previous.updated_at > 1.hour.ago && previous.version > 1
     end
 
     def merge_version
