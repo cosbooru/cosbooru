@@ -87,9 +87,9 @@ ArtistCommentary.fill_commentary = function(commentary) {
 
   // Update the other fields if they're blank. Return success if none conflict.
   return [
-    Utility.update_field($("#artist_commentary_original_title"), commentary.original_title),
-    Utility.update_field($("#artist_commentary_translated_title"), commentary.translated_title),
-    Utility.update_field($("#artist_commentary_translated_description"), commentary.translated_description),
+    Danbooru.Utility.update_field($("#artist_commentary_original_title"), commentary.original_title),
+    Danbooru.Utility.update_field($("#artist_commentary_translated_title"), commentary.translated_title),
+    Danbooru.Utility.update_field($("#artist_commentary_translated_description"), commentary.translated_description),
   ].every(function (i) { return i; });
 };
 
