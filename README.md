@@ -37,7 +37,7 @@ When you're done, you can run the following to delete everything:
 ```sh
 sudo docker compose down --volumes # Delete all data and images in your Cosbooru instance.
 sudo docker image prune            # Clean up all unused Docker images.
-rm -rf ~/cosbooru                   # Delete the Cosbooru code.
+rm -rf ~/cosbooru                  # Delete the Cosbooru code.
 ```
 
 ## Installation
