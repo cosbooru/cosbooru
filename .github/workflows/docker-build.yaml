@@ -5,7 +5,7 @@
 # branch name, the git tag, and the 'latest' tag for the latest commit to
 # master.
 #
-# https://github.com/aibooruorg/aibooru/pkgs/container/aibooru
+# https://github.com/cosbooru/cosbooru/pkgs/container/cosbooru
 #
 # https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
 # https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions
@@ -66,7 +66,7 @@ jobs:
         id: metadata
         with:
           images: |
-            ghcr.io/aibooruorg/aibooru
+            ghcr.io/cosbooru/cosbooru
           tags: |
             type=sha,format=long,prefix=
             type=ref,event=branch
@@ -105,7 +105,7 @@ jobs:
         id: development-metadata
         with:
           images: |
-            ghcr.io/aibooruorg/aibooru
+            ghcr.io/cosbooru/cosbooru
           tags: |
             type=sha,format=long,prefix=development-
             type=ref,event=branch,prefix=development-
@@ -144,33 +144,33 @@ jobs:
         with:
           limit-access-to-actor: true
 
-  deploy-beta:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/beta'
-    needs: docker-build
-    concurrency: deploy-beta
+  # deploy-beta:
+  #  runs-on: ubuntu-latest
+  #  if: github.ref == 'refs/heads/beta'
+  #  needs: docker-build
+  #  concurrency: deploy-beta
 
-    environment:
-      name: beta
-      url: https://beta.aibooru.online
+  #  environment:
+  #    name: beta
+  #    url: https://beta.cos.lycore.co
 
-    steps:
+  #  steps:
     # https://github.com/marketplace/actions/kubectl-tool-installer
-    - name: Install Kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: v1.21.5
+  #  - name: Install Kubectl
+  #    uses: azure/setup-kubectl@v3
+  #    with:
+  #      version: v1.21.5
 
-    - name: Configure Kubectl
-      run: |
-        mkdir -p ~/.kube
-        echo "$KUBECONFIG_YAML" > ~/.kube/config
-      env:
-        KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
+  #  - name: Configure Kubectl
+  #    run: |
+  #      mkdir -p ~/.kube
+  #      echo "$KUBECONFIG_YAML" > ~/.kube/config
+  #    env:
+  #      KUBECONFIG_YAML: ${{secrets.KUBECONFIG_YAML}}
 
-    - name: Deploy to Betabooru
-      run: |
-        kubectl rollout restart deploy/betabooru -n danbooru
+  #  - name: Deploy to Betabooru
+  #    run: |
+  #      kubectl rollout restart deploy/betabooru -n danbooru
 
   deploy-production:
     runs-on: ubuntu-latest
@@ -180,7 +180,7 @@ jobs:
 
     environment:
       name: production
-      url: https://aibooru.online
+      url: https://cos.lycore.co
 
     steps:
     - name: Install Kubectl

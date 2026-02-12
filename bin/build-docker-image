@@ -12,26 +12,26 @@
 #    # Commit any changed files first or they won't be included in the build.
 #    $ git commit --all
 #
-#    # Build images named `aibooru` and `aibooru:development`.
-#    $ bin/build-docker-image aibooru
+#    # Build images named `cosbooru` and `cosbooru:development`.
+#    $ bin/build-docker-image cosbooru
 #
-#    # Build ARM images named `aibooru:arm64` and `aibooru:development-arm64`.
+#    # Build ARM images named `cosbooru:arm64` and `cosbooru:development-arm64`.
 #    # To build ARM images on x86, you must install QEMU first.
 #    $ sudo apt-get install qemu-system-arm qemu-user-static binfmt-support
-#    $ bin/build-docker-image aibooru linux/arm64
+#    $ bin/build-docker-image cosbooru linux/arm64
 #
-#    # Build multi-architecture images for ARM and x86 named `aibooru` and `aibooru:development`.
-#    $ bin/build-docker-image aibooru linux/amd64,linux/arm64
+#    # Build multi-architecture images for ARM and x86 named `cosbooru` and `cosbooru:development`.
+#    $ bin/build-docker-image cosbooru linux/amd64,linux/arm64
 #
 #    # Test out the new image.
-#    $ DANBOORU_IMAGE=aibooru:development bin/dev
+#    $ DANBOORU_IMAGE=cosbooru:development bin/dev
 
 set -euxo pipefail
 
 ARCH="$(docker info -f '{{ .ClientInfo.Arch }}')"
 CURRENT_PLATFORM="linux/$ARCH"
 
-IMAGE="${1:-ghcr.io/aibooruorg/aibooru}"
+IMAGE="${1:-ghcr.io/cosbooru/cosbooru}"
 PLATFORM="${2:-$CURRENT_PLATFORM}"
 
 DOCKER_IMAGE_REVISION=$(git rev-parse HEAD)
