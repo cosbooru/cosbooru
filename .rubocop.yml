@@ -97,7 +97,7 @@ Naming/MethodParameterName:
 Naming/PredicateName:
   Enabled: false
 
-Rails/ActionOrder
+Rails/ActionOrder:
   Enabled: false
 
 Rails/Blank:
