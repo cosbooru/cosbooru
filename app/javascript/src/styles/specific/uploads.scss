@@ -1,9 +1,5 @@
 div#c-uploads {
   div#a-show {
-    input, textarea {
-      max-width: 100%;
-    }
-
     .upload-container {
       --min-edit-container-width: 180;
       --edit-container-width: 480;
@@ -92,6 +88,12 @@ div#c-uploads {
       background-color: var(--blue-8);
       margin-top: -0.5rem;
       margin-bottom: 0.5em;
+    }
+
+    .upload-edit-container {
+      input, textarea {
+        max-width: 100%;
+      }
     }
   }
 }
