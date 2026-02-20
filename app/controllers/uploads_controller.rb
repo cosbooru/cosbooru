@@ -48,13 +48,6 @@ class UploadsController < ApplicationController
     respond_with(@upload, include: { upload_media_assets: { include: { media_asset: { include: :post }}}})
   end
 
-  def destroy
-    @upload = authorize Upload.find(params[:id])
-    @upload.update(is_deleted: true)
-
-    respond_with(@upload, location: Routes.uploads_path, notice: "Upload was deleted.")
-  end
-
   def undelete
     @upload = authorize Upload.find(params[:id])
     @upload.update(is_deleted: false)
@@ -69,14 +62,5 @@ class UploadsController < ApplicationController
     @upload.update(is_deleted: true)
 
     respond_with(@upload, location: Routes.uploads_path, notice: "Upload was deleted.")
-  end
-
-  def undelete
-    @upload = authorize Upload.find(params[:id])
-    @upload.update(is_deleted: false)
-
-    respond_with(@upload, notice: "Upload was undeleted.") do |format|
-      format.html { redirect_to uploads_path }
-    end
   end
 end
