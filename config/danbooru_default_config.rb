@@ -662,9 +662,20 @@ module Danbooru
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
+<<<<<<< HEAD
       %w[bad_anatomy bad_arm bad_feet bad_hands bad_head bad_horizon bad_leg bad_reflection
          bad_shadow duplicate error extra_finger extra_toes image_sample jpeg_artifacts md5_mismatch
          missing_finger missing_toe off-topic paid_reward]
+=======
+      %w[ai-generated ai-assisted anime_screenshot game_screenshot bad_source duplicate
+      hard-translated image_sample md5_mismatch nude_filter off-topic paid_reward resized
+      third-party_edit]
+    end
+
+    # Whether the Gold account upgrade page should be enabled.
+    def user_upgrades_enabled?
+      true
+>>>>>>> 8a21b9fee (Update default modqueue warning tags)
     end
 
     # Whether to enable API rate limits.
