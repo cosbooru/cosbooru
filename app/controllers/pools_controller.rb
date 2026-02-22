@@ -33,8 +33,14 @@ class PoolsController < ApplicationController
 
   def gallery
     limit = params[:limit].presence || CurrentUser.user.per_page
+<<<<<<< HEAD
 
     @pools = authorize Pool.search(search_params, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+=======
+    search = search_params.presence || ActionController::Parameters.new(category: "series")
+
+    @pools = authorize Pool.search(search, CurrentUser.user).paginate(params[:page], limit: limit, search_count: params[:search])
+>>>>>>> 70e77c67e (Merge pull request #6286 from nonamethanks/feat-lint-controllers)
     respond_with(@pools)
   end
 
