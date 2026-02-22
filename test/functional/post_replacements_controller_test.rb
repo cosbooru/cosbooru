@@ -165,7 +165,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           post_auth post_replacements_path, create(:moderator_user), params: {
             post_id: @post.id,
             post_replacement: {
-              replacement_url: "https://twitter.com/catwheezie/status/1604604864809799680",
+              replacement_url: "https://x.com/motty08111213/status/943446161586733056",
             }
           }
 

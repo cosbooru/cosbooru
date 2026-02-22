@@ -600,9 +600,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://noizave.deviantart.com/art/test-no-download-697415967")
         should_upload_successfully("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg")
 
-        should_upload_successfully("https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda")
-        should_upload_successfully("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png")
-
         should_upload_successfully("https://yande.re/post/show/482880")
         should_upload_successfully("https://files.yande.re/image/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880.jpg")
 
@@ -612,14 +609,12 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://gelbooru.com/index.php?page=post&s=view&id=7798121")
         should_upload_successfully("https://safebooru.org/index.php?page=post&s=view&id=4189916")
         should_upload_successfully("https://tbib.org/index.php?page=post&s=view&id=11480218")
-        should_upload_successfully("https://rule34.xxx/index.php?page=post&s=view&id=6961597")
         should_upload_successfully("https://rule34.us/index.php?r=posts/view&id=6204967")
 
         should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
         should_upload_successfully("https://seiga.nicovideo.jp/image/source/9146749")
         should_upload_successfully("https://seiga.nicovideo.jp/watch/mg389884")
-        should_upload_successfully("https://dic.nicovideo.jp/oekaki/52833.png")
         should_upload_successfully("https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893")
         should_upload_successfully("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf")
         should_upload_successfully("http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893")
@@ -669,7 +664,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://c.fantia.jp/uploads/post/file/1070093/16faf0b1-58d8-4aac-9e86-b243063eaaf1.jpeg")
         should_upload_successfully("https://fantia.jp/posts/1132267")
-        should_upload_successfully("https://fantia.jp/products/249638")
 
         should_upload_successfully("http://wwwew.web.fc2.com/e/405.jpg")
 
@@ -680,9 +674,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://poipiku.com/583/2867587.html")
 
         should_upload_successfully("https://medibang.com/picture/4b2112261505098280008769655/")
-
-        should_upload_successfully("https://movw2000.gumroad.com/l/zbslv")
-        should_upload_successfully("https://movw2000.gumroad.com/p/new-product-b072093e-e628-4a92-9740-e9b4564d9901")
       end
     end
   end

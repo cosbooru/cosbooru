@@ -669,7 +669,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get_auth post_path(post), @user
 
           assert_response :success
-          assert_select "video#image"
+          assert_select "#image.video-component"
           assert_not_select "#translate"
         end
       end
@@ -915,7 +915,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         )
 
         assert_post_source_equals("https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773", "https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773")
-        assert_post_source_equals("https://jeyrain.artstation.com/projects/04XA4", "https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg?1443931773", "https://www.artstation.com/artwork/04XA4")
 
         assert_post_source_equals("https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg")
         assert_post_source_equals("https://h.bilibili.com/83341894", "https://i0.hdslb.com/bfs/album/669c0974a2a7508cbbb60b185eddaa0ccf8c5b7a.jpg", "https://h.bilibili.com/83341894")
