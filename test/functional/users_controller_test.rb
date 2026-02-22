@@ -492,6 +492,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("127.0.0.1", User.last.last_ip_addr.to_s)
       end
 
+      should "redirect to the given URL after creating a user" do
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: comments_path }
+        assert_redirected_to comments_url
+      end
+
+      should "not redirect to an offsite URL after creating a user" do
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }, url: "https://evil.com" }
+        assert_response 403
+      end
+
       should "not create a user with an invalid name" do
         assert_no_difference("User.count") do
           post users_path, params: { user: { name: "x" * 100, password: "xxxxx1", password_confirmation: "xxxxx1" }}

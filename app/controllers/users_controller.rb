@@ -65,7 +65,7 @@ class UsersController < ApplicationController
   def create
     user_signup = UserSignup.new(request)
     @user = authorize(user_signup.user)
-    @url = params.dig(:user, :url).presence || params[:url].presence || root_path
+    @url = params.dig(:user, :url).presence || params[:url].presence
 
     if @user.save(context: [:create, :deliverable])
       set_current_user
