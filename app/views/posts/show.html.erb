@@ -284,7 +284,7 @@
     <% elsif @post.is_flash? -%>
       <div class="ruffle-container" data-swf="<%= @post.tagged_file_url %>"></div>
     <% elsif @post.is_video? || @post.is_ugoira? -%>
-      <%= render VideoComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), html: { id: "image" }) %>
+      <%= render VideoComponent.new(@post.media_asset, default_quality: (params.fetch(:size, CurrentUser.user.default_image_size) == "original" ? "original" : "sample"), start_time: params[:time].to_f, html: { id: "image" }) %>
     <% elsif @post.is_image? -%>
       <picture>
         <%= tag.source media: "(max-width: 660px)", srcset: @post.tagged_large_file_url %>

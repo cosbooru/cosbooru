@@ -18,9 +18,9 @@ export default class VideoPlayer {
     this.scrubbingVolume = false;
     this.autoplay = this.$container.data("autoplay");
     this.hasSound = this.$container.data("has-sound");
+    this.currentTime = this.$container.data("start-time");
 
     this._error = null;
-    this._currentTime = 0;
     this._playbackRate = 1.0;
     this._showPlaybackRate = false;
     this._volume = JSON.parse(localStorage.getItem("video.volume")) ?? 1.0;
@@ -315,7 +315,7 @@ export default class VideoPlayer {
   set currentTime(time) {
     this._currentTime = time;
 
-    if (this.video.currentTime !== time) {
+    if (this.video && this.video.currentTime !== time) {
       this.video.currentTime = time;
     }
   }
