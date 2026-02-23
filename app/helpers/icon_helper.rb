@@ -173,15 +173,23 @@ module IconHelper
   end
 
   def sound_icon(**options)
-    svg_icon_tag("sound", "volume-high", viewBox: "0 0 640 512", **options)
+    svg_icon_tag("volume-high", viewBox: "0 0 640 512", **options)
   end
 
-  def sound_off_icon(**options)
-    svg_icon_tag("sound-off", "volume-off", viewBox: "0 0 320 512", **options)
+  def volume_high_icon(**options)
+    svg_icon_tag("volume-high", viewBox: "0 0 640 512", **options)
+  end
+
+  def volume_medium_icon(**options)
+    svg_icon_tag("volume-medium", viewBox: "0 0 640 512", **options)
+  end
+
+  def volume_low_icon(**options)
+    svg_icon_tag("volume-low", viewBox: "0 0 640 512", **options)
   end
 
   def no_sound_icon(**options)
-    svg_icon_tag("no-sound", "volume-xmark", viewBox: "0 0 576 512", **options)
+    svg_icon_tag("no-sound", "volume-xmark", viewBox: "0 0 640 512", **options)
   end
 
   def hashtag_icon(**options)

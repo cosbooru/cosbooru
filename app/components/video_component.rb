@@ -3,7 +3,8 @@
 # This component is used to render a video or ugoira. It provides controls for playing the video and for switching between
 # the media asset's variants.
 class VideoComponent < ApplicationComponent
-  delegate :play_icon, :pause_icon, :expand_icon, :minimize_icon, :gear_icon, :check_icon, :sound_icon, :sound_off_icon, :no_sound_icon, to: :helpers
+  delegate :play_icon, :pause_icon, :expand_icon, :minimize_icon, :gear_icon, :check_icon,
+           :volume_high_icon, :volume_medium_icon, :volume_low_icon, :sound_off_icon, :no_sound_icon, to: :helpers
 
   attr_reader :media_asset, :default_quality, :variants, :autoplay, :muted, :html_options
 
