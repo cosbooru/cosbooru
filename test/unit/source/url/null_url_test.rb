@@ -44,11 +44,100 @@ module Source::Tests::URL
         assert_equal("Hatena", Source::URL.parse("http://d.hatena.ne.jp/yuutamiitan/").site_name)
         assert_equal("Hatena Blog", Source::URL.parse("http://yeaththekid.hatenablog.com").site_name)
         assert_equal("html.co.jp", Source::URL.parse("https://html.co.jp/zeelch").site_name)
+        assert_equal("ImgBB", Source::URL.parse("https://meliach.imgbb.com").site_name)
         assert_equal("Itch.io", Source::URL.parse("https://lewdwayne.itch.io").site_name)
         assert_equal("Line", Source::URL.parse("https://store.line.me/stickershop/author/103126").site_name)
         assert_equal("LinkedIn", Source::URL.parse("https://www.linkedin.com/in/star-ren/").site_name)
         assert_equal("Linktree", Source::URL.parse("https://linktr.ee/crankbot").site_name)
         assert_equal("TikTok", Source::URL.parse("https://www.tiktok.com/@lenn0n__?").site_name)
+        assert_equal("7-Eleven MyShip", Source::URL.parse("https://myship.7-11.com.tw/general/detail/GM2311291644399").site_name)
+        assert_equal("Bahamut", Source::URL.parse("https://home.gamer.com.tw/homeindex.php?owner=zxc16978").site_name)
+        assert_equal("BASE", Source::URL.parse("https://tsukiakari09.theshop.jp").site_name)
+        assert_equal("BASE", Source::URL.parse("https://artistname.thebase.com").site_name)
+        assert_equal("Cash App", Source::URL.parse("https://cash.app/$artistname").site_name)
+        assert_equal("Clibo", Source::URL.parse("https://cli-bo.com/user/abc").site_name)
+        assert_equal("Comic Vine", Source::URL.parse("https://comicvine.gamespot.com/profile/artist").site_name)
+        assert_equal("Commiss.io", Source::URL.parse("https://commiss.io/artistname").site_name)
+        assert_equal("Direct.me", Source::URL.parse("https://direct.me/artist").site_name)
+        assert_equal("Drawcrowd", Source::URL.parse("https://dxthpu4318olx.cloudfront.net/users/agussw").site_name)
+        assert_equal("Eth.co", Source::URL.parse("https://eth.co/artist").site_name)
+        assert_equal("Final Fantasy XIV", Source::URL.parse("https://na.finalfantasyxiv.com/lodestone/character/1234").site_name)
+        assert_equal("GameFAQs", Source::URL.parse("https://gamefaqs.gamespot.com/community/artist").site_name)
+        assert_equal("Gank", Source::URL.parse("https://www.ganknow.com/artist").site_name)
+        assert_equal("Image Comics", Source::URL.parse("https://imagecomics.com/creators/view/artist").site_name)
+        assert_equal("Instabio", Source::URL.parse("https://instabio.cc/artist").site_name)
+        assert_equal("Instabio", Source::URL.parse("https://linkbio.co/artist").site_name)
+        assert_equal("Kemono Party", Source::URL.parse("https://kemono.party/patreon/user/123").site_name)
+        assert_equal("Kirby's Comic Art", Source::URL.parse("https://www.kirbyscomicart.com/artist").site_name)
+        assert_equal("Kiru Made", Source::URL.parse("https://kirumade.com/artist").site_name)
+        assert_equal("Last.fm", Source::URL.parse("https://www.last.fm/user/artist").site_name)
+        assert_equal("Lava.top", Source::URL.parse("https://lava.top/@artist").site_name)
+        assert_equal("League of Comic Geeks", Source::URL.parse("https://leagueofcomicgeeks.com/profile/artist").site_name)
+        assert_equal("Livedoor", Source::URL.parse("https://blog.livedoor.jp/ac370ml").site_name)
+        assert_equal("Livedoor", Source::URL.parse("https://livedoor.livedoor.biz/archives/artist.html").site_name)
+        assert_equal("Lit.link", Source::URL.parse("https://lit.link/en/artist").site_name)
+        assert_equal("Manga Library Z", Source::URL.parse("https://www.mangaz.com/person/detail/44761").site_name)
+        assert_equal("Mangano", Source::URL.parse("https://manga-no.com/artist/123").site_name)
+        assert_equal("MarppleShop", Source::URL.parse("https://marpple.shop/kr/@artist").site_name)
+        assert_equal("Mastodon", Source::URL.parse("https://mastodon.cloud/@artist").site_name)
+        assert_equal("Mastodon", Source::URL.parse("https://mstdn.jp/@oneb").site_name)
+        assert_equal("Milkshake", Source::URL.parse("https://msha.ke/artist").site_name)
+        assert_equal("Milkshake", Source::URL.parse("https://milkshake.app/artist").site_name)
+        assert_equal("MyAnimeList", Source::URL.parse("https://myanimelist.net/profile/artist").site_name)
+        assert_equal("MyFigureCollection", Source::URL.parse("https://myfigurecollection.net/profile/artist").site_name)
+        assert_equal("OCN", Source::URL.parse("http://homepage3.ocn.ne.jp/~artist").site_name)
+        assert_equal("OnlyFans", Source::URL.parse("https://onlyfans.com/artist").site_name)
+        assert_equal("Ou Xiang Xie Zhen", Source::URL.parse("https://www.ouxiangxiezhen.com/artist").site_name)
+        assert_equal("Overdoll", Source::URL.parse("https://overdoll.com/artist").site_name)
+        assert_equal("Overdoll", Source::URL.parse("https://dollycdn.net/artist").site_name)
+        assert_equal("PayPal", Source::URL.parse("https://www.paypal.me/artist").site_name)
+        assert_equal("PayPal", Source::URL.parse("https://www.paypal.com/donate/?hosted_button_id=ABC").site_name)
+        assert_equal("Pixel Joint", Source::URL.parse("https://pixeljoint.com/p/artist.htm").site_name)
+        assert_equal("Planet Minecraft", Source::URL.parse("https://www.planetminecraft.com/member/artist").site_name)
+        assert_equal("Pronouns.page", Source::URL.parse("https://en.pronouns.page/@artist").site_name)
+        assert_equal("Pronouny.xyz", Source::URL.parse("https://pronouny.xyz/u/artist").site_name)
+        assert_equal("Joyreactor", Source::URL.parse("https://joyreactor.cc/user/artist").site_name)
+        assert_equal("Joyreactor", Source::URL.parse("https://reactor.cc/user/artist").site_name)
+        assert_equal("Jump Rookie!", Source::URL.parse("https://rookie.shonenjump.com/author/artist").site_name)
+        assert_equal("Sakura.ne.jp", Source::URL.parse("https://www117.sakura.ne.jp/~artist").site_name)
+        assert_equal("Scratch", Source::URL.parse("https://scratch.mit.edu/users/artist").site_name)
+        assert_equal("Secret Drawing Box", Source::URL.parse("https://drawme.share-on.me/artist").site_name)
+        assert_equal("Sheezy.art", Source::URL.parse("https://sheezy.art/artist").site_name)
+        assert_equal("Solo.to", Source::URL.parse("https://solo.to/artist").site_name)
+        assert_equal("SoundCloud", Source::URL.parse("https://soundcloud.com/artist").site_name)
+        assert_equal("Spotify", Source::URL.parse("https://open.spotify.com/artist/123").site_name)
+        assert_equal("Square", Source::URL.parse("https://artist.square.site").site_name)
+        assert_equal("Square", Source::URL.parse("https://squareup.com/store/artist").site_name)
+        assert_equal("Steam", Source::URL.parse("https://steamcommunity.com/id/artist").site_name)
+        assert_equal("Straw.page", Source::URL.parse("https://straw.page/artist").site_name)
+        assert_equal("SubscribeStar", Source::URL.parse("https://subscribestar.adult/artist").site_name)
+        assert_equal("SubscribeStar", Source::URL.parse("https://subscribestar.com/artist").site_name)
+        assert_equal("SuperRare", Source::URL.parse("https://superrare.com/artist").site_name)
+        assert_equal("Suzuri", Source::URL.parse("https://suzuri.jp/artist").site_name)
+        assert_equal("Suzuri", Source::URL.parse("https://dijsur42hqnz1.cloudfront.net/products/artist").site_name)
+        assert_equal("Taiwan Doujinshi Center", Source::URL.parse("https://shop.doujin.com.tw/artist").site_name)
+        assert_equal("Tapas", Source::URL.parse("https://tapas.io/artist").site_name)
+        assert_equal("Tapas", Source::URL.parse("https://d30womf5coomej.cloudfront.net/artist").site_name)
+        assert_equal("TeePublic", Source::URL.parse("https://www.teepublic.com/user/artist").site_name)
+        assert_equal("Telegram", Source::URL.parse("https://t.me/artist").site_name)
+        assert_equal("Telegram", Source::URL.parse("https://telegram.org/artist").site_name)
+        assert_equal("TensorArt", Source::URL.parse("https://tensor.art/u/artist").site_name)
+        assert_equal("The Interviews", Source::URL.parse("http://theinterviews.jp/artist").site_name)
+        assert_equal("Tistory", Source::URL.parse("https://artist.tistory.com").site_name)
+        assert_equal("Toyhouse", Source::URL.parse("https://toyhou.se/artist").site_name)
+        assert_equal("Trello", Source::URL.parse("https://bxp-content-static.prod.public.atl-paas.net/board-bg.jpg").site_name)
+        assert_equal("tsunagu.cloud", Source::URL.parse("https://tsunagu.cloud/artist").site_name)
+        assert_equal("Vimeo", Source::URL.parse("https://vimeo.com/artist").site_name)
+        assert_equal("Vimeo", Source::URL.parse("https://livestream.com/artist").site_name)
+        assert_equal("Webtoons", Source::URL.parse("https://www.webtoons.com/en/creator/artist").site_name)
+        assert_equal("Weebly", Source::URL.parse("https://artist.weebly.com").site_name)
+        assert_equal("Weebly", Source::URL.parse("https://artist.weeblysite.com").site_name)
+        assert_equal("Willow", Source::URL.parse("https://wlo.link/@artist").site_name)
+        assert_equal("Wix", Source::URL.parse("https://artist.wixsite.com/home").site_name)
+        assert_equal("Wix", Source::URL.parse("https://static.wixstatic.com/media/artist.jpg").site_name)
+        assert_equal("WordPress", Source::URL.parse("https://artist.wordpress.com").site_name)
+        assert_equal("YCH.art", Source::URL.parse("https://ych.art/user/artist").site_name)
+        assert_equal("Youtube", Source::URL.parse("https://youtu.be/dQw4w9WgXcQ").site_name)
       end
     end
 
@@ -134,6 +223,14 @@ module Source::Tests::URL
                              page_url: "https://hitomi.la/reader/1054851.html#1",)
     end
 
+    context "For imgbb links" do
+      url_parser_should_work("https://meliach.imgbb.com",
+                             profile_url: "https://meliach.imgbb.com",)
+
+      url_parser_should_work("https://meliach.imgbb.com/albums",
+                             profile_url: "https://meliach.imgbb.com",)
+    end
+
     context "For tiktok links" do
       url_parser_should_work("https://www.tiktok.com/@ajmarekart?_t=ZM-8wmxRtoZXjq&_r=1",
                              profile_url: "https://www.tiktok.com/@ajmarekart",)
@@ -143,6 +240,76 @@ module Source::Tests::URL
 
       url_parser_should_work("https://www.tiktok.com/@h.panda_12",
                              profile_url: "https://www.tiktok.com/@h.panda_12",)
+    end
+
+    context "For about.me links" do
+      url_parser_should_work("http://about.me/rig22",
+                             profile_url: "https://about.me/rig22",)
+    end
+
+    context "For ameblo.jp links" do
+      url_parser_should_work("http://marilyn77.ameblo.jp/",
+                             profile_url: "https://ameblo.jp/marilyn77",)
+
+      url_parser_should_work("https://ameblo.jp/g8set55679",
+                             profile_url: "https://ameblo.jp/g8set55679",)
+
+      url_parser_should_work("http://ameblo.jp/hanauta-os/entry-11860045489.html",
+                             profile_url: "https://ameblo.jp/hanauta-os",)
+
+      url_parser_should_work("http://stat.ameba.jp/user_images/20130802/21/moment1849/38/bd/p",
+                             profile_url: "https://ameblo.jp/moment1849",)
+
+      url_parser_should_work("https://profile.ameba.jp/ameba/kbnr32rbfs",
+                             profile_url: "https://ameblo.jp/kbnr32rbfs",)
+    end
+
+    context "For anidb.net links" do
+      url_parser_should_work("https://anidb.net/creator/65313",
+                             profile_url: "https://anidb.net/creator/65313",)
+
+      url_parser_should_work("https://anidb.net/perl-bin/animedb.pl?show=creator&creatorid=3903",
+                             profile_url: "https://anidb.net/creator/3903",)
+    end
+
+    context "For baidu.com links" do
+      url_parser_should_work("http://hi.baidu.com/new/mocaorz",
+                             profile_url: "http://hi.baidu.com/mocaorz",)
+
+      url_parser_should_work("http://hi.baidu.com/longbb1127/home",
+                             profile_url: "http://hi.baidu.com/longbb1127",)
+    end
+
+    context "For flickr.com links" do
+      url_parser_should_work("https://www.flickr.com/people/shirasaki408/",
+                             profile_url: "https://www.flickr.com/people/shirasaki408",)
+
+      url_parser_should_work("https://www.flickr.com/photos/shirasaki408/49398982266/",
+                             profile_url: "https://www.flickr.com/people/shirasaki408",)
+
+      url_parser_should_work("https://www.flickr.com/photos/hizna/sets/72157629448846789/",
+                             profile_url: "https://www.flickr.com/people/hizna",)
+    end
+
+    context "For linktr.ee links" do
+      url_parser_should_work("https://linktr.ee/cxlinray",
+                             profile_url: "https://linktr.ee/cxlinray",)
+    end
+
+    context "For twpl.jp profile links" do
+      url_parser_should_work("http://twpl.jp/swacoro",
+                             profile_url: "https://twpf.jp/swacoro",)
+    end
+
+    context "For yfrog.com links" do
+      url_parser_should_work("http://yfrog.com/gyi1smoj",
+                             page_url: "http://yfrog.com/gyi1smoj",)
+
+      url_parser_should_work("http://twitter.yfrog.com/z/oe3umiifj",
+                             page_url: "http://yfrog.com/oe3umiifj",)
+
+      url_parser_should_work("http://yfrog.com/user/0128sinonome/photos",
+                             profile_url: "http://yfrog.com/user/0128sinonome/photos",)
     end
 
     context "For e-hentai links" do

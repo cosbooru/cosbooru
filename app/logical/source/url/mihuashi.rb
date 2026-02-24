@@ -88,6 +88,8 @@ module Source
         in _, "mihuashi.com", "users", username
           @username = username
 
+        # https://www.mihuashi.com/artboards/6879554
+        # https://www.mihuashi.com/tools/widget/58c082f7-6da9-4770-9cc4-949f8d3d54c0
         else
           nil
         end

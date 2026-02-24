@@ -101,14 +101,19 @@ class Source::URL::Null < Source::URL
       "Hatena"
     in _, ("hatenablog.com" | "hatenablog.jp" | "hateblo.jp" | "st-hatena.com")
       "Hatena Blog"
+<<<<<<< HEAD
     in "huggingface.co"
       "Hugging Face"
     in _, "hoyolab.com"
       "HoYoLAB"
+=======
+>>>>>>> e0b9265ee (sources: cleanup null URL parsing, expand test coverage.)
     in _, "html.co.jp"
       "html.co.jp"
     in _, "imagecomics.com"
       "Image Comics"
+    in _, "imgbb.com"
+      "ImgBB"
     in _, "instabio.cc" | "linkbio.co"
       "Instabio"
     in "iromirai.jp"
@@ -189,8 +194,6 @@ class Source::URL::Null < Source::URL
       "Joyreactor"
     in "rookie", "shonenjump.com"
       "Jump Rookie!"
-    in _, "redgifs.com"
-      "RedGIFs"
     in _, "sakura.ne.jp"
       "Sakura.ne.jp"
     in _, "sankakucomplex.com"
@@ -334,7 +337,7 @@ class Source::URL::Null < Source::URL
     # https://anidb.net/perl-bin/animedb.pl?show=creator&creatorid=3903
     in _, "anidb.net", "perl-bin", "animedb.pl" if params[:show] == "creator" and params[:creatorid].present?
       @user_id = params[:creatorid]
-      @profile_url = "https://anidb.net/creator/#{user_id}"
+      @profile_url = "https://anidb.net/creator/#{@user_id}"
 
     # https://www.animenewsnetwork.com/encyclopedia/people.php?id=17056
     in _, ("animenewsnetwork.com" | "animenewsnetwork.cc"), "encyclopedia", "people.php" if params[:id].present?
@@ -348,9 +351,16 @@ class Source::URL::Null < Source::URL
       @username = username
       @profile_url = "https://ask.fm/#{username}"
 
+    # http://hi.baidu.com/new/mocaorz
+    in "hi", "baidu.com", "new", username
+      @profile_url = "http://hi.baidu.com/#{username}"
+
     # http://hi.baidu.com/lizzydom
     # http://hi.baidu.com/longbb1127/home
-    # http://hi.baidu.com/new/mocaorz
+    # http://hi.baidu.com/daidaishi/ihome/ihomefeed
+    in "hi", "baidu.com", username, *rest
+      @profile_url = "http://hi.baidu.com/#{username}"
+
     in _, "baidu.com", *rest
       nil
 
@@ -489,6 +499,8 @@ class Source::URL::Null < Source::URL
 
     # https://plus.google.com/111509637967078773143/posts
     # http://sites.google.com/site/dorumentaiko/
+    # https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj
+    # https://drive.google.com/file/d/1LNiTeOS9HFhkElIBGXjVMNdWVW-vkFeZ/view
     in _, "google.com", *rest
       nil
 
@@ -505,6 +517,10 @@ class Source::URL::Null < Source::URL
     in _, "hitomi.la", "galleries", gallery_id, file
       @gallery_id = gallery_id
       @page_url = "https://hitomi.la/galleries/#{gallery_id}.html"
+
+    # https://meliach.imgbb.com
+    in username, "imgbb.com", *rest unless subdomain.in?(["www", nil])
+      @profile_url = "https://#{username}.imgbb.com"
 
     # https://www.inprnt.com/gallery/zuyuancesartoo/
     in _, "inprnt.com", *rest
@@ -544,6 +560,7 @@ class Source::URL::Null < Source::URL
       nil
 
     # https://www.melonbooks.co.jp/circle/index.php?circle_id=15547
+    # https://www.melonbooks.co.jp/detail/detail.php?product_id=2391671
     in _, "melonbooks.co.jp", *rest
       nil
 
@@ -552,12 +569,12 @@ class Source::URL::Null < Source::URL
       nil
 
     # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
-    # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
     # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
     in _, "mega.nz", *rest
       nil
 
     # https://www.mihuashi.com/profiles/75614
+    # https://www.mihuashi.com/artworks/14704979
     in _, "mihuashi.com", *rest
       nil
 
@@ -658,16 +675,6 @@ class Source::URL::Null < Source::URL
     in _, "paheal.net", *rest
       nil
 
-    # https://api-cdn-mp4.rule34.xxx/images/4330/2f85040320f64c0e42128a8b8f6071ce.mp4
-    # https://ny5webm.rule34.xxx//images/4653/3c63956b940d0ff565faa8c7555b4686.mp4?5303486
-    # https://img.rule34.xxx//images/4977/7d76919c2f713c580f69fe129d2d1a44.jpeg?5668795
-    # http://rule34.xxx//images/993/5625625970c9ce8c5121fde518c2c4840801cd29.jpg?992983
-    # http://img3.rule34.xxx/img/rule34//images/1180/76c6497b5138c4122710c2d05458e729a8d34f7b.png?1190815
-    # http://aimg.rule34.xxx//samples/1267/sample_d628f215f27815dc9c1d365a199ee68e807efac1.jpg?1309664
-    in _, "rule34.xxx", ("images" | "samples"), *subdirs, /^(?:sample_)?(\h{32})\.(jpg|jpeg|png|gif|webm|mp4)$/
-      @md5 = $1
-      @page_url = "https://rule34.xxx/index.php?page=post&s=list&md5=#{$1}"
-
     # https://cs.sankakucomplex.com/data/68/6c/686ceee03af38fe4ceb45bf1c50947e0.jpg?e=1591893718&m=fLlJfTrK_j2Rnc0uIHNC3w
     # https://v.sankakucomplex.com/data/24/ff/24ff5da1fd7ed051b083b36e4e51de8e.mp4?e=1644999580&m=-OtZg2QdtKbibMte8vlsdw&expires=1644999580&token=0YUdUKKwTmvpozhG1WW_nRvSUQw3WJd574andQv-KYY
     # https://cs.sankakucomplex.com/data/sample/2a/45/sample-2a45c67281b0fcfd26208063f81a3114.jpg?e=1590609355&m=cexHhVyJguoZqPB3z3N7aA
@@ -702,6 +709,7 @@ class Source::URL::Null < Source::URL
       nil
 
     # https://steamcommunity.com/id/sobchan
+    # https://steamcommunity.com/sharedfiles/filedetails/?id=422092039
     in _, ("steamcommunity.com" | "steamstatic.com"), *rest
       nil
 
@@ -710,6 +718,7 @@ class Source::URL::Null < Source::URL
       nil
 
     # https://subscribestar.adult/daivijohn
+    # https://subscribestar.adult/posts/1242417
     in _, ("subscribestar.adult" | "subscribestar.com"), *rest
       nil
 
@@ -799,9 +808,17 @@ class Source::URL::Null < Source::URL
     in _, "yaplog.jp", *rest
       nil
 
+    # http://yfrog.com/gyi1smoj
+    in nil, "yfrog.com", post_id unless image_url?
+      @page_url = "http://yfrog.com/#{post_id}"
+
+    # http://twitter.yfrog.com/z/oe3umiifj
+    in "twitter", "yfrog.com", "z", post_id
+      @page_url = "http://yfrog.com/#{post_id}"
+
     # http://yfrog.com/user/0128sinonome/photos
-    in _, "yfrog.com", *rest
-      nil
+    in _, "yfrog.com", "user", username, *rest
+      @profile_url = "http://yfrog.com/user/#{username}/photos"
 
     else
       @recognized = false
