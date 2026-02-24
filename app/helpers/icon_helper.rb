@@ -392,7 +392,7 @@ module IconHelper
   # @param options [Hash] Additional HTML attributes to apply to the <img> element
   # @return [ActiveSupport::SafeBuffer] An HTML-safe string containing the <img> element.
   def external_site_icon(site_name, **options)
-    name = site_name.downcase.gsub(/[^a-z0-9.]/, "-")
+    name = site_name.downcase.gsub(/[^a-z0-9.]/, "-").squeeze("-").delete_prefix("-").delete_suffix("-")
     filename = SITE_ICONS[name]
 
     if filename

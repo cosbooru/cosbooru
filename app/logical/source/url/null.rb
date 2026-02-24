@@ -17,7 +17,7 @@ class Source::URL::Null < Source::URL
       "Aipictors"
     in _, "allmylinks.com"
       "AllMyLinks"
-    in _, "animenewsnetwork.com"
+    in _, ("animenewsnetwork.com" | "animenewsnetwork.cc")
       "Anime News Network"
     in _, ("aminoapps.com" | "narvii.com")
       "Amino"
@@ -41,6 +41,8 @@ class Source::URL::Null < Source::URL
       "BASE"
     in _, "bigcartel.com"
       "Big Cartel"
+    in _, "booru.org"
+      "Booru.org"
     in _, "buymeacoffee.com"
       "Buy Me a Coffee"
     in _, "cash.app"
@@ -101,19 +103,18 @@ class Source::URL::Null < Source::URL
       "Hatena"
     in _, ("hatenablog.com" | "hatenablog.jp" | "hateblo.jp" | "st-hatena.com")
       "Hatena Blog"
-<<<<<<< HEAD
     in "huggingface.co"
       "Hugging Face"
     in _, "hoyolab.com"
       "HoYoLAB"
-=======
->>>>>>> e0b9265ee (sources: cleanup null URL parsing, expand test coverage.)
     in _, "html.co.jp"
       "html.co.jp"
     in _, "imagecomics.com"
       "Image Comics"
     in _, "imgbb.com"
       "ImgBB"
+    in _, "img.ly"
+      "img.ly"
     in _, "instabio.cc" | "linkbio.co"
       "Instabio"
     in "iromirai.jp"
@@ -138,7 +139,7 @@ class Source::URL::Null < Source::URL
       "Livedoor"
     in _, "lit.link"
       "Lit.link"
-    in _, ("kirbyscomicart.com"| "kirbyscomicartshop.com")
+    in _, ("kirbyscomicart.com" | "kirbyscomicartshop.com")
       "Kirby's Comic Art"
     in _, "kirumade.com"
       "Kiru Made"
@@ -212,6 +213,8 @@ class Source::URL::Null < Source::URL
       "Solo.to"
     in _, ("soundcloud.com" | "sndcdn.com")
       "SoundCloud"
+    in _, "smutba.se"
+      "SmutBase"
     in _, ("spotify.com" | "spotifycdn.com")
       "Spotify"
     in _, "square.site" | "squareup.com"
@@ -220,6 +223,8 @@ class Source::URL::Null < Source::URL
       "Steam"
     in _, "straw.page"
       "Straw.page"
+    in _, ("strikingly.com" | "mystrikingly.com")
+      "Strikingly"
     in _, ("subscribestar.adult" | "subscribestar.com")
       "SubscribeStar"
     in _, "superrare.com"
@@ -236,6 +241,8 @@ class Source::URL::Null < Source::URL
       "Tapas"
     in _, "teepublic.com"
       "TeePublic"
+    in _, ("pipa.jp" | "tegaki.com")
+      "Tegaki"
     in _, ("telegram.org" | "t.me")
       "Telegram"
     in _, "tensor.art"
@@ -256,6 +263,8 @@ class Source::URL::Null < Source::URL
       "tsunagu.cloud"
     in _, "unifans.io"
       "UniFans"
+    in _, ("twpl.jp" | "twipple.jp")
+      "Twipple"
     in _, ("vimeo.com" | "vimeocdn.com" | "livestream.com")
       "Vimeo"
     in _, "webtoons.com"
@@ -268,15 +277,12 @@ class Source::URL::Null < Source::URL
       "Willow"
     in _, ("wix.com" | "wixsite.com" | "wixstatic.com")
       "Wix"
-    in _, "wordpress.com"
+    in _, ("wordpress.com" | "wp.com")
       "WordPress"
-<<<<<<< HEAD
     in "yodayo.com"
       "Yodayo"
-=======
     in _, "ych.art"
       "YCH.art"
->>>>>>> d235acb68 (Fix #6175: Missing icons for artist entries.)
     in _, "youtu.be"
       "Youtube"
     in _, nil
@@ -643,7 +649,8 @@ class Source::URL::Null < Source::URL
       nil
 
     # http://tegaki.pipa.jp/515745
-    in _, "pipa.jp", *rest
+    # https://tegaki.com/515745/
+    in _, ("pipa.jp" | "tegaki.com"), *rest
       nil
 
     # https://pomf.tv/oozutsucannon

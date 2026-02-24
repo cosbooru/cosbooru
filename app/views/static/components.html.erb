@@ -217,7 +217,7 @@
 
         <div class="flex flex-wrap gap-2">
             <% IconHelper.svg_icon_methods.each do |method_name| %>
-              <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px h-16">
+              <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px">
                 <%= send(method_name, class: "w-6 h-6") %>
                 <div class="max-w-full truncate"><%= method_name %></div>
               </div>
@@ -230,7 +230,7 @@
 
         <div class="flex flex-wrap gap-2">
           <% IconHelper::SITE_ICONS.keys.each do |site| %>
-            <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px h-16">
+            <div class="flex flex-col justify-center items-center gap-2 text-xs text-center card-outlined p-2 w-150px">
               <%= external_site_icon(site, class: "w-6 h-6") %>
               <div class="max-w-full truncate"><%= site %></div>
             </div>
