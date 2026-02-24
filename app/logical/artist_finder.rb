@@ -27,9 +27,9 @@ module ArtistFinder
 
       # XXX Using a CTE is a hack to force Postgres to use the regexp_replace(lower(url)) index instead of the artist_id index
       # artists += Artist.active.where(id: ArtistURL.normalized_url_like(u).select(:artist_id).order(:url)).limit(10)
-      Artist.with(matching_artists: ArtistURL.select(:artist_id).normalized_url_like(u))
-            .joins("INNER JOIN matching_artists ON matching_artists.artist_id = artists.id")
-            .active.limit(10)
+      artists += Artist.with(matching_artists: ArtistURL.select(:artist_id).normalized_url_like(u))
+                       .joins("INNER JOIN matching_artists ON matching_artists.artist_id = artists.id")
+                       .active.limit(10)
 
       # File.dirname("example.com/a/b/c") => "example.com/a/b"; File.dirname("example.com") => "."
       url = File.dirname(url)
