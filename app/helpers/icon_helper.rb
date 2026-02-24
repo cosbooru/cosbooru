@@ -9,6 +9,8 @@
 # To add a new logo for a site, add the image to public/logos and name it "<site-name>-logo.png". See
 # public/logos/README.md for more details.
 #
+# See /static/components for a visual list of all icons and logos.
+#
 # Most SVG icons are from https://www.fontawesome.com.
 module IconHelper
   # @return [Hash<String, String>] A hash mapping site names to logo filenames.
@@ -398,5 +400,10 @@ module IconHelper
     else
       globe_icon(**options)
     end
+  end
+
+  # @return [Array<Symbol>] The list of all available SVG icon method names, sorted alphabetically.
+  def self.svg_icon_methods
+    IconHelper.instance_methods(false).grep(/_icon\z/).excluding(:discord_icon, :github_icon, :twitter_icon, :external_site_icon).sort
   end
 end

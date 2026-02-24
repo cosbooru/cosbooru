@@ -19,3 +19,4 @@ Logos should have a transparent background, and should be legible over both a li
 * `site_name` in app/logical/source/url.rb (Where default site names are generated)
 * `site_name` in app/logical/source/url/null.rb (Where custom site names for miscellaneous sites are generated)
 * `external_site_icon` in app/helpers/external_site_icon.rb
+* /static/components (visual list of all site logos)

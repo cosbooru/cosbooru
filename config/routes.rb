@@ -351,6 +351,7 @@ Rails.application.routes.draw do
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
   get "/static/colors" => "static#colors", :as => "colors"
+  get "/static/components" => "static#components", :as => "components"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
   get "/static/terms_of_service", to: redirect("/terms_of_service")
   get "/static/contact", to: redirect("/contact")

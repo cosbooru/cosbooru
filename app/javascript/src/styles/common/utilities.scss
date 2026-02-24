@@ -291,6 +291,7 @@ $spacer: 0.25rem; /* 4px */
 .h-360px { height: 360px; }
 
 .min-h-8 { min-height: 8  * $spacer; }
+.min-h-12 { min-height: 12  * $spacer; }
 .min-h-150px { min-height: 150px; }
 
 .\!max-h-120px { max-height: 120px !important; }
@@ -362,6 +363,8 @@ $spacer: 0.25rem; /* 4px */
 .self-stretch { align-self: stretch; }
 .self-end { align-self: flex-end; }
 
+.place-items-center { place-items: center; }
+
 .float-right { float: right; }
 
 .-rotate-90 { rotate: -90deg; }
@@ -371,6 +374,7 @@ $spacer: 0.25rem; /* 4px */
 .grid-cols-1  { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-2  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-cols-3  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-5  { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .grid-cols-4  { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .grid-cols-6  { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 .grid-cols-8  { grid-template-columns: repeat(8, minmax(0, 1fr)); }
