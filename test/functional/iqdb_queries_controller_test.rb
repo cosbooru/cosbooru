@@ -28,6 +28,8 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "return an error if the url has multiple images" do
+          skip "Twitter credentials not available" unless Source::Extractor::Twitter.enabled?
+
           mock_iqdb_matches([])
           get_auth iqdb_queries_path, @user, params: { url: "https://twitter.com/fatfatpankocat/status/1763401033680576982" }
 
@@ -37,6 +39,8 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "return an error if the url doesn't have any images" do
+          skip "Twitter credentials not available" unless Source::Extractor::Twitter.enabled?
+
           mock_iqdb_matches([])
           get_auth iqdb_queries_path, @user, params: { url: "https://twitter.com/dril/status/384408932061417472" }
 

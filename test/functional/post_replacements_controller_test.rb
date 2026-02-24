@@ -84,6 +84,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "replacing a post with a Pixiv page URL" do
         should "replace with the full size image" do
+          skip "Pixiv credentials not configured" unless Source::Extractor::Pixiv.enabled?
+
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
@@ -160,6 +162,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "a replacement URL that contains multiple images" do
         should "return an error" do
+          skip "Twitter credentials not configured" unless Source::Extractor::Twitter.enabled?
+
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
@@ -176,6 +180,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
 
       context "a replacement URL that doesn't contain any images" do
         should "return an error" do
+          skip "Twitter credentials not configured" unless Source::Extractor::Twitter.enabled?
+
           @post = create(:post)
 
           post_auth post_replacements_path, create(:moderator_user), params: {
