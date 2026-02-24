@@ -64,6 +64,7 @@ export default class VideoPlayer {
     this.$container.find("canvas, video").on("pause", event => this.onPause());
     this.$container.find("canvas, video").on("volumechange", event => this.onVolumeChange());
     this.$container.find("canvas, video").on("error", event => this._error ??= event.target.error?.message ?? "An unknown error occurred while loading the video.");
+    this.$container.find("canvas, video").on("error", event => this.pause());
     this.$container.find(".video-slider").on("pointerdown", event => this.onDragStart(event));
     this.$container.find(".video-slider").on("pointerup", event => this.onDragEnd(event));
     this.$container.find(".video-slider").on("input", event => this.onDrag(event));
@@ -99,6 +100,10 @@ export default class VideoPlayer {
   }
 
   async play() {
+    if (this._error) {
+      return;
+    }
+
     try {
       await this.video?.play();
     } catch (error) {
@@ -107,8 +112,6 @@ export default class VideoPlayer {
         this._error = "Your browser doesn't support this video format.";
         return;
       }
-
-      throw error;
     }
   }
 
@@ -117,6 +120,10 @@ export default class VideoPlayer {
   }
 
   async pause() {
+    if (this._error) {
+      return;
+    }
+
     this.resumePlayback = !this.paused;
     await this.video?.pause();
   }
@@ -240,8 +247,12 @@ export default class VideoPlayer {
     this.quality = quality;
     this.video = this._variants[quality];
 
-    this.video.load();
+    if (this.video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      this.video.load();
+    }
+
     this.duration = this.video.duration || 0;
+    this._error = this.video.error?.message;
 
     this.video.currentTime = this.currentTime;
     this.video.playbackRate = this.playbackRate;

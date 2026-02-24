@@ -98,6 +98,10 @@ export default class VideoRenderer {
     return this.video.paused;
   }
 
+  get error() {
+    return this.video.error;
+  }
+
   onAnimationFrame() {
     const now = performance.now() / 1000;
 

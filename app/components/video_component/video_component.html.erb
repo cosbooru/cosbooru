@@ -27,12 +27,12 @@
 
   <span class="playback-rate-indicator absolute p-4 rounded text-xl text-inverse select-none" x-text="player.playbackRate.toFixed(2) + 'x'" x-cloak x-show="player._showPlaybackRate"></span>
 
-  <div class="video-component-error-message @container absolute w-full p-4 rounded text-inverse text-center leading-normal" x-cloak x-show="player.state === 'error'">
+  <div class="video-component-error-message @container flex flex-col justify-center absolute inset-0 p-4 rounded text-inverse text-center leading-normal" x-cloak x-show="player.state === 'error'">
     <p class="text-xl @max-270px:text-sm">An error occurred while loading the video.</p>
     <p class="text-sm @max-270px:text-xs text-muted" x-text="player._error"></p>
   </div>
 
-  <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity" x-cloak x-show="player.state === 'ready'">
+  <div class="video-controls @container flex items-center absolute bottom-0 w-full h-8 px-2 gap-2 opacity-0 transition-opacity">
     <div class="flex-none w-6 h-full cursor-pointer select-none @max-120px:hidden">
       <%= play_icon class: "w-full h-full py-2", "x-show": "player.paused", "x-on:click": "player.play()" %>
       <%= pause_icon class: "w-full h-full py-2", "x-show": "!player.paused", "x-on:click": "player.pause()" %>
