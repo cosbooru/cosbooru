@@ -293,6 +293,7 @@ COPY --link postcss.config.js babel.config.json ./
 COPY --link config/shakapacker.yml ./config/
 COPY --link config/webpack/ ./config/webpack/
 COPY --link public/images ./public/images
+COPY --link public/logos ./public/logos
 COPY --link public/fonts ./public/fonts
 COPY --link app/components/ ./app/components
 COPY --link app/javascript/ ./app/javascript

@@ -14,6 +14,7 @@ import morph from '@alpinejs/morph';
 import persist from '@alpinejs/persist'
 
 require.context("../../../public/images", true);
+require.context("../../../public/logos", true, /\.png$/);
 
 import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
