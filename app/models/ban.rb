@@ -146,7 +146,10 @@ class Ban < ApplicationRecord
     if previously_new_record?
       ModAction.log(%{banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban, subject: user, user: banner)
     elsif saved_changes? && updater.present?
-      ModAction.log(%{updated ban #{saved_changes.keys.without("updated_at").to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
+      changes = saved_changes.without("updated_at").map do |attr, (old_val, new_val)|
+        "#{attr} from #{old_val.inspect} to #{new_val.inspect}"
+      end
+      ModAction.log(%{updated ban #{changes.to_sentence} for <@#{user_name}>}, :user_ban_update, subject: user, user: updater)
     end
   end
 

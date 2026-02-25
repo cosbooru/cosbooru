@@ -128,7 +128,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "allow mods to change the ban reason" do
-        @ban = create(:ban)
+        @ban = create(:ban, reason: "old reason")
         @mod = create(:moderator_user)
         put_auth ban_path(@ban.id), @mod, params: { ban: { reason: "xxx" }}
 
@@ -136,7 +136,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", @ban.reload.reason)
         assert_equal(true, @ban.user.is_banned?)
 
-        assert_equal("updated ban reason for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban reason from \"old reason\" to \"xxx\" for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
@@ -154,7 +154,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_equal(1.day, @ban.reload.duration)
         assert_equal(false, @user.reload.is_banned?)
 
-        assert_equal("updated ban duration for <@#{@ban.user.name}>", ModAction.last.description)
+        assert_equal("updated ban duration from 1 year to 1 day for <@#{@ban.user.name}>", ModAction.last.description)
         assert_equal("user_ban_update", ModAction.last.category)
         assert_equal(@ban.user, ModAction.last.subject)
         assert_equal(@mod, ModAction.last.creator)
