@@ -754,7 +754,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "-age:>1y")
       assert_tag_match([], "-age:<1y")
 
-      assert_tag_match([], "age:<60")
+      assert_tag_match([post], "age:<60")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
@@ -785,7 +785,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the duration:<x> metatag" do
-      post = create(:post, media_asset: create(:media_asset, file: "test/files/webm/test-512x512.webm"))
+      post = create(:post, media_asset: create(:media_asset, duration: 0.48, file: "test/files/webm/test-512x512.webm"))
 
       assert_tag_match([post], "duration:0.48")
       assert_tag_match([post], "duration:>0.4")
@@ -796,6 +796,52 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "-duration:<0.4")
       assert_tag_match([], "-duration:<0.5")
       assert_tag_match([], "-duration:>0.4")
+
+      assert_tag_match([post], "duration:<1s")
+      assert_tag_match([post], "duration:<1sec")
+      assert_tag_match([post], "duration:<1second")
+      assert_tag_match([post], "duration:<1seconds")
+      assert_tag_match([post], "duration:>0.4s")
+      assert_tag_match([], "duration:>1s")
+
+      assert_tag_match([post], "duration:<1min")
+      assert_tag_match([post], "duration:<1minute")
+      assert_tag_match([post], "duration:<1minutes")
+      assert_tag_match([], "duration:>1min")
+
+      assert_tag_match([post], "duration:<1h")
+      assert_tag_match([post], "duration:<1hour")
+      assert_tag_match([post], "duration:<1hours")
+      assert_tag_match([], "duration:>1h")
+
+      assert_tag_match([post], "duration:<1d")
+      assert_tag_match([post], "duration:<1day")
+      assert_tag_match([post], "duration:<1days")
+      assert_tag_match([], "duration:>1d")
+
+      assert_tag_match([post], "duration:<1w")
+      assert_tag_match([post], "duration:<1week")
+      assert_tag_match([post], "duration:<1weeks")
+      assert_tag_match([], "duration:>1w")
+
+      assert_tag_match([post], "duration:<1mo")
+      assert_tag_match([post], "duration:<1month")
+      assert_tag_match([post], "duration:<1months")
+      assert_tag_match([], "duration:>1mo")
+
+      assert_tag_match([post], "duration:<1y")
+      assert_tag_match([post], "duration:<1year")
+      assert_tag_match([post], "duration:<1years")
+      assert_tag_match([], "duration:>1y")
+
+      long_post = create(:post, media_asset: create(:media_asset, duration: 90.0))
+      assert_tag_match([long_post], "duration:90")
+      assert_tag_match([long_post], "duration:90s")
+      assert_tag_match([long_post], "duration:1.5min")
+      assert_tag_match([long_post], "duration:>1min")
+      assert_tag_match([long_post], "duration:1min..2min")
+      assert_tag_match([], "duration:>2min")
+      assert_tag_match([], "duration:1s..1min")
     end
 
     should "return posts for the is:<status> metatag" do

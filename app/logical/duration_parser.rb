@@ -6,9 +6,13 @@ module DurationParser
   def self.parse(string)
     abbrevs = Abbrev.abbrev(%w[seconds minutes hours days weeks months years])
 
-    raise unless string =~ /(.*?)([a-z]+)\z/i
-    size = Float($1)
-    unit = abbrevs.fetch($2.downcase)
+    if string =~ /(.*?)([a-z]+)\z/i
+      size = Float($1)
+      unit = abbrevs.fetch($2.downcase)
+    else
+      size = Float(string)
+      unit = "seconds"
+    end
 
     case unit
     when "seconds"

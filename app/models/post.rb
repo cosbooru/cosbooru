@@ -1229,7 +1229,7 @@ class Post < ApplicationRecord
         when "tagcount"
           attribute_matches(value, :tag_count)
         when "duration"
-          attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
+          attribute_matches(value, "media_assets.duration", :duration).joins(:media_asset)
         when "is"
           is_matches(value, current_user)
         when "has"

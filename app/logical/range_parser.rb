@@ -63,9 +63,9 @@ class RangeParser
       [:not_eq, nil]
     in "none"
       [:eq, nil]
-    in _ if type == :float
+    in _ if type in :float | :duration
       value = parse_value(string)
-      [:between, (value * 0.95..value * 1.05)] # add a 5% tolerance for float values
+      [:between, (value * 0.95..value * 1.05)] # add a 5% tolerance for float/duration values
     in /[km]b?\z/i if type == :filesize
       value = parse_value(string)
       [:between, (value * 0.95..value * 1.05)] # add a 5% tolerance for filesize values
@@ -109,6 +109,9 @@ class RangeParser
 
     when :float
       Float(string) # raises ArgumentError if string is invalid
+
+    when :duration
+      DurationParser.parse(string).to_f
 
     when :md5
       raise ParseError, "#{string} is not a valid MD5" unless string.match?(/\A[0-9a-fA-F]{32}\z/)
