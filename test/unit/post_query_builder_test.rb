@@ -191,6 +191,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([], "age:foo")
         assert_tag_match([], "age:30")
 
+        assert_tag_match([], "duration:foo")
+        assert_tag_match([], "duration:1x")
+        assert_tag_match([], "duration:30s1m")
+
         assert_tag_match([], "md5:foo")
 
         assert_tag_match([], "pixelhash:foo")
@@ -755,6 +759,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "-age:<1y")
 
       assert_tag_match([post], "age:<60")
+
+      assert_tag_match([post], "age:<1m30s")
+      assert_tag_match([post], "age:<1h30m")
+      assert_tag_match([post], "age:0s..1h30m")
+      assert_tag_match([], "age:>1h30m")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
@@ -842,6 +851,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([long_post], "duration:1min..2min")
       assert_tag_match([], "duration:>2min")
       assert_tag_match([], "duration:1s..1min")
+
+      assert_tag_match([long_post], "duration:1:30")
+      assert_tag_match([long_post], "duration:1m30s")
+      assert_tag_match([long_post], "duration:1:25..1:35")
+      assert_tag_match([long_post], "duration:1m25s..1m35s")
+      assert_tag_match([], "duration:>2:00")
     end
 
     should "return posts for the is:<status> metatag" do

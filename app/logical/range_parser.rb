@@ -110,7 +110,7 @@ class RangeParser
     when :float
       Float(string) # raises ArgumentError if string is invalid
 
-    when :duration
+    when :duration # accepts durations (1m30s) or timecodes (1:30)
       DurationParser.parse(string).to_f
 
     when :md5
@@ -123,10 +123,10 @@ class RangeParser
       date
 
     when :age
-      DurationParser.parse(string).ago
+      DurationParser.parse_duration(string).ago
 
     when :interval
-      DurationParser.parse(string)
+      DurationParser.parse_duration(string)
 
     when :ratio
       string = string.tr(":", "/") # "2:3" => "2/3"
