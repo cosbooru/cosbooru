@@ -97,8 +97,8 @@ class Source::Extractor
         post_url = "https://#{item.dig(:blog, :name)}.tumblr.com/post/#{item.dig(:post, :id)}"
 
         # Hack to forcibly escape raw quotes inside alt text. Necessary because Tumblr incorrectly doesn't escape quote
-        # marks inside alt text in the `content_raw` attribute.
-        content = item[:content_raw].gsub(/alt="(.*?)" srcset=/) { %{alt="#{$1.gsub('"', "&quot;")}" srcset=} }
+        # marks inside alt text in the `content_raw` attribute. The /m flag is to match alt text containing newlines.
+        content = item[:content_raw].gsub(/alt="(.*?)" srcset=/m) { %{alt="#{$1.gsub('"', "&quot;")}" srcset=} }
 
         # https://www.tumblr.com/noizave/171237880542/test-ask
         if item[:is_root_item] && item[:is_current_item] && post[:type] == "answer"
@@ -165,7 +165,7 @@ class Source::Extractor
           element.inner_html = <<~EOS
             <h6>Image description</h6>
 
-            <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>")}</p>
+            <p>#{CGI.escapeHTML(element["alt"]).gsub(/\n\n+/, "<p>").gsub("\n", "<br>")}</p>
           EOS
 
         # Include images inside quotes to provide context for responses.

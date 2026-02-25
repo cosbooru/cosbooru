@@ -751,6 +751,46 @@ module Source::Tests::Extractor
       )
     end
 
+    # https://github.com/danbooru/danbooru/issues/6290
+    context "A commentary with alt text containing multiple lines with double quotes" do
+      strategy_should_work(
+        "https://mokadevs.tumblr.com/post/809014356759248896/so-distant",
+        image_urls: %w[https://64.media.tumblr.com/51b05501aa7e3c7aaac9f355b6ce326f/fc3ea454fa03226e-5d/s21000x21000/7f14258a4ebff9531ea85328393f8a991a12d925.png],
+        media_files: [{ file_size: 1_129_239 }],
+        page_url: "https://mokadevs.tumblr.com/post/809014356759248896",
+        profile_urls: %w[https://mokadevs.tumblr.com],
+        display_name: nil,
+        username: "mokadevs",
+        published_at: Time.parse("2026-02-19T21:23:33.000000Z"),
+        updated_at: nil,
+        tags: [
+          ["fiamos", "https://tumblr.com/tagged/fiamos"],
+          ["arknights", "https://tumblr.com/tagged/arknights"],
+          ["mostima", "https://tumblr.com/tagged/mostima"],
+          ["fiammetta", "https://tumblr.com/tagged/fiammetta"],
+          ["kiki draws", "https://tumblr.com/tagged/kiki draws"],
+          ["minifemslashfeb2026", "https://tumblr.com/tagged/minifemslashfeb2026"],
+          ["yyyyep this was coming", "https://tumblr.com/tagged/yyyyep this was coming"],
+          ["yyyyyyyyyyyyyyyyyyyep.", "https://tumblr.com/tagged/yyyyyyyyyyyyyyyyyyyep."],
+        ],
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          [quote]
+          h6. Image description
+
+          art of fiammetta and mostima from the game arknights. it is a comic. read top to down, it reads:
+          "i hated it. the part of me that's still good even hates it for the right reasons"
+          "when you couldn't look me in the eye, i thought:"
+          "you'll turn into everyone else in this @#$%ing place"
+          "what an idiot i was. i should've been terrible from the start. i should've been relieved."
+          "this distance is the most honest anyone will ever be with me."
+          [/quote]
+
+          "so distant":[https://ministarfruit.tumblr.com/post/802726575387836416/im-getting-asks-about-whats-allowed-and-not]
+        EOS
+      )
+    end
+
     context "A commentary with nested reblogs" do
       strategy_should_work(
         "https://www.tumblr.com/shortgremlinman/707877745599905792/get-asked-idiot",
