@@ -645,7 +645,7 @@ class DText
       in "inline-spoiler" # fake tag added by source extractors
         content = html_to_dtext(element, **options, &block).strip
         "[spoiler]#{content}[/spoiler]" if content.present?
-      in "small" unless element.ancestors.any? { |e| e.name == "small" }
+      in "small" unless element.ancestors.any? { |e| e.name.in?(%w[a small]) }
         content = html_to_dtext(element, **options, &block)
         "[tn]#{content}[/tn]" if content.present?
       in "b" unless element.ancestors.any? { |e| e.name == "b" }

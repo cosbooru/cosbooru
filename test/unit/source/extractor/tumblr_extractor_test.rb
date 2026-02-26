@@ -655,8 +655,8 @@ module Source::Tests::Extractor
 
           [b]B[/b][b]o[/b][b]d[/b][b]y[/b][b],[/b][b]M[/b][b]i[/b][b]n[/b][b]d[/b][b]&[/b][b]S[/b][b]o[/b][b]u[/b][b]l[/b]
 
-          [tn]Fanart of Alphonse, made for the E.E. Anthology – [/tn]"[tn]@equivalentexchangeanthology[/tn]":[https://www.tumblr.com/equivalentexchangeanthology][tn] ⚕️[/tn]
-          [tn]▪︎ [/tn]"[tn]Image description (audio available)[/tn]":[https://href.li/?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
+          [tn]Fanart of Alphonse, made for the E.E. Anthology – [/tn]"@equivalentexchangeanthology":[https://www.tumblr.com/equivalentexchangeanthology][tn] ⚕️[/tn]
+          [tn]▪︎ [/tn]"Image description (audio available)":[https://href.li/?https://ee-anthology.dreamwidth.org/tag/artist:+dee+trowble]
         EOS
       )
     end
@@ -883,6 +883,29 @@ module Source::Tests::Extractor
           [/quote]
 
           Get photographed. Idiot
+        EOS
+      )
+    end
+
+    context "A commentary with <small> tags inside links" do
+      strategy_should_work(
+        "https://caffichai.tumblr.com/post/743006177203535872",
+        image_urls: %w[https://64.media.tumblr.com/093b7b2dba761db89d5c5f5eff7fe456/915afacdf5372215-92/s21000x21000/8e57fae3d6096c0aa7e604365f45831c18182aa8.png],
+        page_url: "https://caffichai.tumblr.com/post/743006177203535872",
+        profile_urls: %w[https://caffichai.tumblr.com],
+        display_name: nil,
+        username: "caffichai",
+        published_at: Time.parse("2024-02-22T07:11:48.000000Z"),
+        updated_at: nil,
+        dtext_artist_commentary_title: "",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          FEater!
+
+          I made the executive decision to draw her even though she didn’t win the poll. Thanks to the anon for the suggestion!
+
+          [tn]Also, the way pandas metabolize their food to gain fat and muscle is [/tn]"fascinating":[https://www.scmp.com/news/people-culture/environment/article/3164671/why-are-pandas-so-chonky-despite-their-vegan-diet][tn]! [/tn]
+
+          "Hey, if you’re here, check this out!":[https://www.tumblr.com/caffichai/751605936379101184/food-bank-fundraiser?source=share]
         EOS
       )
     end
