@@ -55,22 +55,22 @@ class Source::Extractor::Patreon < Source::Extractor
   def artist_commentary_desc
     if post["post_type"] == "poll"
       <<~EOS
-        #{post["content"]}
+        #{content_html}
 
         <h6>Poll: #{CGI.escapeHTML(poll["question_text"])}</h6>
 
         <ul>
-          #{poll_choices.pluck("text_content").map { |choice| "<li>#{CGI.escapeHTML(choice)}</li>" }.join("\n")}
+          #{poll_choices.pluck("text_content").map { |choice| "<li>#{CGI.escapeHTML(choice.to_s)}</li>" }.join("\n")}
         </ul>
       EOS
     else
-      post["content"]
+      content_html
     end
   end
 
   def dtext_artist_commentary_desc
     # Ignore commentary if it only contains inline images with no actual text.
-    return "" if post["content"].to_s.parse_html.text.blank?
+    return "" if content_html.to_s.parse_html.text.blank?
 
     DText.from_html(artist_commentary_desc, base_url: "https://www.patreon.com") do |element|
       if element.name == "img"
@@ -78,6 +78,77 @@ class Source::Extractor::Patreon < Source::Extractor
         element.content = "[image]"
         element["href"] = url
       end
+    end
+  end
+
+  memoize def content_json
+    post[:content_json_string]&.parse_json || {}
+  end
+
+  memoize def content_html
+    rich_text_to_html(content_json)
+  end
+
+  def rich_text_to_html(node)
+    case node
+    in Array
+      node.map { |child| rich_text_to_html(child) }.join
+    in Hash
+      children_html = rich_text_to_html(node[:content])
+
+      html = case node[:type]
+      in "doc"
+        children_html
+      in "text"
+        CGI.escapeHTML(node[:text].to_s).gsub("\n", "<br>")
+      in "paragraph"
+        "<p>#{children_html}</p>"
+      in "hardBreak"
+        "<br>"
+      in "heading"
+        level = node.dig(:attrs, :level).to_i.clamp(1, 6)
+        "<h#{level}>#{children_html}</h#{level}>"
+      in "bulletList"
+        "<ul>#{children_html}</ul>"
+      in "orderedList"
+        "<ol>#{children_html}</ol>"
+      in "listItem"
+        "<li>#{children_html}</li>"
+      in "blockquote"
+        "<blockquote>#{children_html}</blockquote>"
+      in "image"
+        image_url = node.dig(:attrs, :src)
+        image_url.present? ? %{<img src="#{CGI.escapeHTML(image_url)}">} : ""
+      in "link"
+        href = node.dig(:attrs, :href)
+        href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{children_html}</a>} : children_html
+      else
+        children_html
+      end
+
+      node[:marks].to_a.reduce(html) do |body, mark|
+        mark_type = mark[:type]
+
+        case mark_type
+        in "bold"
+          "<strong>#{body}</strong>"
+        in "italic"
+          "<em>#{body}</em>"
+        in "underline"
+          "<u>#{body}</u>"
+        in "strike"
+          "<s>#{body}</s>"
+        in "code"
+          "<code>#{body}</code>"
+        in "link"
+          href = mark.dig(:attrs, :href)
+          href.present? ? %{<a href="#{CGI.escapeHTML(href)}">#{body}</a>} : body
+        else
+          body
+        end
+      end
+    else
+      CGI.escapeHTML(node.to_s)
     end
   end
 

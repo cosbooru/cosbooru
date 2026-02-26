@@ -158,21 +158,11 @@ module Source::Tests::Extractor
       )
     end
 
-    context "A public post with a poll and an inline image that is not in the text" do
+    context "A post that is hidden because it is under review by Patreon" do
       strategy_should_work(
         "https://www.patreon.com/posts/56127163",
-        image_urls: [
-          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/56127163/824329aabdb14edab157f4390b28ce2c/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
-          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/56127163/df12807137174624aa766afeaa0b2624/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg},
-          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/56127163/2d4d4bb5d8604c179ec395e872f52bb8/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg},
-          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/56127163/cabbad943b5840e6884a72ef1be131dc/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png},
-        ],
-        media_files: [
-          { file_size: 536_985 },
-          { file_size: 819_289 },
-          { file_size: 2_558_103 },
-          { file_size: 1_037_050 },
-        ],
+        image_urls: [],
+        media_files: [],
         page_url: "https://www.patreon.com/posts/56127163",
         profile_url: "https://www.patreon.com/Rumblekatt",
         profile_urls: %w[https://www.patreon.com/Rumblekatt https://www.patreon.com/user?u=647065],
@@ -186,32 +176,158 @@ module Source::Tests::Extractor
           ["printable", "https://www.patreon.com/Rumblekatt/posts?filters[tag]=printable"],
         ],
         dtext_artist_commentary_title: "September Printable!!",
+        dtext_artist_commentary_desc: "",
+      )
+    end
+
+    context "A public post with a poll" do
+      strategy_should_work(
+        "https://www.patreon.com/posts/october-art-140055441",
+        image_urls: [],
+        page_url: "https://www.patreon.com/posts/october-art-140055441",
+        profile_urls: %w[https://www.patreon.com/Minhart https://www.patreon.com/user?u=185721414],
+        display_name: "Min",
+        username: "Minhart",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "October Art",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Hey Party people!!
+          Hi guys!!
 
-          Here is this month's poll for which printable will be offered this month.
+          I'm preparing next month art wooo! Maybe it'll be a challenge again🤔 Not sure yet, I was thinking of making it halloween themed.
 
-          The three options are!
+          Let me know if it should be Raora again (haha) or someone else!
 
-          "[image]":[https://www.patreon.com/posts/56127163]
+          h6. Poll: October Art
 
-          Lucky Tiger!
+          * Draw Raora (yes again)
+          * Draw someone else (let me know!)
+        EOS
+      )
+    end
 
-          "[image]":[https://www.patreon.com/posts/56127163]
+    context "A public posts with a commentary with lists and inline formatting" do
+      strategy_should_work(
+        "https://www.patreon.com/posts/closed-color-139862716",
+        image_urls: %w[
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/2f3f875e393c40aea6ce07488ffa180b/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=VeD-SlmkNHv1KYbb2ZBlbwRUHCMnKgJmLP0rDbtqv9Q%3D&token-time=1773360000
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/bb29955bc9c9489697b24340161739a1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=iqZsXRdK9CAJpV1B3qEWpS8QIzOlAo9HqHqV271dvaA%3D&token-time=1773360000
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/a3cf3e5919d84acbb7c15e579255e1c1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=BC53fftxupabUYvfwGHBQOdYxYnsBVgZbI_RfIKyCfc%3D&token-time=1773360000
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/26c6912241714bf4996164ed8edf71b2/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png?token-hash=Ksrk2yNCmFOsPTD_dxfv1BRn6k7voCHcMOQoPJl1_Rk%3D&token-time=1773360000
+        ],
+        media_files: [
+          { file_size: 839_212 },
+          { file_size: 1_940_488 },
+          { file_size: 973_281 },
+          { file_size: 4_168_265 },
+        ],
+        page_url: "https://www.patreon.com/posts/closed-color-139862716",
+        profile_url: "https://www.patreon.com/PI_Art314",
+        profile_urls: %w[https://www.patreon.com/PI_Art314 https://www.patreon.com/user?u=168690901],
+        display_name: "Pi",
+        username: "PI_Art314",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "(Closed) 🖌 Color Sketch Commissions 🎨✨",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          [i]All slots are now filled — thank you so much for your support![/i] 🥰🙏✨
 
-          Yu Yu Hakusho!
+          Hello everyone!
 
-          "[image]":[https://www.patreon.com/posts/56127163]
+          Thank you for waiting 🥰 Commissions are now open!
 
-          Dinosaurs!
+          This time, I’m offering [b]color sketch commissions[/b]:
 
-          Whatever piece wins will be an available printable for Tadpole and Frog Patrons at the end of the month!
+          * One character only
+          * No background
+          * A bit rougher finish compared to my usual works
+          * [b]Pose cannot be revised[/b] (I will provide several pose options, and you may choose from them)
 
-          h6. Poll: September Printable!!
+          💲 [b]Pricing[/b]
 
-          * Lucky Tiger
-          * Yu Yu Hakusho
-          * Dinosaurs!
+          * Thigh-up: $250
+          * Full-body: $300
+
+          ⏰ [b]Slots[/b]
+
+          [s]Limited to 3 slots only (first come, first served)[/s]
+
+          📩 [b]How to Apply[/b]
+
+          If you would like to participate, please [b]switch to the “Color Sketch Commission (Half-body)” plan[/b].
+
+          * Half-body: $250
+          * For Full-body, please add $50 (for a total of $300) when you join.
+
+          After confirming your subscription, please [b]contact me via Patreon message or Discord DM[/b].
+          After that, I will deliver the sketches and the finished illustration [b]via Discord DM or Dropbox[/b].
+
+          👉 [b]Apply here:[/b]
+          [s]<https://www.patreon.com/checkout/PI_Art314?rid=26956166>[/s]
+
+          💡 [b]Note[/b]
+
+          Once your commission is confirmed, you may [b]cancel the plan afterwards[/b].
+          (There is no need to keep paying every month, so please don’t worry.)
+
+          Sexy themes are welcome within the following limits:
+
+          * ❌ No depiction of nipples
+          * ❌ No genitals or sexual acts
+
+          Other Notes
+
+          * Commercial use is prohibited.
+          * Personal use, such as posting on social media, is permitted.
+          * Illustrations created for commissions may be shared on social media and other platforms.
+          * Commissioned illustrations may be further modified to create other works.
+
+          I look forward to your requests! 🖌🥰🎨✨
+        EOS
+      )
+    end
+
+    context "A public post with a commentary with headings and quotes" do
+      strategy_should_work(
+        "https://www.patreon.com/posts/143480584",
+        image_urls: %w[
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/943aff6d90e84f539161a144a6d2e3b6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=uj0LzRmIkVlIAa773u4nrltsIn4NlbGRJIchHJxBbWU%3D&token-time=1773360000
+          https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/e0876ee72822446e863cf16745fc7cf6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=J9qAS561NoDkzrWy5Nx9JSc-LJLTw_6xErKICFlRPaA%3D&token-time=1773360000
+        ],
+        media_files: [
+          { file_size: 381_670 },
+          { file_size: 248_368 },
+        ],
+        page_url: "https://www.patreon.com/posts/143480584",
+        profile_url: "https://www.patreon.com/easonx",
+        profile_urls: %w[https://www.patreon.com/easonx https://www.patreon.com/user?u=9961216],
+        display_name: "Easonx",
+        username: "easonx",
+        published_at: nil,
+        updated_at: nil,
+        tags: [],
+        dtext_artist_commentary_title: "Ino Yamanaka and  wip..  (October)",
+        dtext_artist_commentary_desc: <<~EOS.chomp,
+          h3. I’m late again, everyone — here are the WIPs for the [b]second[/b] and [b]third[/b] October rewards: [b]Ino Yamanaka[/b] and [b]Kyoka Jiro[/b] (WIP)
+
+          [quote]
+          [i]As you can see, there isn’t much time left in November, and I’ll also be traveling with my family for a short trip at the end of the month. Because of that, the November rewards will be paused again, and I will pause the system’s billing for December.[/i]
+          [/quote]
+
+          [u]If you joined in [b]November[/b], once I finish all of the October rewards, I will upload them to the shop.[/u]
+          [u](For a short period, the shop price will match the Patreon tier.)[/u]
+
+          I know my time management is terrible — thank you so much to everyone who continues to support me. 💖
+
+          --------------------------------------------------------------------------------
+
+          各位我來遲了，這是十月的第二個獎勵與第三個獎勵的WIP 山中井野和耳郎響香(wip)
+
+          *如各位所見，十一月所剩時間不多加上十一月底我要跟家人出去旅行一小段時間，因此十一月獎勵又將暫停一次，我會暫停系統十二月的收款。 如果你是十一月才加入，等我把十月獎勵都完成之後會一起上架至到商店。(上架短時間會與patreon價格相同)
+
+          我知道我的時間控管很差，謝謝每一位願意支持我的人。
         EOS
       )
     end
