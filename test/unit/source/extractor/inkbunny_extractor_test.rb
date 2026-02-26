@@ -25,7 +25,7 @@ module Source::Tests::Extractor
         tag_name: "yupa",
         tags: ["cub", "cum", "cum in pussy", "cum inside", "cumming", "female", "fox", "furry", "girl", "nude", "pussy", "underwear"],
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          commission work for "Okamii":[https://inkbunny.net/Okamii]
+          commission work for "shadowkami":[https://inkbunny.net/shadowkami]
 
           Thank you!
         EOS

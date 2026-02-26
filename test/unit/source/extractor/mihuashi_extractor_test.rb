@@ -105,7 +105,7 @@ module Source::Tests::Extractor
         updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "💖五仁2025个人企划",
-        dtext_artist_commentary_desc: "2025年五仁企划留档",
+        dtext_artist_commentary_desc: "青羽Traum企划 ❤️",
       )
     end
 

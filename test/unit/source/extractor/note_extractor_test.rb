@@ -472,9 +472,7 @@ module Source::Tests::Extractor
 
           ◎関連記事
 
-          <https://sunmarkweb.com/n/nfd651638a501>
-
-          <https://sunmarkweb.com/n/nbfefd1ff39d6>
+          <https://sunmarkweb.com/n/nae621d6283cf>
 
           "[image]":[https://sunmarkweb.com/n/nfdb87d960b06]
         EOS

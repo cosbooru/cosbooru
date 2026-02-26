@@ -149,15 +149,13 @@ module Source::Tests::Extractor
         profile_urls: %w[https://gallog.dcinside.com/4756qwer],
         display_name: "44",
         username: "4756qwer",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "[🎨창작] 아로나 그린거 보실분",
         dtext_artist_commentary_desc: <<~EOS.chomp,
           "viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906":[https://dcimg1.dcinside.com/viewimage.php?id=3dafdf2ce0d12cab76&no=24b0d769e1d32ca73de98efa1bd62531416b0cf072989a548cbc1d4adf4728efb2c5786b58077507144c5e8b424ba8d4f071e5f71bb7f51881cd678a6d59e4c5bf7874b906]
           "11":[https://dcimg5.dcinside.com/dccon.php?no=62b5df2be09d3ca567b1c5bc12d46b394aa3b1058c6e4d0ca41648b65fe8266eadc328cfdea5b74810026b505984e855639060800d4d06195f505e37f50b07e65e55156664b2e18c4d318c15]
-          "[b]イブ님(@IV70311741) [/b]
-          15.晴れ
-          x.com
-          ":[https://x.com/IV70311741/status/1838151449202798751]
         EOS
       )
     end
