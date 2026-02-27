@@ -619,6 +619,10 @@ module Danbooru
     def plurk_session_cookie
     end
 
+    # Your Reddit "reddit_session" cookie
+    def reddit_session_cookie
+    end
+
     # Your Xiaohongshu "gid" cookie. Login to Xiaohongshu then use the devtools to find the "gid" cookie.
     def xiaohongshu_session_cookie
     end
@@ -671,8 +675,8 @@ module Danbooru
 =======
 >>>>>>> a9d27dff5 (Merge pull request #6289 from withanorange/patch-1)
       %w[ai-generated ai-assisted anime_screenshot game_screenshot bad_source duplicate
-      hard-translated image_sample md5_mismatch nude_filter off-topic paid_reward resized
-      third-party_edit]
+         hard-translated image_sample md5_mismatch nude_filter off-topic paid_reward resized
+         third-party_edit]
     end
 
     # Whether the Gold account upgrade page should be enabled.

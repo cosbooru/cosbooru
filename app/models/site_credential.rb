@@ -108,6 +108,11 @@ class SiteCredential < ApplicationRecord
       default_credential: { session_cookie: Danbooru.config.plurk_session_cookie },
       help: %{Your "Plurk":https://www.plurk.com 'plurktokena' cookie.},
     }, {
+      id: 2050,
+      name: "Reddit",
+      default_credential: { session_cookie: Danbooru.config.reddit_session_cookie },
+      help: %{Your "Reddit":https://reddit.com 'reddit_session' cookie.},
+    }, {
       id: 2100,
       name: "Tinami",
       default_credential: { session_id: Danbooru.config.tinami_session_id },
