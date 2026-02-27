@@ -86,10 +86,16 @@ class Source::Extractor::URLShortener < Source::Extractor
       http.redirect_url("https://sketchfab.com/s/#{id}")&.to_s
 
     # curl -v https://reurl.cc/E2zlnA
-    # HEAD not supported; Returns 200 OK with 'Target' header on success and no 'Target' header on error.
+    # HEAD not supported; returns an HTML page with the URL in `<input id="target" value="...">`.
     in "reurl.cc", id
       response = http.no_follow.get(https_url)
-      response.headers["Target"] if response.status.code == 200
+      response.parse.at("#target")&.attr("value") if response.status.code == 200
+
+    # curl -I https://ow.ly/WmrYu
+    # Returns 301 on success and 301 redirect to https://www.hootsuite.com/error/lost-owly on error.
+    in "ow.ly", id
+      url = http.redirect_url(https_url)&.to_s
+      url unless url == "https://www.hootsuite.com/error/lost-owly"
 
     # curl -I https://shorturl.at/uMS23
     # http://shorturl.at/uMS23 -> https://shorturl.at/uMS23 -> https://www.shorturl.at/uMS23 -> https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj?usp=sharing
@@ -98,12 +104,17 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = http.redirect_url("https://www.shorturl.at/#{id}")&.to_s
       url unless url == "https://www.shorturl.at/"
 
-    # curl -I http://xhslink.com/WNd9gI
-    # Returns 307 on success, 307 redirect to http://www.xiaohongshu.com on error, and 500 if id is too long.
-    in "xhslink.com", id
-      # http://xhslink.com/ErpbmK，复制本条信息，打开【小红书】App查看精彩内容！
-      url = http.redirect_url(https_url)&.to_s
+    # curl -v http://xhslink.com/o/3y3uwYYeyHn
+    # Returns 307 on success, 307 redirect to https://www.xiaohongshu.com on error, and 500 if id is too long.
+    in "xhslink.com", *rest
+      url = http.redirect_url(https_url, method: "GET")&.to_s
       url unless url == "http://www.xiaohongshu.com"
+
+    # curl -I https://x.gd/uysub
+    # Returns 301 on success and 302 redirect to https://x.gd/view/notfound on error.
+    in "x.gd", id
+      url = http.redirect_url(https_url, method: "GET")&.to_s
+      url unless url == "https://x.gd/view/notfound"
 
     # curl -v https://t.cn/A6pONxY1 # -> https://video.weibo.com/show?fid=1034:4914351942074379
     # Returns 302 redirect for trusted URLs, 200 success with Location header for untrusted URLs, and 302 redirect to http://weibo.com/sorry on error. Requires browser user agent and GET method.
