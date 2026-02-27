@@ -5,7 +5,7 @@
 # TODO: Add more shorteners from https://wiki.archiveteam.org/index.php/URLTeam. Use data dumps to unshorten dead URLs?
 class Source::Extractor::URLShortener < Source::Extractor
   delegate :page_url, :profile_url, :artist_name, :display_name, :username, :tag_name, :published_at, :updated_at, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_extractor, allow_nil: true
-  delegate :domain, :site, :host, :path, :path_segments, :params, to: :parsed_url
+  delegate :domain, :site, :host, :path, :path_segments, :params, :query, to: :parsed_url
 
   def image_urls
     sub_extractor&.image_urls || []
@@ -109,6 +109,11 @@ class Source::Extractor::URLShortener < Source::Extractor
     in "xhslink.com", *rest
       url = http.redirect_url(https_url, method: "GET")&.to_s
       url unless url == "http://www.xiaohongshu.com"
+
+    # https://href.li/?https://www.google.com
+    in "href.li", *_rest
+      url = query&.delete_prefix("?")
+      Source::URL.parse(url)&.to_s
 
     # curl -I https://x.gd/uysub
     # Returns 301 on success and 302 redirect to https://x.gd/view/notfound on error.

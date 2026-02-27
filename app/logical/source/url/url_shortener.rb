@@ -15,6 +15,7 @@ class Source::URL::URLShortener < Source::URL
     # https://dlvr.it/SWKqJ0
     # https://eepurl.com/j5st
     # https://forms.gle/CK6UER39rK5qKnnT8
+    # https://href.li/?https://www.google.com
     # https://j.mp/cKV0uf
     # https://photos.app.goo.gl/eHfTwV866X4Vf7Zt5 (Google Photos share link)
     # https://images.app.goo.gl/5uBga7TuPKHxyyR1A (Google Images share link)
@@ -37,7 +38,7 @@ class Source::URL::URLShortener < Source::URL
     # https://xhslink.com/WNd9gI
     # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
     # https://hoyo.link/aifgFBAL
-    url.domain.in?(%w[amzn.asia amzn.to b23.tv bit.ly bili2233.cn j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
+    url.domain.in?(%w[amzn.asia amzn.to b23.tv bit.ly bili2233.cn j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl href.li hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
 
     # https://pic.twitter.com/Dxn7CuVErW
     # https://pic.x.com/Dxn7CuVErW
