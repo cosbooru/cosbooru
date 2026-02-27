@@ -44,8 +44,8 @@ module Source::Tests::Extractor
 
     context "A video cover image" do
       strategy_should_work(
-        "https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg?v=c6f079b5",
-        image_urls: %w[https://rosymiz.carrd.co/assets/videos/video02.mp4.jpg],
+        "https://rosymiz.carrd.co/assets/videos/video02_poster.jpg?v=856a426b",
+        image_urls: %w[https://rosymiz.carrd.co/assets/videos/video02_poster.jpg],
         media_files: [{ file_size: 454_589 }],
         page_url: nil,
         profile_urls: %w[https://rosymiz.carrd.co],
@@ -389,53 +389,134 @@ module Source::Tests::Extractor
 
     context "A crd.co page" do
       strategy_should_work(
-        "https://soycatate.crd.co/#portfolio",
+        "https://mimikabiicoms.crd.co/#comms",
         image_urls: %w[
-          https://soycatate.crd.co/assets/images/gallery02/8b38245f_original.jpg
-          https://soycatate.crd.co/assets/images/gallery02/7927e76f_original.jpg
-          https://soycatate.crd.co/assets/images/gallery02/870dbb00_original.jpg
-          https://soycatate.crd.co/assets/images/gallery03/c4f9ba75_original.jpg
-          https://soycatate.crd.co/assets/images/gallery03/5035b188_original.jpg
-          https://soycatate.crd.co/assets/images/gallery03/372cdeb2_original.jpg
-          https://soycatate.crd.co/assets/images/gallery01/c0d06614_original.jpg
-          https://soycatate.crd.co/assets/images/gallery01/029db4d2_original.jpg
-          https://soycatate.crd.co/assets/images/gallery01/5a949634_original.jpg
-          https://soycatate.crd.co/assets/images/image04.png
+          https://mimikabiicoms.crd.co/assets/images/image08.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/dd0b3023_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/cdb0f2da_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/e52683e7_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/7e3fec5e_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/36303e99_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/590b1803_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery02/f40f8bb1_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/image10.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/67d2dd9e_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/a13dc74a_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/1eaf3c4f_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/71aa47f7_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/54b66b2e_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/ee6643be_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/gallery01/30be5045_original.jpg
+          https://mimikabiicoms.crd.co/assets/images/image09.jpg
+          https://mimikabiicoms.crd.co/assets/images/image07.jpg
+          https://mimikabiicoms.crd.co/assets/images/image03.jpg
+          https://mimikabiicoms.crd.co/assets/images/image06.jpg
         ],
         media_files: [
-          { file_size: 227_835 },
-          { file_size: 182_706 },
-          { file_size: 196_199 },
-          { file_size: 425_891 },
-          { file_size: 210_504 },
-          { file_size: 202_039 },
-          { file_size: 316_880 },
-          { file_size: 318_048 },
-          { file_size: 189_924 },
-          { file_size: 17_248 },
+          { file_size: 120_992 },
+          { file_size: 349_421 },
+          { file_size: 535_098 },
+          { file_size: 1_259_211 },
+          { file_size: 807_258 },
+          { file_size: 431_410 },
+          { file_size: 654_204 },
+          { file_size: 163_058 },
+          { file_size: 89_618 },
+          { file_size: 318_291 },
+          { file_size: 416_016 },
+          { file_size: 661_516 },
+          { file_size: 196_642 },
+          { file_size: 234_588 },
+          { file_size: 57_627 },
+          { file_size: 262_737 },
+          { file_size: 103_925 },
+          { file_size: 103_592 },
+          { file_size: 401_258 },
+          { file_size: 146_439 },
         ],
-        page_url: "https://soycatate.crd.co/#portfolio",
-        profile_urls: %w[https://soycatate.crd.co],
+        page_url: "https://mimikabiicoms.crd.co/#comms",
+        profile_url: "https://mimikabiicoms.crd.co",
+        profile_urls: %w[https://mimikabiicoms.crd.co],
         display_name: nil,
-        username: "soycatate",
+        username: "mimikabiicoms",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          h1. Portfolio
+          h3. Commission Types
 
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery02/8b38245f_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery02/7927e76f_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery02/870dbb00_original.jpg]
+          Prices listed are [u]Base Prices[/u].
+          They are subject to change based on demand, complexity or additional details of the order given.If you'd like a price quota, you're free to email or DM me!All examples of my art can always be found in my gallery carrd "here":[https://mimikabii.crd.co]
 
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery03/c4f9ba75_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery03/5035b188_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery03/372cdeb2_original.jpg]
+          [hr]
 
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery01/c0d06614_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery01/029db4d2_original.jpg]
-          * "[image]":[https://soycatate.crd.co/assets/images/gallery01/5a949634_original.jpg]
+          h3. STYLE 1 - CELL STYLE
 
-          "[image]":[https://soycatate.crd.co/assets/images/image04.png]
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image08.jpg]
+
+          [b][u]Bold Line art with Bold Shading and Lighting.[/u][/b]
+          If you like art that pops out, this is for you! This style focuses on the bold, thick lineart with block-y shading and lighting. A realistic cartoony style, it adds a intricate and simplistic touch to characters.[u]Flat $10 for a complex background[/u] (Not solid or pattern based)Complex designs may increase total price.Adding a character is +%50 the original price.
+
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/dd0b3023_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/cdb0f2da_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/e52683e7_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/7e3fec5e_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/36303e99_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/590b1803_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery02/f40f8bb1_original.jpg]
+
+          [hr]
+
+          h3. STYLE 2 - BLENDED STYLE
+
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image10.jpg]
+
+          [b][u]Blended paints with a spark of life[/u][/b]
+          This style adds a painted/blended look to help bring out colors under certain lighting. Best to use when you want to take advantage of lit environments or a very colorful touch. Line-art optional, but highly recommended.[u]Flat $15 for a complex background[/u] (Not solid or pattern based)Complex designs may increase total price.Adding a character is +%50 the original price.
+
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/67d2dd9e_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/a13dc74a_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/1eaf3c4f_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/71aa47f7_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/54b66b2e_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/ee6643be_original.jpg]
+          * "[image]":[https://mimikabiicoms.crd.co/assets/images/gallery01/30be5045_original.jpg]
+
+          [hr]
+
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image09.jpg]
+
+          h3. STYLE IMITATIONS
+
+          [b][u]From Bold Pictures to Moving Pixel Art[/u][/b]
+          Notable styles I can imitate range from Earthbound Sprites to Homestuck Sprites to Paper Mario styled art. I can take other similar styles, however I cannot guarantee they will be as accurate. As these styles range on complexity, the prices will be determined on what style is requested and what is to be drawn. Feel free to email me for a detailed quota!"Click here to see some styled examples!":[https://mimikabii.crd.co/#styles]
+
+          [hr]
+
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image07.jpg]
+
+          h3. ICONS
+
+          [b][u]Notable Icons for Unique Profiles[/u][/b]
+          A popped up icon that yells originality. Default comes with a simple background of a gradient or solid color, and/or a transparent background. Small props do not change the price (ie a handheld item, lesser detailed characters)
+
+          [hr]
+
+          h3. Sketches
+
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image03.jpg]
+
+          [b][u](mostly) Anything Goes[/u][/b]
+          Two types of Sketches dependent on the donation received. No complex shading/lighting unless the donation is way more than required.[b][u]FLAT PRICE OF $6 LINED AND $12 SIMPLY COLORED[/u][/b]These are separate from general commissions and can be obtained through "my Ko-Fi here!":[https://ko-fi.com/mimikabii]
+
+          [hr]
+
+          h3. ... AND MORE!
+
+          "[image]":[https://mimikabiicoms.crd.co/assets/images/image06.jpg]
+
+          [b][u]Don't see something you were hoping, don't worry![/u][/b]Want a simple GIF animation, or a comic strip, or a meme redraw? Banner? Larger Project? Something that doesn't fit those options? Feel free to email me and we can arrange a commission!"Check out my Gallery to see more of what I can do!":[https://mimikabii.carrd.co/#port1]
         EOS
       )
     end
