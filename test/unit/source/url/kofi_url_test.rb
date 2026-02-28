@@ -20,10 +20,12 @@ module Source::Tests::URL
           "https://ko-fi.com/E1E7FH8ZY?viewimage=IU7U5SS0YZ",
           "https://ko-fi.com/thom_sketching/gallery?viewimage=IO5O1BOYV6#galleryItemView",
           "https://ko-fi.com/Gallery/LockedGalleryItem?id=IV7V6XDSRU#checkoutModal",
+          "https://ko-fi-live.azurewebsites.net/D1D5VUW3P?viewimage=IV7V6X5X5F",
         ],
         profile_urls: [
           "https://ko-fi.com/johndaivid",
           "https://ko-fi.com/T6T41FDFF/gallery/?action=gallery",
+          "https://ko-fi-live.azurewebsites.net/gyngerwombatart",
         ],
       )
     end

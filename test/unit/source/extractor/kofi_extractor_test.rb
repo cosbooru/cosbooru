@@ -52,9 +52,9 @@ module Source::Tests::Extractor
           { file_size: 519_547 },
         ],
         page_url: "https://ko-fi.com/i/IV7V6X5X5F",
-        profile_urls: %w[https://ko-fi.com/D1D5VUW3P],
+        profile_urls: %w[https://ko-fi.com/itssim https://ko-fi.com/D1D5VUW3P],
         display_name: "ItsSim",
-        username: nil,
+        username: "itssim",
         tags: [],
         dtext_artist_commentary_title: "Requests from Discord art stream",
         dtext_artist_commentary_desc: "",
@@ -77,31 +77,42 @@ module Source::Tests::Extractor
 
     context "A commission page" do
       strategy_should_work(
-        "https://ko-fi.com/c/780f9a88f9",
+        "https://ko-fi.com/c/840131e57b",
         image_urls: %w[
-          https://storage.ko-fi.com/cdn/useruploads/display/d49a3d18-2777-42b4-abc1-8fc6cec88771_47acfea4-fbd9-40f3-8f2b-4e754cacb4ed.png
-          https://storage.ko-fi.com/cdn/useruploads/display/PNG_4d7caae0-af23-40cd-b1f7-75deda8027dd.PNG
-          https://storage.ko-fi.com/cdn/useruploads/display/PNG_4de0b1a0-a3a0-42c3-a6c6-ba9152791bec.PNG
+          https://storage.ko-fi.com/cdn/useruploads/display/ef2548c2-557c-43e1-b41d-60fe3fc1afd1_polytrixval.png
+          https://storage.ko-fi.com/cdn/useruploads/display/f25dfbd2-6c60-494f-8b17-d9d64695b271_aleepy.png
+          https://storage.ko-fi.com/cdn/useruploads/display/6226ed79-6f11-4852-a125-2fc4ed13f2df_woody2.png
+          https://storage.ko-fi.com/cdn/useruploads/display/116f8a7c-10b0-4d1d-a1b0-158ccaa7a631_untitled_artwork45.png
+          https://storage.ko-fi.com/cdn/useruploads/display/e46558c9-4abd-4d02-a6f4-f7a1f4bc7798_redmira.png
+          https://storage.ko-fi.com/cdn/useruploads/display/080c7788-3a91-475d-8388-05f350c6f86d_griddlehark_cuddle.png
+          https://storage.ko-fi.com/cdn/useruploads/display/da38655c-8abd-41da-ac40-c2c4ac2c1815_dowutin.png
+          https://storage.ko-fi.com/cdn/useruploads/display/21524372-9e3d-49ab-9a8d-a80de5c91f9d_gid.png
+          https://storage.ko-fi.com/cdn/useruploads/display/9454bbc0-e4f9-40a0-bd13-4535139399d5_tis_but_a_flesh_wound.png
         ],
         media_files: [
-          { file_size: 279_930 },
-          { file_size: 465_339 },
-          { file_size: 606_571 },
+          { file_size: 908_017 },
+          { file_size: 358_442 },
+          { file_size: 310_050 },
+          { file_size: 369_178 },
+          { file_size: 965_921 },
+          { file_size: 629_853 },
+          { file_size: 323_672 },
+          { file_size: 336_695 },
+          { file_size: 525_601 },
         ],
-        page_url: "https://ko-fi.com/c/780f9a88f9",
-        profile_urls: %w[https://ko-fi.com/thom_sketching https://ko-fi.com/B0B7BOXI6],
-        display_name: "THOM",
-        username: "thom_sketching",
+        page_url: "https://ko-fi.com/c/840131e57b",
+        profile_url: "https://ko-fi.com/gyngerwombatart",
+        profile_urls: %w[https://ko-fi.com/gyngerwombatart https://ko-fi.com/D1D61UZW1U],
+        display_name: "GyngerWombat",
+        username: "gyngerwombatart",
+        published_at: nil,
+        updated_at: nil,
         tags: [],
-        dtext_artist_commentary_title: "Bust sketch",
+        dtext_artist_commentary_title: "[Full Render] Full Body",
         dtext_artist_commentary_desc: <<~EOS.chomp,
-          Description: Character portrait sketch from waist or shoulders up.
+          A fully rendered full body of up to three characters of your choice! NSFW content is allowed, but no Dead Dove content.
 
-          Refinement: Fairly clean but sketch lines are visible
-          Colour: No
-          Revisions: No
-
-          Disclaimer: I mostly work on weekends, so depending on which day you place your commission (and how many commissions I have going), it might take a few days before I finish it.
+          B&W by default, but color can be added on.
         EOS
       )
     end
