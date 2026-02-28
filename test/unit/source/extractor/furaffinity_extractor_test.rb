@@ -64,7 +64,7 @@ module Source::Tests::Extractor
 
           Glad you loved this piece, Sheep! ^_^
 
-          Miko @ The Lovely "silentsheep silentsheep":[https://www.furaffinity.net/user/silentsheep]
+          Miko @ The Lovely "silentsheep SilentSheep":[https://www.furaffinity.net/user/silentsheep]
 
           Art @ CuteSexyRoButts from DeviantArt
         EOS

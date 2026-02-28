@@ -4,13 +4,13 @@ module Source::Tests::Extractor
   class MihuashiExtractorTest < ActiveSupport::ExtractorTestCase
     context "A Mihuashi sample image url" do
       strategy_should_work(
-        "https://image-assets.mihuashi.com/pfop/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg!artwork.detail",
-        image_urls: %w[https://image-assets.mihuashi.com/permanent/4329541|-2024/07/12/18/Fu2oKtHkplA-waTASBzUpF6EozkB.jpg],
-        media_files: [{ file_size: 3_832_210 }],
+        "https://image-assets.mihuashi.com/permanent/29105|-2025/05/30/15/Flz917NRVbHcZeG9xW1KklVM_s3y_1046.jpg!artwork.detail",
+        image_urls: %w[https://image-assets.mihuashi.com/permanent/29105|-2025/05/30/15/Flz917NRVbHcZeG9xW1KklVM_s3y_1046.jpg],
+        media_files: [{ file_size: 1_869_044 }],
         page_url: nil,
         profile_url: nil,
         display: nil,
-        published_at: Time.parse("2024-07-12T10:00:00.000000Z"),
+        published_at: Time.parse("2025-05-30T07:00:00.000000Z"),
         updated_at: nil,
         tags: [],
         dtext_artist_commentary_title: "",
