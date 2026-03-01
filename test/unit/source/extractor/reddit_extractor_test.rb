@@ -185,6 +185,8 @@ module Source::Tests::Extractor
     end
 
     context "A redditmedia url" do
+      setup { skip "Dead domain?" }
+
       strategy_should_work(
         "https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4",
         image_urls: ["https://i.redditmedia.com/9cYFBDQ3QsqWnF9v7EhW5uOcQNHz1Ak9_E1zVNeSLek.png?s=6fee1bb56e7d926847dc3ece01a1ffd4"],

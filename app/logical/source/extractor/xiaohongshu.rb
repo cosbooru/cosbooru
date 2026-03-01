@@ -5,7 +5,7 @@
 # @see https://github.com/JoeanAmier/XHS-Downloader
 class Source::Extractor::Xiaohongshu < Source::Extractor
   def self.enabled?
-    site_credentials.present?
+    SiteCredential.for_site("Xiaohongshu").present?
   end
 
   def image_urls

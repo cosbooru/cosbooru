@@ -48,6 +48,8 @@ module Source::Tests::Extractor
     end
 
     context "A post with multiple images" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=&xsec_source=pc_user",
         image_urls: %w[
@@ -76,6 +78,8 @@ module Source::Tests::Extractor
     end
 
     context "A post with user id in url" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/user/profile/5af06707db2e600283b2ffd3/674a802f0000000007029471?xsec_token=ABgt_jFg7t-LqYcRm3UlqACnVpHeS-InXHcQ2BeoLJKfU=&xsec_source=pc_user",
         image_urls: %w[
@@ -104,6 +108,8 @@ module Source::Tests::Extractor
     end
 
     context "A post with /spectrum/ image URLs" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/676692a9000000000b022e4d?xsec_token=ABp9YCBRRqv5v30dlFfxzHw8HBaoViPhFHlY2eTE035AM=",
         image_urls: %w[
@@ -152,6 +158,8 @@ module Source::Tests::Extractor
     end
 
     context "A video post" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/6789d20f000000001d011d4b?xsec_token=ABYRoRr3DGE29GWtiam4UBANcw79-RNRRc1VdpIJVdz1A=",
         image_urls: %w[https://sns-video-bd.xhscdn.com/spectrum/1040g0jg31co8l51912005nrar8808fbnkchvk1o],
@@ -182,6 +190,8 @@ module Source::Tests::Extractor
     end
 
     context "A mixed post with videos and images" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/67a396a7000000002503cbd3?xsec_token=CBRIrPInWF5UjSI0_h4-v2v6nT1TXLzRXVwp_ng-vPOLQ=",
         image_urls: %w[
@@ -220,6 +230,8 @@ module Source::Tests::Extractor
     end
 
     context "A deleted or nonexistent post" do
+      setup { skip "Xiaohongshu extractor requires credentials" unless Source::Extractor::Xiaohongshu.enabled? }
+
       strategy_should_work(
         "https://www.xiaohongshu.com/explore/999999999",
         image_urls: %w[],

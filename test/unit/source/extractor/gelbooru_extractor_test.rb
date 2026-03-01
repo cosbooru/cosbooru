@@ -298,6 +298,10 @@ module Source::Tests::Extractor
     end
 
     context "Rule34.xxx:" do
+      setup do
+        skip "rule34.xxx extractor is broken (needs an API key: #6295)"
+      end
+
       # source: https://twitter.com/marushin_0214/status/1590260107405053954
       context "A https://rule34.xxx/index.php?page=post&s=view&id=$post_id URL" do
         strategy_should_work(

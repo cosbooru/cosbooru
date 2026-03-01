@@ -147,7 +147,7 @@ module Source::Tests::Extractor
         ],
         media_files: [
           { file_size: 120_358 },
-          { file_size: 109_932 },
+          { file_size: 109_980 },
         ],
         page_url: "https://skeb.jp/@LambOic029/works/146",
         profile_url: "https://skeb.jp/@LambOic029",

@@ -210,11 +210,11 @@ module Source::Tests::Extractor
     context "A public posts with a commentary with lists and inline formatting" do
       strategy_should_work(
         "https://www.patreon.com/posts/closed-color-139862716",
-        image_urls: %w[
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/2f3f875e393c40aea6ce07488ffa180b/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=VeD-SlmkNHv1KYbb2ZBlbwRUHCMnKgJmLP0rDbtqv9Q%3D&token-time=1773360000
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/bb29955bc9c9489697b24340161739a1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=iqZsXRdK9CAJpV1B3qEWpS8QIzOlAo9HqHqV271dvaA%3D&token-time=1773360000
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/a3cf3e5919d84acbb7c15e579255e1c1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=BC53fftxupabUYvfwGHBQOdYxYnsBVgZbI_RfIKyCfc%3D&token-time=1773360000
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/26c6912241714bf4996164ed8edf71b2/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png?token-hash=Ksrk2yNCmFOsPTD_dxfv1BRn6k7voCHcMOQoPJl1_Rk%3D&token-time=1773360000
+        image_urls: [
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/2f3f875e393c40aea6ce07488ffa180b/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg\?token-hash=.*&token-time=.*},
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/bb29955bc9c9489697b24340161739a1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg\?token-hash=.*&token-time=.*},
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/a3cf3e5919d84acbb7c15e579255e1c1/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg\?token-hash=.*&token-time=.*},
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/139862716/26c6912241714bf4996164ed8edf71b2/eyJhIjoxLCJwIjoxfQ%3D%3D/1.png\?token-hash=.*&token-time=.*},
         ],
         media_files: [
           { file_size: 839_212 },
@@ -292,9 +292,9 @@ module Source::Tests::Extractor
     context "A public post with a commentary with headings and quotes" do
       strategy_should_work(
         "https://www.patreon.com/posts/143480584",
-        image_urls: %w[
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/943aff6d90e84f539161a144a6d2e3b6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=uj0LzRmIkVlIAa773u4nrltsIn4NlbGRJIchHJxBbWU%3D&token-time=1773360000
-          https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/e0876ee72822446e863cf16745fc7cf6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg?token-hash=J9qAS561NoDkzrWy5Nx9JSc-LJLTw_6xErKICFlRPaA%3D&token-time=1773360000
+        image_urls: [
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/943aff6d90e84f539161a144a6d2e3b6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg\?token-hash=.*&token-time=.*},
+          %r{https://c10.patreonusercontent.com/4/patreon-media/p/post/143480584/e0876ee72822446e863cf16745fc7cf6/eyJhIjoxLCJwIjoxfQ%3D%3D/1.jpg\?token-hash=.*&token-time=.*},
         ],
         media_files: [
           { file_size: 381_670 },

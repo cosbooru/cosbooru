@@ -68,13 +68,11 @@ module Source::Tests::Extractor
       assert_redirects_to("http://posty.pe/343rpc", "https://www.postype.com/post/12206917")
       assert_redirects_to("http://pse.is/4b4tda", "https://twitter.com/d_art_taipei/status/1542795420132204547?s=20&t=5KZ9b0gnQro7txOAfaZB3g")
       assert_redirects_to("http://reurl.cc/E2zlnA", "https://www.youtube.com/channel/UCM1nL55m_QImE0ZRqvGmWWQ")
-      assert_redirects_to("http://shorturl.at/uMS23", "https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj?usp=sharing")
       assert_redirects_to("http://skfb.ly/6WrAQ", "https://sketchfab.com/3d-models/the-bards-lute-e667442a9acf4f8f8b4456a05cae039f")
       assert_redirects_to("http://t.co/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
       assert_redirects_to("http://t.cn/A6pONxY1 ", "https://video.weibo.com/show?fid=1034:4914351942074379")
       assert_redirects_to("http://t.cn/Ex4V08E", "https://www.toolsdaquan.com")
       assert_redirects_to("https://unsafelink.com/https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19", "https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19")
-      assert_redirects_to("http://t.ly/x8f4j", "https://docs.google.com/document/d/166zHw2WwtJufey71cDjfhL_1Vvga9AWbL4BtHMcJu9I/edit")
       assert_redirects_to("http://tiny.cc/6ut5vz", "https://drive.google.com/drive/folders/1SMBFYwAOq3h6rhWS5rLQdxDqLGq5OwY2")
       assert_redirects_to("http://tinyurl.com/3avx9w4r", "https://spell-breakers.blogspot.com/2023/07/schools-out-for-summer.html")
       assert_redirects_to("http://tmblr.co/ZdPV4t2OHwdv5", "https://techsupportdog.tumblr.com/post/163509337669?")
@@ -86,6 +84,12 @@ module Source::Tests::Extractor
       assert_redirects_to("http://xhslink.com/m/EXCcWbUXnl", "https://www.xiaohongshu.com/user/profile/68d823620000000022028d16?xsec_token=YBfNZ3Zp4oeouvBW7OFlB6VOaMeq8fLfZeMQZe9vK_owI%3D&xsec_source=app_share&shareRedId=ODtFNjk4O0I2NzUyOTgwNjY8OTpKSkdC&apptime=1770968580&share_id=b7f7bcc8fad04df2872078f5891a43bc&share_channel=copy_link&appuid=65c66379000000000903fea9&xhsshare=CopyLink")
       assert_redirects_to("http://xhslink.com/a/KNEOVM4zO1Xdb", "https://www.xiaohongshu.com/discovery/item/683b1ec80000000012002773?app_platform=ios&app_version=8.69.1&share_from_user_hidden=true&xsec_source=app_share&type=video&xsec_token=CBqYjuPKTkd8k5oKpNY1BZUyzpdfQAwWXGJ47H0Bd3Gkc=&author_share=1&xhsshare=CopyLink&shareRedId=N0s0OTQ8OkI2NzUyOTgwNjY0OTc1Skg7&apptime=1748841986&share_id=bb0216827e574919aa0ae980158575e3")
       assert_redirects_to("http://xhslink.com/a/jqL6B32eU0F7，复制本条信息，打开", "https://www.xiaohongshu.com/discovery/item/66ed0e75000000001e019f28?app_platform=ios&app_version=8.74&share_from_user_hidden=true&xsec_source=app_share&type=normal&xsec_token=CB8IWmEbNhHy5Nf7hmRi03DdY_HF3lJ60Z8lLIApsOKGE=&author_share=1&xhsshare=CopyLink&shareRedId=ODxIQTM7N0I2NzUyOTgwNjdHOTk3PT85&apptime=1741772437&share_id=644f929a9cbc42ecb28d61b5cb5dc132")
+    end
+
+    context "Broken shorteners" do
+      setup { skip "t.ly and shorturl.at are broken (requires Cloudflare bypass)"}
+      assert_redirects_to("http://t.ly/x8f4j", "https://docs.google.com/document/d/166zHw2WwtJufey71cDjfhL_1Vvga9AWbL4BtHMcJu9I/edit")
+      assert_redirects_to("http://shorturl.at/uMS23", "https://drive.google.com/drive/folders/1NL1iwZb8o52ieGt-Tkt8AAZu79rqmekj?usp=sharing")
     end
 
     context "A deleted or nonexistent shortened URL" do

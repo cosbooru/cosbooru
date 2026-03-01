@@ -127,24 +127,39 @@ module Source::Tests::Extractor
 
       context "An article with multiple images" do
         strategy_should_work(
-          "https://www.miyoushe.com/bh3/article/53114504",
+          "https://www.miyoushe.com/bh3/article/73295619",
           image_urls: %w[
-            https://upload-bbs.miyoushe.com/upload/2024/05/23/294793394/92df40e3acb32327011e2f5ca6f5dcfa_316472910014603594.jpg
-            https://upload-bbs.miyoushe.com/upload/2024/05/23/294793394/917a84d26a5184e19d6d7e52634a4790_8492679095619953214.png
-            https://upload-bbs.miyoushe.com/upload/2024/05/23/294793394/0431a25f29897661179e12090e558767_1193816014887204670.png
+            https://upload-bbs.miyoushe.com/upload/2026/02/16/9031288/a2cfb38333e3dcb78940cfce41d3e9a6_1153216912682215929.jpg
+            https://upload-bbs.miyoushe.com/upload/2026/02/16/9031288/3df2711d364c824d4de809db0023b744_8954535864363163123.jpg
+            https://upload-bbs.miyoushe.com/upload/2026/02/16/9031288/9ceff2b7a8cd0e1fc8b4c50df0683e58_4614547757742209891.jpg
           ],
           media_files: [
-            { file_size: 406_346 },
-            { file_size: 1_579_722 },
-            { file_size: 940_149 },
+            { file_size: 2_292_246 },
+            { file_size: 2_315_011 },
+            { file_size: 2_207_283 },
           ],
-          page_url: "https://www.miyoushe.com/bh3/article/53114504",
-          profile_urls: %w[https://www.miyoushe.com/sr/accountCenter/postList?id=294793394],
-          display_name: "好楠好楠好",
+          page_url: "https://www.miyoushe.com/bh3/article/73295619",
+          profile_urls: %w[https://www.miyoushe.com/sr/accountCenter/postList?id=9031288],
+          display_name: "CAISENA",
           username: nil,
-          tags: [],
-          dtext_artist_commentary_title: "大月下的一个废稿",
-          dtext_artist_commentary_desc: "第二张是透明底 自印随意",
+          published_at: nil,
+          updated_at: nil,
+          tags: [
+            ["雷电芽衣", "https://www.miyoushe.com/sr/topicDetail/3"],
+            ["同人图", "https://www.miyoushe.com/sr/topicDetail/53"],
+            ["琪亚娜", "https://www.miyoushe.com/sr/topicDetail/186"],
+            ["布洛妮娅", "https://www.miyoushe.com/sr/topicDetail/188"],
+            ["镇×偃月叩晓", "https://www.miyoushe.com/sr/topicDetail/2295"],
+            ["V8.7时岁叩晓", "https://www.miyoushe.com/sr/topicDetail/2296"],
+          ],
+          dtext_artist_commentary_title: "新年快乐~",
+          dtext_artist_commentary_desc: <<~EOS.chomp,
+            还得是画这种让我身心愉悦鸭！
+
+            鸭鸭：💡
+
+            提前祝各位新年快乐~
+          EOS
         )
       end
 

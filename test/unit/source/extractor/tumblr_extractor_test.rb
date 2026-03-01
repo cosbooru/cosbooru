@@ -473,7 +473,13 @@ module Source::Tests::Extractor
 
           デザインは"LiGHTEN":[https://twitter.com/LiGHTEN]、ジャケットイラストは"東山エイト":[http://08b.tokyo/]が担当しています。
 
-          今回は折角なので、制作している風景を撮影し、動画をYoutubeにアップロードいたしました。  第1段はNhato氏との共作です。是非ご覧ください。
+          今回は折角なので、制作している風景を撮影し、動画をYoutubeにアップロードいたしました。
+
+          https://www.youtube.com/embed/qHC92e92jac
+
+          第1段はNhato氏との共作です。是非ご覧ください。
+
+          https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/520739574&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true
         EOS
       )
     end
