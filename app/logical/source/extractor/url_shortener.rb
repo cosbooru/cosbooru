@@ -115,6 +115,46 @@ class Source::Extractor::URLShortener < Source::Extractor
       url = query&.delete_prefix("?")
       Source::URL.parse(url)&.to_s
 
+    # https://unsafelink.com/https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19
+    # Used by arca.live.
+    in "unsafelink.com", *_rest
+      url = path.delete_prefix("/")
+      url = "#{url}?#{query}" if query.present?
+      Source::URL.parse(url)&.to_s
+
+    # https://www.deviantart.com/users/outgoing?https://www.google.com
+    in "deviantart.com", "users", "outgoing"
+      url = query&.delete_prefix("?")
+      url = Danbooru::URL.unescape(url) if url.present?
+      Source::URL.parse(url)&.to_s
+
+    # https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com
+    in "nijie.info", "jump.php"
+      url = query&.delete_prefix("?")
+      url = Danbooru::URL.unescape(url) if url.present?
+      Source::URL.parse(url)&.to_s
+
+    # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
+    in "pixiv.net", "jump.php"
+      url = query&.delete_prefix("?")
+      url = Danbooru::URL.unescape(url) if url.present?
+      Source::URL.parse(url)&.to_s
+
+    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com
+    in "piapro.jp", "jump"
+      url = Danbooru::URL.unescape(params[:url]) if params[:url].present?
+      Source::URL.parse(url)&.to_s
+
+    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com
+    in "vk.com", "away.php"
+      url = Danbooru::URL.unescape(params[:to]) if params[:to].present?
+      Source::URL.parse(url)&.to_s
+
+    # https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com
+    in "weibo.com" | "weibo.cn", "sinaurl"
+      url = Danbooru::URL.unescape(params[:u]) if params[:u].present?
+      Source::URL.parse(url)&.to_s
+
     # curl -I https://x.gd/uysub
     # Returns 301 on success and 302 redirect to https://x.gd/view/notfound on error.
     in "x.gd", id

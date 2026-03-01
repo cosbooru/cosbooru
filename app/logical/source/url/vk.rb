@@ -8,7 +8,8 @@ class Source::URL::Vk < Source::URL
   attr_reader :full_image_url, :username, :page_type, :id, :owner_id, :item_id, :parent_id, :parent_owner_id, :parent_item_id, :article_slug, :doc_hash
 
   def self.match?(url)
-    url.domain.in?(%w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com])
+    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
+    url.domain.in?(%w[vk.com vk.cc vk.me vk.ru vk.team vk.company vkontakte.ru mvk.com userapi.com]) && !Source::URL::URLShortener.match?(url)
   end
 
   def parse

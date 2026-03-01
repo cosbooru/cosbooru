@@ -38,16 +38,52 @@ class Source::URL::URLShortener < Source::URL
     # https://xhslink.com/WNd9gI
     # https://hoyo.link/80GCFBAL?q=25tufAgwB8N
     # https://hoyo.link/aifgFBAL
-    url.domain.in?(%w[amzn.asia amzn.to b23.tv bit.ly bili2233.cn j.mp cutt.ly dlvr.it eepurl.com forms.gle goo.gl href.li hoyo.link is.gd naver.me pin.it posty.pe pse.is reurl.cc shorturl.at skfb.ly t.ly tiny.cc tinyurl.com tmblr.co t.cn t.co wp.me x.gd xhslink.com]) ||
+    case [url.subdomain, url.domain, *url.path_segments]
+    in _, "amzn.asia" | "amzn.to" | "b23.tv" | "bit.ly" | "bili2233.cn" | "j.mp" | "cutt.ly" | "dlvr.it" | "eepurl.com" | "forms.gle" | "goo.gl" | "href.li" | "hoyo.link" | "is.gd" | "naver.me" | "pin.it" | "posty.pe" | "pse.is" | "reurl.cc" | "shorturl.at" | "skfb.ly" | "t.ly" | "tiny.cc" | "tinyurl.com" | "tmblr.co" | "t.cn" | "t.co" | "wp.me" | "x.gd" | "xhslink.com", *_rest
+      true
 
     # https://pic.twitter.com/Dxn7CuVErW
     # https://pic.x.com/Dxn7CuVErW
-    url.host.in?(%w[pic.twitter.com pic.x.com]) ||
+    in "pic", ("twitter.com" | "x.com"), id
+      true
 
     # http://ow.ly/WmrYu
     # http://ow.ly/i/3oHVc (not a redirect)
     # http://ow.ly/user/coppelion_anime (not a redirect)
-    (url.domain == "ow.ly" && !url.path_segments.first&.in?(%w[i user]))
+    in _, "ow.ly", id unless id.in?(%w[i user])
+      true
+
+    # https://unsafelink.com/https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19
+    in _, "unsafelink.com", *_rest
+      true
+
+    # https://www.deviantart.com/users/outgoing?https://www.google.com
+    in _, "deviantart.com", "users", "outgoing"
+      true
+
+    # https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com
+    in _, ("weibo.com" | "weibo.cn"), "sinaurl"
+      true
+
+    # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
+    in _, "pixiv.net", "jump.php"
+      true
+
+    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com
+    in _, "piapro.jp", "jump"
+      true
+
+    # https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com
+    in _, "vk.com", "away.php"
+      true
+
+    # https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com
+    in _, "nijie.info", "jump.php"
+      true
+
+    else
+      false
+    end
   end
 
   def site_name
@@ -80,6 +116,18 @@ class Source::URL::URLShortener < Source::URL
       "Tumblr"
     in _, "t.cn"
       "Weibo"
+    in _, "deviantart.com"
+      "DeviantArt"
+    in _, "weibo.com" | "weibo.cn"
+      "Weibo"
+    in _, "pixiv.net"
+      "Pixiv"
+    in _, "piapro.jp"
+      "Piapro"
+    in _, "vk.com"
+      "VK"
+    in _, "nijie.info"
+      "Nijie"
     in _, "xhslink.com"
       "Xiaohongshu"
     else # ow.ly, is.gd, etc

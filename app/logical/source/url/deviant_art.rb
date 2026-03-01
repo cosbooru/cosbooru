@@ -21,8 +21,17 @@ module Source
     attr_reader :username, :work_id, :stash_id, :title, :file, :jwt
 
     def self.match?(url)
-      url.domain.in?(%w[artworkfolio.com daportfolio.com deviantart.net deviantart.com fav.me sta.sh]) ||
-        url.host.in?(%w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com img-deviantart.wixmp.com])
+      case [url.subdomain, url.domain]
+      # https://www.deviantart.com/users/outgoing?https://www.google.com (handled in Source::URL::URLShortener)
+      in _, "deviantart.com" unless Source::URL::URLShortener.match?(url)
+        true
+      in _, "artworkfolio.com" | "daportfolio.com" | "deviantart.net" | "fav.me" | "sta.sh"
+        true
+      in ("images-wixmp-ed30a86b8c4ca887773594c2" | "wixmp-ed30a86b8c4ca887773594c2" | "api-da" | "img-deviantart"), "wixmp.com"
+        true
+      else
+        false
+      end
     end
 
     def parse

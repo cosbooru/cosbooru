@@ -73,6 +73,7 @@ module Source::Tests::Extractor
       assert_redirects_to("http://t.co/Dxn7CuVErW", "https://twitter.com/Kekeflipnote/status/1496555599718498319/video/1")
       assert_redirects_to("http://t.cn/A6pONxY1 ", "https://video.weibo.com/show?fid=1034:4914351942074379")
       assert_redirects_to("http://t.cn/Ex4V08E", "https://www.toolsdaquan.com")
+      assert_redirects_to("https://unsafelink.com/https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19", "https://x.com/horuhara/status/1839132898785636671?t=RtemijMNpG1bdpziXac6-Q&s=19")
       assert_redirects_to("http://t.ly/x8f4j", "https://docs.google.com/document/d/166zHw2WwtJufey71cDjfhL_1Vvga9AWbL4BtHMcJu9I/edit")
       assert_redirects_to("http://tiny.cc/6ut5vz", "https://drive.google.com/drive/folders/1SMBFYwAOq3h6rhWS5rLQdxDqLGq5OwY2")
       assert_redirects_to("http://tinyurl.com/3avx9w4r", "https://spell-breakers.blogspot.com/2023/07/schools-out-for-summer.html")
@@ -127,6 +128,32 @@ module Source::Tests::Extractor
       assert_redirects_to("https://xhslink.com/xkcbDL", nil)
       assert_redirects_to("https://xhslink.com/ErpbmK，复制本条信息，打开【小红书】App查看精彩内容！", nil)
       assert_redirects_to("https://xhslink.com/C/n6OjWF", nil)
+    end
+
+    context "A valid wrapped URL" do
+      assert_redirects_to("https://www.deviantart.com/users/outgoing?https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://vk.com/away.php?to=https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com%2Fsearch%3Fq=test%26foo=1", "https://www.google.com/search?q=test&foo=1")
+
+      assert_redirects_to("https://www.deviantart.com/users/outgoing?https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://weibo.cn/sinaurl?u=https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test")
+      assert_redirects_to("https://www.pixiv.net/jump.php?https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test&foo=1")
+      assert_redirects_to("https://piapro.jp/jump/?url=https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test")
+      assert_redirects_to("https://vk.com/away.php?to=https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test")
+      assert_redirects_to("https://nijie.info/jump.php?https://www.google.com/search?q=test&foo=1", "https://www.google.com/search?q=test&foo=1")
+    end
+
+    context "An invalid wrapped URL" do
+      assert_redirects_to("https://unsafelink.com/bad", nil)
+      assert_redirects_to("https://www.deviantart.com/users/outgoing?bad", nil)
+      assert_redirects_to("https://weibo.cn/sinaurl?u=bad", nil)
+      assert_redirects_to("https://www.pixiv.net/jump.php?bad", nil)
+      assert_redirects_to("https://piapro.jp/jump/?url=bad", nil)
+      assert_redirects_to("https://vk.com/away.php?to=bad", nil)
+      assert_redirects_to("https://nijie.info/jump.php?bad", nil)
     end
   end
 end

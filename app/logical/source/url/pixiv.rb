@@ -5,9 +5,13 @@ module Source
     attr_reader :work_id, :image_type, :page, :date, :username, :user_id, :novel_id, :novel_series_id, :novel_embedded_image_id, :ugoira_frame
 
     def self.match?(url)
-      return false if Source::URL::Fanbox.match?(url) || Source::URL::PixivSketch.match?(url) || Source::URL::PixivComic.match?(url) || Source::URL::PixivFactory.match?(url) || Source::URL::Booth.match?(url)
-
-      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net])
+      url.domain.in?(%w[pximg.net pixiv.net pixiv.me pixiv.cc p.tl phixiv.net]) &&
+        !Source::URL::Fanbox.match?(url) &&       # https://pixiv.net/fanbox/creator/1566167
+        !Source::URL::PixivSketch.match?(url) &&  # https://sketch.pixiv.net/items/5835314698645024323
+        !Source::URL::PixivComic.match?(url) &&   # https://comic.pixiv.net/works/10137
+        !Source::URL::PixivFactory.match?(url) && # https://factory.pixiv.net/palette/collections/imys_tachie#image-13760863
+        !Source::URL::Booth.match?(url) &&        # https://booth.pximg.net/b242a7bd-0747-48c4-891d-9e8552edd5d7/i/3746752/52dbee27-7ad2-4048-9c1d-827eee36625c.jpg
+        !Source::URL::URLShortener.match?(url)    # https://www.pixiv.net/jump.php?https%3A%2F%2Fwww.google.com
     end
 
     def parse

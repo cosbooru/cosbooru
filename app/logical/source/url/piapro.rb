@@ -10,7 +10,8 @@ class Source::URL::Piapro < Source::URL
   attr_reader :username, :post_id, :content_id, :full_image_url
 
   def self.match?(url)
-    url.domain == "piapro.jp"
+    # https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
+    url.domain == "piapro.jp" && !Source::URL::URLShortener.match?(url)
   end
 
   def site_name

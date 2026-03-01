@@ -36,6 +36,7 @@ module Source::Tests::URL
       should_not_find_false_positives(
         profile_urls: [
           "https://weibo.com/u/",
+          "https://weibo.cn/sinaurl?u=https%3A%2F%2Fwww.google.com",
         ],
       )
     end

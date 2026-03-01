@@ -13,7 +13,8 @@ class Source::URL::Nijie < Source::URL
   attr_reader :work_id, :user_id
 
   def self.match?(url)
-    url.domain.in?(%w[nijie.net nijie.info])
+    # https://nijie.info/jump.php?https%3A%2F%2Fwww.google.com (handled in Source::URL::URLShortener)
+    url.domain.in?(%w[nijie.net nijie.info]) && !Source::URL::URLShortener.match?(url)
   end
 
   def parse

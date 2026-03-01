@@ -26,6 +26,7 @@ module Source::Tests::URL
       should_not_find_false_positives(
         profile_urls: [
           "https://blog.piapro.net/2024/04/g2404291.html",
+          "https://piapro.jp/jump/?url=https%3A%2F%2Fwww.google.com",
         ],
       )
     end
