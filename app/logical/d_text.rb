@@ -672,6 +672,9 @@ class DText
         hn = element.name
         title = html_to_dtext(element, **options, &block).strip
         "\n\n#{hn}. #{title}\n\n" if title.present?
+      in "iframe"
+        src = element["src"]
+        "\n\n#{src}\n\n" if src.present?
       in "a"
         title = html_to_dtext(element, **options, inline: true, &block).squeeze(" ")
         url = element["href"].to_s

@@ -252,6 +252,10 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal("", DText.from_html('<a href="http://example.com"></a>'))
         assert_equal("", DText.from_html('<a href="http://example.com"> </a>'))
         assert_equal("example", DText.from_html('<a>example</a>'))
+
+        # <small> inside a link should not wrap link text in [tn], since [tn] is invalid inside link text
+        assert_equal('"fascinating":[https://example.com]', DText.from_html('<a href="https://example.com"><small>fascinating</small></a>'))
+        assert_equal('[tn]prefix [/tn]"link":[https://example.com][tn] suffix[/tn]', DText.from_html('<p><small>prefix </small><a href="https://example.com"><small>link</small></a><small> suffix</small></p>'))
       end
 
       should "omit redundant nested formatting tags" do
@@ -359,6 +363,10 @@ class DTextTest < ActiveSupport::TestCase
 
       should "convert <code> tags to DText" do
         assert_equal("foo [code]bar[/code] baz", DText.from_html("<p>foo <code>bar</code> baz</p>"))
+      end
+
+      should "convert <iframe> tags to DText" do
+        assert_equal("https://www.youtube.com/embed/dQw4w9WgXcQ?si=kx95-wHZ-pqFONjj", DText.from_html(%{ <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=kx95-wHZ-pqFONjj">fallback</iframe>}))
       end
     end
 
