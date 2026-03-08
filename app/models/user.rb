@@ -914,11 +914,11 @@ class User < ApplicationRecord
       end
 
       if params[:min_level].present?
-        q = q.where("level >= ?", params[:min_level].to_i)
+        q = q.where(level: params[:min_level].to_i..)
       end
 
       if params[:max_level].present?
-        q = q.where("level <= ?", params[:max_level].to_i)
+        q = q.where(level: ..params[:max_level].to_i)
       end
 
       if params[:is_banned].present?

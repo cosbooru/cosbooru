@@ -87,7 +87,7 @@ module VersionFor
   #
   # The array looks like `[attr, old_value, new_value]`.
   def diff(version = previous_version)
-    versioned_columns.map { |attr| [attr, version&.send(attr), send(attr)] }
+    versioned_columns.index_with { |attr| [version&.send(attr), send(attr)] }
   end
 
   # Revert the model back to this version.

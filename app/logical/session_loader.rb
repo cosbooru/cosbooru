@@ -128,7 +128,7 @@ class SessionLoader
       UserEvent.create_from_request!(user, :failed_reauthenticate, request)
       errors.add(:password, "is incorrect")
       false
-    elsif !user.totp.present? # right password and user doesn't have 2FA
+    elsif user.totp.blank? # right password and user doesn't have 2FA
       UserEvent.create_from_request!(user, :reauthenticate, request)
       session[:last_authenticated_at] = Time.now.utc.inspect
       true
@@ -196,7 +196,7 @@ class SessionLoader
 
   # @return [Boolean] true if the current request has an API key
   def has_api_authentication?
-    request.authorization.present? || params.has_key?(:login) || params.has_key?(:api_key)
+    request.authorization.present? || params.key?(:login) || params.key?(:api_key)
   end
 
   private

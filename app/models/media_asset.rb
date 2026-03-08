@@ -206,7 +206,7 @@ class MediaAsset < ApplicationRecord
       [media_asset, type].hash
     end
 
-    def serializable_hash(*options)
+    def serializable_hash(*_options)
       { type: type, url: file_url, width: width, height: height, file_ext: file_ext }
     end
 
@@ -290,7 +290,7 @@ class MediaAsset < ApplicationRecord
       #
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
-      def upload!(media_file, &)
+      def upload!(media_file, &_block)
         media_file = MediaFile.open(media_file) unless media_file.is_a?(MediaFile)
 
         media_asset = create!(file: media_file, status: :processing)

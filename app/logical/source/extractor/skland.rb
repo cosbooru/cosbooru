@@ -95,7 +95,7 @@ class Source::Extractor::Skland < Source::Extractor
   end
 
   memoize def article
-    api_response.dig(:data, :list, 0) || {}
+    api_response[:data] || {}
   end
 
   memoize def api_response

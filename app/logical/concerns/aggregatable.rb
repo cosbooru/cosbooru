@@ -121,8 +121,12 @@ module Aggregatable
 
   def build_dataframe(query, groups)
     results = query.select_all
-    types = results.columns.map { |column| [column, :object] }.to_h
-    associations = groups.map { |name| reflections[name.to_s] }.compact_blank
+    types = results.columns.index_with { :object }
+
+    associations = groups.map do |name|
+      name = name.split(".").first if name.include?(".")
+      reflections[name.to_s]
+    end.compact_blank
 
     dataframe = Danbooru::DataFrame.new(results.to_a, types: types)
     dataframe = dataframe.preload_associations(associations)
