@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class WebhooksControllerTest < ActionDispatch::IntegrationTest
   context "The webhooks controller" do

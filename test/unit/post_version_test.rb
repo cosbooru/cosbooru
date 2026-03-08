@@ -1,10 +1,10 @@
-require 'test_helper'
+require "test_helper"
 
 class PostVersionTest < ActiveSupport::TestCase
   context "A post" do
     setup do
       travel_to(1.month.ago) do
-        @user = FactoryBot.create(:user)
+        @user = create(:user)
       end
       CurrentUser.user = @user
     end
@@ -15,7 +15,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
-        @post = FactoryBot.create(:post, :tag_string => "1")
+        @post = create(:post, tag_string: "1")
         travel(2.hours)
         @post.update(tag_string: "1 2")
         travel(2.hours)
@@ -36,7 +36,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has been created" do
       setup do
-        @parent = FactoryBot.create(:post)
+        @parent = create(:post)
         @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com", created_at: 2.hours.ago)
       end
 
@@ -52,7 +52,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that should be merged" do
       setup do
-        @parent = FactoryBot.create(:post)
+        @parent = create(:post)
         @post = create(:post, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
       end
 

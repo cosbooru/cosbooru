@@ -79,7 +79,7 @@ class Ban < ApplicationRecord
   end
 
   def validate_deletions
-    if delete_posts && !post_deletion_reason.present?
+    if delete_posts && post_deletion_reason.blank?
       errors.add(:post_deletion_reason, "is required")
     end
 
@@ -97,7 +97,7 @@ class Ban < ApplicationRecord
   end
 
   def user_name
-    user ? user.name : nil
+    user&.name
   end
 
   def user_name=(username)

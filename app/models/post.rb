@@ -1821,14 +1821,10 @@ class Post < ApplicationRecord
       def search(params, current_user)
         q = search_attributes(
           params,
-          %i[id created_at updated_at rating source pixiv_id fav_count
-             score up_score down_score md5 file_ext file_size image_width
-             image_height tag_count has_children has_active_children
-             is_pending is_flagged is_deleted is_banned
-             last_comment_bumped_at last_commented_at last_noted_at
-             uploader approver parent
-             artist_commentary flags appeals notes comments children
-             approvals replacements media_metadata],
+          %i[id created_at updated_at rating source pixiv_id fav_count score up_score down_score md5 file_ext
+             file_size image_width image_height tag_count has_children has_active_children is_pending is_flagged is_deleted
+             is_banned last_comment_bumped_at last_commented_at last_noted_at uploader approver parent artist_commentary
+             flags appeals notes comments children approvals replacements media_metadata],
           current_user: current_user,
         )
 
@@ -1988,7 +1984,7 @@ class Post < ApplicationRecord
       end
 
       post_edit.invalid_added_tags.each do |tag|
-        tag.errors.messages.each do |_attribute, messages|
+        tag.errors.messages.each_value do |messages|
           warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
         end
       end

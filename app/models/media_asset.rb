@@ -104,8 +104,8 @@ class MediaAsset < ApplicationRecord
       backup_storage_service.delete(file_path)
     end
 
-    def open_file(&)
-      open_file!(&)
+    def open_file(&block)
+      open_file!(&block)
     rescue StandardError
       nil
     end

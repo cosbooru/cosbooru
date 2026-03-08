@@ -218,7 +218,7 @@ class Pool < ApplicationRecord
   end
 
   def cover_post
-    post_count > 0 ? Post.find(post_ids.first) : nil
+    (post_count > 0) ? Post.find(post_ids.first) : nil
   end
 
   def create_version(force = false)

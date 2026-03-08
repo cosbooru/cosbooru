@@ -140,6 +140,7 @@ Rails.application.routes.draw do
   resource :iqdb_queries, :only => [:show, :create] do
     collection do
       get :preview
+      get :check, to: redirect { |_path_params, req| "/iqdb_queries?#{req.query_string}" }
     end
   end
   resources :media_assets, only: [:index, :show, :destroy] do

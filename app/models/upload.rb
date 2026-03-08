@@ -103,11 +103,11 @@ class Upload < ApplicationRecord
           next
         elsif archive.uncompressed_size > MediaAsset::MAX_FILE_SIZE
           errors.add(:base, "'#{filename}' is too large (uncompressed size: #{archive.uncompressed_size.to_fs(:human_size)}; max size: #{MediaAsset::MAX_FILE_SIZE.to_fs(:human_size)})")
-        elsif entry = archive.entries.find { |entry| entry.pathname.starts_with?("/") }
+        elsif (entry = archive.entries.find { |entry| entry.pathname.starts_with?("/") })
           errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' can't start with '/'")
-        elsif entry = archive.entries.find { |entry| entry.directory_traversal? }
+        elsif (entry = archive.entries.find { |entry| entry.directory_traversal? })
           errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' can't contain '..' components")
-        elsif entry = archive.entries.find { |entry| !entry.file? && !entry.directory? }
+        elsif (entry = archive.entries.find { |entry| !entry.file? && !entry.directory? })
           errors.add(:base, "'#{entry.pathname_utf8}' in '#{filename}' isn't a regular file")
         end
       end
@@ -248,7 +248,7 @@ class Upload < ApplicationRecord
 
   # The list of archive files uploaded from disk, with their filenames.
   def archive_files
-    uploaded_files.select do |file, original_filename|
+    uploaded_files.select do |file, _original_filename|
       file.is_a?(Danbooru::Archive)
     end
   end

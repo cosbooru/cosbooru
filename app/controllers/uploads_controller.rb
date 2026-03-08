@@ -2,7 +2,7 @@
 
 class UploadsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :verify_authenticity_token, only: [:create], if: -> { request.xhr? }
 
   def index
     @mode = params.fetch(:mode, "gallery")
