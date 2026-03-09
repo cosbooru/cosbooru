@@ -33,21 +33,33 @@ module Source
       end
 
       def profile_url
-        # We do it like this we can handle users like https://arca.live/u/@크림/55256970 or https://arca.live/u/@Nauju/45320365
-        url = page&.css(".member-info > .user-info > a")&.attr("href")
-        Addressable::URI.join("https://arca.live", CGI.unescape(url)).to_s if url.present?
+        if username.present? && artist_id.present?
+          "https://arca.live/u/@#{username}/#{artist_id}"
+        elsif username.present?
+          "https://arca.live/u/@#{username}"
+        end
       end
 
-      def artist_name
-        page&.css(".member-info > .user-info > a")&.text
+      def page_url
+        channel = api_response["boardSlug"] || parsed_url.channel || parsed_referer&.channel || "breaking"
+        post_id = api_response["id"] || parsed_url.post_id || parsed_referer&.post_id
+        "https://arca.live/b/#{channel}/#{post_id}" if channel.present? && post_id.present?
+      end
+
+      def username
+        api_response["nickname"]
+      end
+
+      def artist_id
+        api_response["publicId"]
       end
 
       def artist_commentary_title
-        page&.css(".title-row > .title")&.children&.last&.text&.strip
+        api_response["title"]
       end
 
       def artist_commentary_desc
-        page&.css(".article-content")&.to_s
+        api_response["content"]
       end
 
       def dtext_artist_commentary_desc

@@ -19,7 +19,7 @@ Rails.application.routes.draw do
   root "posts#index"
 
   namespace :admin do
-    resources :users, :only => [:edit, :update]
+    resources :users, only: [:edit, :update]
   end
   namespace :moderator do
     namespace :post do
@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     end
   end
   namespace :explore do
-    resources :posts, :only => [] do
+    resources :posts, only: [] do
       collection do
         get :popular
         get :viewed
@@ -99,22 +99,22 @@ Rails.application.routes.draw do
       put :cancel
     end
   end
-  resources :dmails, :only => [:new, :create, :update, :index, :show] do
+  resources :dmails, only: [:new, :create, :update, :index, :show] do
     collection do
       get :all
       post :mark_all_as_read
     end
   end
-  resource  :dtext_preview, :only => [:create]
+  resource  :dtext_preview, only: [:create]
   resources :dtext_links, only: [:index]
   resources :emails, only: [:index, :show]
-  resources :favorites, :only => [:index, :create, :destroy]
+  resources :favorites, only: [:index, :create, :destroy]
   resources :favorite_groups do
     member do
       put :add_post
       put :remove_post
     end
-    resource :order, :only => [:edit], :controller => "favorite_group_orders"
+    resource :order, only: [:edit], controller: "favorite_group_orders"
   end
   resources :forum_posts do
     member do
@@ -137,7 +137,7 @@ Rails.application.routes.draw do
   resources :ip_bans, only: [:index, :show, :new, :create, :update]
   resources :ip_addresses, only: [:show], id: /.+?(?=\.json|\.xml|\.html)|.+/
   resources :ip_geolocations, only: [:index]
-  resource :iqdb_queries, :only => [:show, :create] do
+  resource :iqdb_queries, only: [:show, :create] do
     collection do
       get :preview
       get :check, to: redirect { |_path_params, req| "/iqdb_queries?#{req.query_string}" }
@@ -171,7 +171,7 @@ Rails.application.routes.draw do
     get :preview, on: :collection
     post :preview, on: :collection
   end
-  resources :note_versions, :only => [:index, :show]
+  resources :note_versions, only: [:index, :show]
   resource :password_reset, only: [:create, :show, :edit, :update]
   resource :password, only: [:edit, :update]
   resources :pools do
@@ -182,10 +182,10 @@ Rails.application.routes.draw do
     collection do
       get :gallery
     end
-    resource :order, :only => [:edit], :controller => "pool_orders"
+    resource :order, only: [:edit], controller: "pool_orders"
   end
-  resource :pool_element, :only => [:create]
-  resources :pool_versions, :only => [:index] do
+  resource :pool_element, only: [:create]
+  resources :pool_versions, only: [:index] do
     member do
       get :diff
     end
@@ -194,7 +194,7 @@ Rails.application.routes.draw do
     end
   end
   resources :post_events, only: [:index]
-  resources :post_regenerations, :only => [:create]
+  resources :post_regenerations, only: [:create]
   resources :post_replacements, only: [:index, :show, :new, :create, :update]
   resources :post_votes, only: [:index, :show, :create, :destroy]
 
@@ -202,14 +202,7 @@ Rails.application.routes.draw do
   resources :posts, only: [] do
     resources :events, only: [:index], controller: "post_events", as: "post_events"
     resources :favorites, only: [:index, :create, :destroy]
-    resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
-    # resource :ai_metadata, only: [:show] do
-    #  collection { put :create_or_update }
-    #  member do
-    #    put :revert
-    #    put :undo
-    #  end
-    # end
+    resources :replacements, only: [:index, :new, :create], controller: "post_replacements"
     resource :artist_commentary, only: [:show] do
       collection { put :create_or_update }
       member { put :revert }
@@ -222,7 +215,7 @@ Rails.application.routes.draw do
       get :show_seq
       put :mark_as_translated
     end
-    get :similar, :to => "iqdb_queries#index"
+    get :similar, to: "iqdb_queries#index"
   end
   resources :post_appeals
   resources :post_flags
@@ -236,7 +229,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
-  resources :artist_commentaries, :only => [:index, :show] do
+  resources :artist_commentaries, only: [:index, :show] do
     collection do
       put :create_or_update
     end
@@ -244,19 +237,20 @@ Rails.application.routes.draw do
       put :revert
     end
   end
-  resources :artist_commentary_versions, :only => [:index, :show]
+  resources :artist_commentary_versions, only: [:index, :show]
   resources :rate_limits, only: [:index]
-  resource :related_tag, :only => [:show, :update]
+  resources :reactions, only: [:index, :show, :create, :destroy]
+  resource :related_tag, only: [:show, :update]
   resources :recommended_posts, only: [:index]
   resources :reports, only: [:index, :show]
   resources :robots, only: [:index]
-  resources :saved_searches, :except => [:show]
+  resources :saved_searches, except: [:show]
   resource :session, only: [:new, :create, :destroy] do
     post :verify_totp, on: :collection
     post :reauthenticate, on: :collection
     get :confirm_password, on: :collection
   end
-  resource :source, :only => [:show]
+  resource :source, only: [:show]
   resource :status, only: [:show], controller: "status"
   resource :stats, only: [:show], controller: "statistics" do
     collection do

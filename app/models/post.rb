@@ -79,23 +79,23 @@ class Post < ApplicationRecord
   after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
-  belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
+  belongs_to :uploader, class_name: "User", counter_cache: "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true, autosave: true
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5, inverse_of: :post
   has_one :media_metadata, through: :media_asset
-  has_one :artist_commentary, :dependent => :destroy
+  has_one :artist_commentary, dependent: :destroy
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
   has_one :favorite_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "Favorite"
-  has_many :flags, :class_name => "PostFlag", :dependent => :destroy
-  has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
-  has_many :votes, :class_name => "PostVote", :dependent => :destroy
-  has_many :notes, :dependent => :destroy
-  has_many :comments, :dependent => :destroy
-  has_many :children, -> {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
-  has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
-  has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
+  has_many :flags, class_name: "PostFlag", dependent: :destroy
+  has_many :appeals, class_name: "PostAppeal", dependent: :destroy
+  has_many :votes, class_name: "PostVote", dependent: :destroy
+  has_many :notes, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_many :children, -> { order("posts.id") }, class_name: "Post", foreign_key: "parent_id"
+  has_many :approvals, class_name: "PostApproval", dependent: :destroy
+  has_many :disapprovals, class_name: "PostDisapproval", dependent: :destroy
   has_many :favorites, dependent: :destroy
-  has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
+  has_many :replacements, class_name: "PostReplacement", dependent: :destroy
   has_many :ai_tags, through: :media_asset
   has_many :events, class_name: "PostEvent"
   has_many :mod_actions, as: :subject, dependent: :destroy

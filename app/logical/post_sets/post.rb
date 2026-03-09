@@ -13,6 +13,7 @@ module PostSets
     MAX_WILDCARD_TAGS = PostQueryBuilder::MAX_WILDCARD_TAGS
 
     attr_reader :current_user, :page, :format, :tag_string, :post_query, :normalized_query, :show_votes, :add_extra_data_attributes
+
     delegate :tag, to: :post_query
     alias_method :show_votes?, :show_votes
     alias_method :add_extra_data_attributes?, :add_extra_data_attributes
@@ -79,7 +80,7 @@ module PostSets
     end
 
     def has_explicit?
-      posts.any? {|x| x.rating == "e"}
+      posts.any? { |x| x.rating == "e" }
     end
 
     def niche_posts
@@ -191,7 +192,7 @@ module PostSets
       end
 
       def saved_search_tags
-        searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+        searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map { |x| "search:#{x}" }
         searches.take(MAX_SIDEBAR_TAGS)
       end
     end
