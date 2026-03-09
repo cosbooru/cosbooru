@@ -10,6 +10,20 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: btree_gin; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
+
+
+--
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -2135,7 +2149,7 @@ CREATE TABLE public.upload_media_assets (
     source_url character varying DEFAULT ''::character varying NOT NULL,
     error character varying,
     page_url character varying,
-    user_id integer
+    user_id integer NOT NULL
 );
 
 
@@ -5856,31 +5870,73 @@ CREATE INDEX index_tags_on_word_initials ON public.tags USING gin (public.array_
 
 
 --
--- Name: index_upload_media_assets_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_upgrade_codes_on_code; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_upload_media_assets_on_media_asset_id ON public.upload_media_assets USING btree (media_asset_id);
-
-
---
--- Name: index_upload_media_assets_on_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upload_media_assets_on_status ON public.upload_media_assets USING btree (status);
+CREATE UNIQUE INDEX index_upgrade_codes_on_code ON public.upgrade_codes USING btree (code);
 
 
 --
--- Name: index_upload_media_assets_on_upload_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_upgrade_codes_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_assets USING btree (upload_id);
+CREATE INDEX index_upgrade_codes_on_creator_id ON public.upgrade_codes USING btree (creator_id);
+
+
+--
+-- Name: index_upgrade_codes_on_redeemer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_redeemer_id ON public.upgrade_codes USING btree (redeemer_id) WHERE (redeemer_id IS NOT NULL);
+
+
+--
+-- Name: index_upgrade_codes_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_status ON public.upgrade_codes USING btree (status);
+
+
+--
+-- Name: index_upgrade_codes_on_user_upgrade_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upgrade_codes_on_user_upgrade_id ON public.upgrade_codes USING btree (user_upgrade_id) WHERE (user_upgrade_id IS NOT NULL);
+
+
+--
+-- Name: index_upload_media_assets_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id ON public.upload_media_assets USING btree (user_id);
+
+
+--
+-- Name: index_upload_media_assets_on_user_id_and_source_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id_and_source_url ON public.upload_media_assets USING gin (user_id, source_url public.gin_trgm_ops);
 
 
 --
 -- Name: index_uploads_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_uploads_on_created_at ON public.uploads USING btree (created_at);
+CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_assets USING btree (upload_id);
+
+
+--
+-- Name: index_upload_media_assets_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id ON public.upload_media_assets USING btree (user_id);
+
+
+--
+-- Name: index_upload_media_assets_on_user_id_and_source_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_user_id_and_source_url ON public.upload_media_assets USING gin (user_id, source_url public.gin_trgm_ops);
 
 
 --
@@ -5894,7 +5950,7 @@ CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE 
 -- Name: index_uploads_on_is_deleted; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_uploads_on_is_deleted ON public.uploads USING btree (is_deleted) WHERE (is_deleted = true);
+CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
 
 
 --
@@ -5902,20 +5958,6 @@ CREATE INDEX index_uploads_on_is_deleted ON public.uploads USING btree (is_delet
 --
 
 CREATE INDEX index_uploads_on_media_asset_count ON public.uploads USING btree (media_asset_count);
-
-
---
--- Name: index_uploads_on_referer_url; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_referer_url ON public.uploads USING btree (referer_url);
-
-
---
--- Name: index_uploads_on_source; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_source ON public.uploads USING btree (source);
 
 
 --
@@ -5930,6 +5972,20 @@ CREATE INDEX index_uploads_on_uploader_id ON public.uploads USING btree (uploade
 --
 
 CREATE INDEX index_uploads_on_uploader_id_and_created_at_and_id ON public.uploads USING btree (uploader_id, created_at, id);
+
+
+--
+-- Name: index_uploads_on_uploader_id_and_referer_url; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_uploader_id_and_referer_url ON public.uploads USING gin (uploader_id, referer_url public.gin_trgm_ops);
+
+
+--
+-- Name: index_uploads_on_uploader_id_and_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_uploader_id_and_source ON public.uploads USING gin (uploader_id, source public.gin_trgm_ops);
 
 
 --
@@ -6882,6 +6938,22 @@ ALTER TABLE ONLY public.uploads
 
 
 --
+-- Name: upgrade_codes fk_rails_d5a4e5e1a6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upgrade_codes
+    ADD CONSTRAINT fk_rails_d5a4e5e1a6 FOREIGN KEY (creator_id) REFERENCES public.users(id);
+
+
+--
+-- Name: upload_media_assets fk_rails_d61d4a2ba9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets
+    ADD CONSTRAINT fk_rails_d61d4a2ba9 FOREIGN KEY (user_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: tag_implications fk_rails_dba2c19f93; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6984,6 +7056,7 @@ ALTER TABLE ONLY public.upload_media_assets
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260309181625'),
 ('20260309171518'),
 ('20250720155738'),
 ('20250718142035'),
