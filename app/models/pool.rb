@@ -114,7 +114,8 @@ class Pool < ApplicationRecord
   end
 
   def versions
-    PoolVersion.where(pool_id: id).order("id asc")
+    raise NotImplementedError, "Archive service not configured" unless PoolVersion.enabled?
+    PoolVersion.where(pool_id: id).order(:id)
   end
 
   def is_series?

@@ -27,7 +27,9 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name_matches: "smiling beauty").with { @mod_favgroup }
 
       should respond_to_search(creator_name: -> { @mod_favgroup.creator.name }).with { @mod_favgroup }
-      should respond_to_search(creator: {level: User::Levels::MEMBER}).with { @favgroup }
+      should respond_to_search(creator: { level: User::Levels::MEMBER }).with { @favgroup }
+
+      should respond_to_search(is_public: "false").as_user { @private_favgroup.creator }.with { @private_favgroup }
     end
 
     context "show action" do
@@ -61,7 +63,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "update posts" do
         @posts = create_list(:post, 2)
-        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { name: "foo", post_ids: @posts.map(&:id).join(" ") } }
+        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { name: "foo", post_ids: @posts.map(&:id).join(" ") }}
 
         assert_redirected_to @favgroup
         assert_equal("foo", @favgroup.reload.name)
@@ -69,7 +71,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow users to update favgroups belonging to other users" do
-        put_auth favorite_group_path(@favgroup), create(:user), params: { favorite_group: { name: "foo" } }
+        put_auth favorite_group_path(@favgroup), create(:user), params: { favorite_group: { name: "foo" }}
 
         assert_response 403
         assert_not_equal("foo", @favgroup.reload.name)
@@ -91,7 +93,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     context "add_post action" do
       should "render" do
         @post = create(:post)
-        put_auth add_post_favorite_group_path(@favgroup), @user, params: {post_id: @post.id, format: "js"}
+        put_auth add_post_favorite_group_path(@favgroup), @user, params: { post_id: @post.id, format: "js" }
 
         assert_response :success
         assert_equal([@post.id], @favgroup.reload.post_ids)
@@ -99,7 +101,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
 
       should "not add posts to favgroups belonging to other users" do
         @post = create(:post)
-        put_auth add_post_favorite_group_path(@favgroup), create(:user), params: {post_id: @post.id, format: "js"}
+        put_auth add_post_favorite_group_path(@favgroup), create(:user), params: { post_id: @post.id, format: "js" }
 
         assert_response 403
         assert_equal([], @favgroup.reload.post_ids)
