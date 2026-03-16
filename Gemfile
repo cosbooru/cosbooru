@@ -55,7 +55,7 @@ gem "sentry-rails"
 
 group :discord do
   gem "discordrb"
-  gem "terminal-table", "~> 3.0"
+  gem "terminal-table"
 end
 gem "drb"
 gem "net-sftp"
