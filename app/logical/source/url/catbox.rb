@@ -2,6 +2,8 @@
 
 module Source
   class URL::Catbox < Source::URL
+    site "Catbox", url: "https://catbox.moe", domains: %w[catbox.moe]
+
     attr_reader :file_id, :service
 
     def self.match?(url)

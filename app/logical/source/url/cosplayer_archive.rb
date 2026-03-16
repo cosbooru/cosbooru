@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::CosplayerArchive < Source::URL
+  site "Cosplayers Archive", url: "https://cosp.jp", domains: %w[cosp.jp]
+
   attr_reader :user_id, :image_id, :image_server
 
   def self.match?(url)

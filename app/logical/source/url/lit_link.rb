@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Source::URL::LitLink < Source::URL
+  site "LitLink", url: "https://lit.link", domains: %w[lit.link]
+
   def self.match?(url)
     url.domain == "lit.link"
   end
