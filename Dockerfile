@@ -143,7 +143,7 @@ FROM build-base AS build-ffmpeg
 ARG FFMPEG_VERSION
 ARG FFMPEG_BUILD_DEPS="nasm libx264-dev libx265-dev libsvtav1enc-dev libvpx-dev libdav1d-dev zlib1g-dev openssl libssl-dev"
 ARG FFMPEG_BUILD_OPTIONS="\
-  --disable-ffplay --enable-network --enable-openssl --disable-doc --disable-static --enable-shared --enable-gpl \
+  --disable-ffplay --enable-network --enable-openssl --enable-version3 --disable-doc --disable-static --enable-shared --enable-gpl \
   --enable-libx264 --enable-libx265 --enable-libsvtav1 --enable-libvpx --enable-libdav1d --enable-zlib \
   --disable-muxers \
     --enable-muxer=mp4 --enable-muxer=webm --enable-muxer=matroska --enable-muxer=image2 --enable-muxer=null \
