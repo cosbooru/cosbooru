@@ -5,6 +5,8 @@ class SearchableTest < ActiveSupport::TestCase
     subject { Post }
 
     setup do
+      @user = create(:user)
+      CurrentUser.user = @user
       @p1 = create(:post, source: "a1", score: 1, is_deleted: true)
       @p2 = create(:post, source: "b2", score: 2, is_deleted: false)
       @p3 = create(:post, source: "c3", score: 3, is_deleted: false)

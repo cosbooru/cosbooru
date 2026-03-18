@@ -791,7 +791,7 @@ class Post < ApplicationRecord
     def update_parent_on_save
       return unless saved_change_to_parent_id? || saved_change_to_is_deleted?
 
-      parent.update_has_children_flag if parent.present?
+      parent.presence&.update_has_children_flag
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     rescue StandardError
       # XXX Silently ignore errors so that the edit doesn't fail. We can't let

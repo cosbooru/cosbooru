@@ -114,7 +114,6 @@ class Pool < ApplicationRecord
   end
 
   def versions
-    raise NotImplementedError, "Archive service not configured" unless PoolVersion.enabled?
     PoolVersion.where(pool_id: id).order(:id)
   end
 
@@ -241,7 +240,6 @@ class Pool < ApplicationRecord
     prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
   end
 
-
   def merge_version
     subject = versions.last
     prev = subject.previous
@@ -263,7 +261,7 @@ class Pool < ApplicationRecord
       is_active: is_active?,
       is_deleted: is_deleted?,
       category: category,
-      )
+    )
   end
 
   def calculate_version
