@@ -43,5 +43,6 @@ Cookie.unescape = function(val) {
 
 Cookie.getItem = Cookie.get;
 Cookie.setItem = Cookie.put;
+Cookie.removeItem = Cookie.remove;
 
 export default Cookie
