@@ -6,6 +6,8 @@ class WebhooksController < ApplicationController
   rescue_with DiscordSlashCommand::WebhookVerificationError, status: 401
 
   def receive
+    skip_authorization
+
     case params[:source]
     when "discord"
       json = DiscordSlashCommand.receive_webhook(request)
