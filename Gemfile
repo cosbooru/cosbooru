@@ -63,7 +63,7 @@ gem "rbnacl"
 gem "x25519"
 gem "ed25519"
 gem "bcrypt_pbkdf"
-gem "connection_pool", "~> 2.5"
+gem "connection_pool"
 gem "rotp"
 gem "rqrcode"
 gem "kramdown"
@@ -102,4 +102,5 @@ group :test do
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"
+  gem "testcontainers-core", require: false
 end
