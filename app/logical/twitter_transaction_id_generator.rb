@@ -102,7 +102,11 @@ class TwitterTransactionIdGenerator
 
   # @return [String] The Javascript file for the transaction ID generator (used to extract some magic values).
   memoize def on_demand_js
-    id = homepage&.at('script[text()*="__SCRIPTS_LOADED__"]')&.text&.slice(/"ondemand\.s":"(\h*)"/, 1)
+    script = homepage&.at('script[text()*="__SCRIPTS_LOADED__"]')&.text
+    ondemand_pos = script.index('"ondemand.s"')
+    ondemand_start = script.rindex(",", ondemand_pos)
+    key = script[ondemand_start+1...ondemand_pos-1]
+    id = script.slice(/#{key}:"(\h*)"/, 1)
     url = "https://abs.twimg.com/responsive-web/client-web/ondemand.s.#{id}a.js"
     http.cache(1.minute).get(url)&.to_s
   end
