@@ -58,4 +58,9 @@ class Source::Extractor::DcInside < Source::Extractor
   memoize def page
     http.cache(1.minute).parsed_get(page_url)
   end
+
+  def http_downloader
+    # downloads are prone to being interrupted, especially for large files
+    super.use(retriable: { max_retries: 10 }).headers(Referer: "https://gall.dcinside.com/")
+  end
 end
