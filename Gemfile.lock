@@ -551,6 +551,7 @@ GEM
     stackprof (0.2.27)
     stringio (3.1.7)
     terminal-table (4.0.0)
+      unicode-display_width (>= 1.1.1, < 4)
     testcontainers-core (0.2.0)
       docker-api (~> 2.2)
       unicode-display_width (>= 1.1.1, < 4)
