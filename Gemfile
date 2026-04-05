@@ -10,8 +10,7 @@ gem "ruby-vips"
 gem "diff-lcs", require: false
 gem "bcrypt", require: "bcrypt"
 gem "responders"
-gem "dtext_rb", require: "dtext"
-# gem 'dtext_rb', path: "lib/dtext_rb", require: "dtext"
+gem "dtext_rb", path: "lib/dtext_rb", require: "dtext"
 gem "memoist"
 gem "daemons"
 gem "bootsnap", require: false
