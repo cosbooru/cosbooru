@@ -24,8 +24,10 @@
 # @see https://github.com/puma/puma/blob/319f84db13ee59f7b24885cec686d5c714998a4c/lib/puma/configuration.rb#L188 (default options)
 # @see https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server
 
+# The Rails environment the app will run in. Defaults to development.
+rails_env = ENV.fetch("RAILS_ENV", "development")
+
 # The server port or listening address. Default is http://0.0.0.0:3000.
-# Changed this from port 3000 to 3001
 if ENV.key?("PUMA_PORT")
   port ENV["PUMA_PORT"]
 elsif ENV.key?("PUMA_BIND")
@@ -80,18 +82,10 @@ persistent_timeout ENV.fetch("PUMA_PERSISTENT_TIMEOUT", 65).to_i
 first_data_timeout 30
 
 # The `environment` that Puma will run in.
-environment ENV.fetch("RAILS_ENV", "development")
+environment rails_env
 
 # The `pidfile` that Puma will use.
 pidfile ENV.fetch("PUMA_PIDFILE", "tmp/pids/server.pid")
-
-# Use the `preload_app!` method when specifying a `workers` number.
-# This directive tells Puma to first boot the application and load code
-# before forking the application. This takes advantage of Copy On Write
-# process behavior so workers use less memory.
-if ENV["RAILS_ENV"] == "production"
-  preload_app!
-end
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart

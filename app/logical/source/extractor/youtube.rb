@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require "shellwords"
-
 # @see Source::URL::Youtube
 class Source::Extractor::Youtube < Source::Extractor
-
   class Error < StandardError; end
 
   def image_urls
@@ -37,7 +34,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def display_name
-    if video?
+    if video.present?
       video[:channel] || video[:uploader]
     else
       community_post.dig("authorText", "runs", 0, "text")
@@ -49,9 +46,9 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def tags
-    if video?
+    if video.present?
       video[:tags].map do |tag|
-        [ tag, "https://www.youtube.com/#{tag}"]
+        [tag, "https://www.youtube.com/#{tag}"]
       end
     else
       community_post.dig(:contentText, :runs).to_a.filter_map do |run|
@@ -64,11 +61,11 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def artist_commentary_title
-    video[:title] if video?
+    video[:title] if video.present?
   end
 
   def artist_commentary_desc
-    if video?
+    if video.present?
       video[:description]
     else
       community_post[:contentText]&.to_json
@@ -76,7 +73,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def dtext_artist_commentary_desc
-    if video?
+    if video.present?
       DText.from_plaintext(video[:description])
     else
       DText.from_html(html_artist_commentary_desc, base_url: "https://www.youtube.com")
@@ -100,9 +97,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def download_file!(url)
-    if !video?
-      return super(url)
-    end
+    return super unless video.present?
 
     ext = validate_codecs!
 
@@ -114,9 +109,9 @@ class Source::Extractor::Youtube < Source::Extractor
       "-i", video.dig(:audio, :url).to_s,
       "-c", "copy", "-y",
       "-fflags", "+bitexact",
-      res.path.to_s
+      res.path.to_s,
     ]
-    
+
     ffmpeg_out, status = Open3.capture2e(*cmd)
     raise Error, "ffmpeg failed: #{ffmpeg_out}" unless status.success?
 
@@ -133,7 +128,7 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   def channel_id
-    if video?
+    if video.present?
       video[:channel_id]
     else
       parsed_url.try(:channel_id) || parsed_referer.try(:channel_id) || community_post.dig("authorEndpoint", "browseEndpoint", "browseId")
@@ -142,7 +137,7 @@ class Source::Extractor::Youtube < Source::Extractor
 
   def handle
     # "/@Mirae_Somang" -> "Mirae_Somang"
-    if video?
+    if video.present?
       video[:uploader_id]&.delete_prefix("@")
     else
       parsed_url.try(:handle) || parsed_referer.try(:handle) || community_post.dig("authorEndpoint", "browseEndpoint", "canonicalBaseUrl")&.delete_prefix("/@")
@@ -187,7 +182,11 @@ class Source::Extractor::Youtube < Source::Extractor
   end
 
   memoize def video
-    YtClient.new.info(:youtube, parsed_url.video_id) if video?
+    if video?
+      YtClient.new.info(:youtube, parsed_url.video_id)
+    else
+      {}
+    end
   end
 
   memoize def community_post

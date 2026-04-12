@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 # API client for the internal yt-dlp client
-# 
+#
 # @see https://github.com/cosbooru/yt-client
 
 class YtClient
+  class Error < StandardError; end
+
   attr_reader :yt_client_url, :http
 
   # Create a new YT API client.
