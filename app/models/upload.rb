@@ -41,7 +41,7 @@ class Upload < ApplicationRecord
   scope :undeleted, -> { where(is_deleted: false) }
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
     else
       where(uploader: user)
