@@ -60,10 +60,11 @@ Rails.application.load_seed
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include FactoryBot::Syntax::Methods
-  include ReportbooruHelper
   include AutotaggerHelper
+  include BulkUpdateRequestTestHelper
   include DatabaseTestHelper
   include IqdbTestHelper
+  include ReportbooruHelper
   include UploadTestHelper
   include UrlTestHelper
   extend NormalizeAttributeHelper
