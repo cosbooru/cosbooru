@@ -27,3 +27,6 @@ lib/dtext_rb/ext/dtext/Makefile
 lib/dtext_rb/ext/dtext/dtext.cpp
 *.pem
 notes.md
+
+# devcontainer features lock
+.devcontainer/devcontainer-lock.json
