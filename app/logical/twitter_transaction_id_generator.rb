@@ -71,7 +71,7 @@ class TwitterTransactionIdGenerator
     return nil unless animation_key.present?
 
     time_delta = (((time.to_f * 1000) - (1_682_924_400 * 1000)) / 1000).floor
-    time_delta_bytes = (0..3).map { |i| ((time_delta >> (i * 8)) & 0xFF) }
+    time_delta_bytes = (0..3).map { |i| (time_delta >> (i * 8)) & 0xFF }
 
     # An easter egg from Twitter; "obfio" is the guy who originally reversed engineered this (see https://github.com/obfio, https://antibot.blog).
     keyword = "obfiowerehiring"
@@ -97,7 +97,7 @@ class TwitterTransactionIdGenerator
       "X-Twitter-Client-Language": "en",
     }
 
-    http.cache(1.minute).headers(headers).parsed_get("https://x.com")
+    http.cache(1.minute).headers(headers).parsed_get("https://x.com/home")
   end
 
   # @return [String] The Javascript file for the transaction ID generator (used to extract some magic values).
@@ -105,7 +105,7 @@ class TwitterTransactionIdGenerator
     script = homepage&.at('script[text()*="__SCRIPTS_LOADED__"]')&.text
     ondemand_pos = script.index('"ondemand.s"')
     ondemand_start = script.rindex(",", ondemand_pos)
-    key = script[ondemand_start+1...ondemand_pos-1]
+    key = script[ondemand_start + 1...ondemand_pos - 1]
     id = script.slice(/#{key}:"(\h*)"/, 1)
     url = "https://abs.twimg.com/responsive-web/client-web/ondemand.s.#{id}a.js"
     http.cache(1.minute).get(url)&.to_s
