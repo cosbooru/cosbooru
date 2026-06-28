@@ -5877,41 +5877,6 @@ CREATE INDEX index_tags_on_word_initials ON public.tags USING gin (public.array_
 
 
 --
--- Name: index_upgrade_codes_on_code; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_upgrade_codes_on_code ON public.upgrade_codes USING btree (code);
-
-
---
--- Name: index_upgrade_codes_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_creator_id ON public.upgrade_codes USING btree (creator_id);
-
-
---
--- Name: index_upgrade_codes_on_redeemer_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_redeemer_id ON public.upgrade_codes USING btree (redeemer_id) WHERE (redeemer_id IS NOT NULL);
-
-
---
--- Name: index_upgrade_codes_on_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_status ON public.upgrade_codes USING btree (status);
-
-
---
--- Name: index_upgrade_codes_on_user_upgrade_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upgrade_codes_on_user_upgrade_id ON public.upgrade_codes USING btree (user_upgrade_id) WHERE (user_upgrade_id IS NOT NULL);
-
-
---
 -- Name: index_upload_media_assets_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5933,28 +5898,7 @@ CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_asset
 
 
 --
--- Name: index_upload_media_assets_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upload_media_assets_on_user_id ON public.upload_media_assets USING btree (user_id);
-
-
---
--- Name: index_upload_media_assets_on_user_id_and_source_url; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_upload_media_assets_on_user_id_and_source_url ON public.upload_media_assets USING gin (user_id, source_url public.gin_trgm_ops);
-
-
---
 -- Name: index_uploads_on_error; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
-
-
---
--- Name: index_uploads_on_is_deleted; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
@@ -6942,14 +6886,6 @@ ALTER TABLE ONLY public.favorites
 
 ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT fk_rails_d29b037216 FOREIGN KEY (uploader_id) REFERENCES public.users(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: upgrade_codes fk_rails_d5a4e5e1a6; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.upgrade_codes
-    ADD CONSTRAINT fk_rails_d5a4e5e1a6 FOREIGN KEY (creator_id) REFERENCES public.users(id);
 
 
 --
