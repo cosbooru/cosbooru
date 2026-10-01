@@ -97,7 +97,7 @@ class TwitterTransactionIdGenerator
       "X-Twitter-Client-Language": "en",
     }
 
-    http.cache(1.minute).headers(headers).parsed_get("https://x.com/home")
+    http.cache(1.minute).headers(headers).parsed_get("https://x.com/i/jf/")
   end
 
   # @return [String] The Javascript file for the transaction ID generator (used to extract some magic values).
