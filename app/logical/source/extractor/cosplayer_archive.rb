@@ -70,12 +70,12 @@ class Source::Extractor::CosplayerArchive < Source::Extractor
 
     page.search("a[href^='/photo_search.aspx?']").flat_map do |a|
       uri = URI(a[:href])
-      params = CGI.parse(uri.query)
+      params = URI.decode_www_form(uri.query).to_h
       params.map do |key, values|
         next unless %w[n2 n3 n4 n5 n6 n10].include?(key)
         [
           a.text.strip,
-          "https://cosp.jp#{a[:href]}"
+          "https://cosp.jp#{a[:href]}",
         ]
       end
     end.compact
