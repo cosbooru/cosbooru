@@ -65,7 +65,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def validate_domain
-    errors.add(:address, "has an invalid domain") if address.match?(BANNED_DOMAIN_REGEX)
+    errors.add(:address, "has an invalid domain") if address&.match?(BANNED_DOMAIN_REGEX)
   end
 
   def validate_deliverable
